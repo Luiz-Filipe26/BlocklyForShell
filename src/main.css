@@ -1,0 +1,113 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f0f2f5;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    background-color: #0066CC;
+    padding: 15px 20px;
+    text-align: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.main-header h1 {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.main-container {
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+
+#blockly-area {
+    flex: 1;
+    height: 100%;
+    border-right: 2px solid #ccc;
+}
+
+.sidebar {
+    width: 350px;
+    height: 100%;
+    background-color: #e9ecef;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.panel {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.panel h2 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+pre {
+    background-color: #212529;
+    color: #f8f9fa;
+    font-family: "SF Mono", "Consolas", "Liberation Mono", Menlo, monospace;
+    padding: 10px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 100px;
+    font-size: 0.9em;
+}
+
+#action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#action-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#run-btn {
+    background-color: #28a745;
+    color: white;
+}
+#run-btn:hover {
+    background-color: #218838;
+}
+
+#clear-btn {
+    background-color: #dc3545;
+    color: white;
+}
+#clear-btn:hover {
+    background-color: #c82333;
+}

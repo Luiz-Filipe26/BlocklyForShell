@@ -10,13 +10,13 @@ const pageElements = {
     clearBtn: document.getElementById("clear-btn"),
 };
 
-const LS_COLOR = "#5b80a5";
 const OPTION_COLOR = "#7fbf7f";
 const OPERAND_COLOR = "#a67f5f";
 const GRID_BACKGROUND_COLOR = "#ccc";
 
 const ls_definition = {
     command: "ls",
+    name: "ls",
     description:
         "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
     color: "#5b80a5",
@@ -70,95 +70,37 @@ const ls_definition = {
 
     operands: [
         {
-            name: "CAMINHO",
-            description:
-                "O arquivo ou diretório a ser listado. Se omitido, usa o diretório atual.",
-            type: "path",
-            cardinality: {
-                min: 0,
-                max: "unlimited", // Permite 'ls', 'ls /etc', 'ls /etc /home', etc.
-            },
-            validation: [
+            name: "file",
+            description: "Um arquivo específico a ser listado.",
+            type: "file",
+            defaultValue: "arquivo.txt",
+            cardinality: { min: 0, max: "unlimited" },
+            validations: [
                 {
-                    regex: "^[^;\\0]*$", // Exemplo: não pode conter ';' ou o byte nulo
-                    errorMessage: "O caminho contém caracteres inválidos.",
+                    regex: "^[^/\\0;]*$",
+                    errorMessage: "Nome de arquivo inválido (não pode conter '/').",
+                },
+            ],
+        },
+        {
+            name: "folder",
+            description:
+                "Um diretório a ser listado. Se omitido, usa o diretório atual.",
+            type: "folder",
+            defaultValue: ".",
+            cardinality: { min: 0, max: "unlimited" },
+            validations: [
+                {
+                    regex: "^[^;\\0]*$",
+                    errorMessage: "Caminho de pasta contém caracteres inválidos.",
                 },
             ],
         },
     ],
 };
 
-const cli_definitions = { commands: [ls_definition] };
-
-function createToolBoxContentsFromDefininion(definition) {
-    if (!definition || !Array.isArray(definition))
-        showToast("Não foi provido lista de definições de CLI");
-
-    Blockly.Blocks[definition.command] = {
-        init: function() {
-            this.appendDummyInput().appendField(definition.command);
-            this.appendStatementInput("OPTIONS")
-                .setCheck(`${definition.command}_Option`)
-                .appendField("Opções:");
-            this.appendStatementInput("OPERANDS")
-                .setCheck(`${definition.command}_Operand`)
-                .appendField("Operandos:");
-            this.setPreviousStatement(true);
-            this.setNextStatement(true);
-            this.setColour(definition.color);
-            this.setTooltip(definition.description);
-
-            this.setOnChange(() => {
-                const firstOption = this.getInputTargetBlock("OPTIONS");
-                if (!firstOption) return;
-                const blocksList = getBlocksList(firstOption).filter(
-                    (block) => block.type === `${definition.command}_option`,
-                );
-                unplugDuplicatesFromList(blocksList, (block) =>
-                    block.getFieldValue("FLAG"),
-                );
-            });
-        },
-    };
-
-    Blockly.Blocks[`${definition.command}_option`] = {
-        init: function() {
-            this.appendDummyInput().appendField(
-                new Blockly.FieldDropdown([
-                    ["-a (inclui ocultos)", "-a"],
-                    ["-l (detalhado)", "-l"],
-                    ["-h (human readable)", "-h"],
-                    ["-r (ordem reversa)", "-r"],
-                    ["-t (por tempo)", "-t"],
-                    ["-S (por tamanho)", "-S"],
-                    ["-R (recursivo)", "-R"],
-                ]),
-                "FLAG",
-            );
-            this.setPreviousStatement(true, "Option");
-            this.setNextStatement(true, "Option");
-            this.setColour(OPTION_COLOR);
-            this.setTooltip(
-                "Opção (flag) para ls. Pode ser encadeada com outras opções.",
-            );
-        },
-    };
-
-    const blockContent = (type) => ({ kind: "block", type: type });
-    return definition.map((def) => ({
-        name: def.command,
-        colour: def.color,
-        contents: [
-            blockContent(def.name),
-            blockContent(`${def.name}"_option`),
-            ...def.operands.map((operand) =>
-                blockContent(`${def.name}_${operand.name}_${operand}`),
-            ),
-        ],
-    }));
-}
-
-const workspace = Blockly.inject(pageElements.blocklyArea, getBlocklyOptions());
+//TODO: diferenciar um name (apresentável) de um id (técnico interno) no JSON para operands
+const global_cli_definitions = { commands: [ls_definition] };
 
 function showToast(message, duration = 1500) {
     const toast = document.createElement("div");
@@ -208,118 +150,108 @@ function unplugDuplicatesFromList(blocks, valueFn) {
     }
 }
 
-Blockly.Blocks["ls"] = {
-    init: function() {
-        this.appendDummyInput().appendField("ls");
-        this.appendStatementInput("OPTIONS")
-            .setCheck("Option")
-            .appendField("Opções:");
-        this.appendStatementInput("OPERANDS")
-            .setCheck("Operand")
-            .appendField("Operandos:");
-        this.setPreviousStatement(true);
-        this.setNextStatement(true);
-        this.setColour(LS_COLOR);
-        this.setTooltip(
-            'Bloco ls — arraste blocos de opção na caixa "Opções" e operandos na caixa "Operandos".',
-        );
+function createBlocksFromDefinition(definition) {
+    Blockly.Blocks[definition.command] = {
+        init: function() {
+            this.appendDummyInput().appendField(definition.command);
+            this.appendStatementInput("OPTIONS")
+                .setCheck(`${definition.command}_Option`)
+                .appendField("Opções:");
+            this.appendStatementInput("OPERANDS")
+                .setCheck(`${definition.command}_Operand`)
+                .appendField("Operandos:");
+            this.setPreviousStatement(true, "command");
+            this.setNextStatement(true, "command");
+            this.setColour(definition.color);
+            this.setTooltip(definition.description);
 
-        this.setOnChange(() => {
-            const firstOption = this.getInputTargetBlock("OPTIONS");
-            if (!firstOption) return;
-            const blocksList = getBlocksList(firstOption).filter(
-                (block) => block.type === "ls_option",
+            this.setOnChange(() => {
+                const firstOption = this.getInputTargetBlock("OPTIONS");
+                if (!firstOption) return;
+                const blocksList = getBlocksList(firstOption).filter(
+                    (block) => block.type === `${definition.command}_option`,
+                );
+                unplugDuplicatesFromList(blocksList, (block) =>
+                    block.getFieldValue("FLAG"),
+                );
+            });
+        },
+    };
+
+    Blockly.Blocks[`${definition.command}_option`] = {
+        init: function() {
+            this.appendDummyInput().appendField(
+                new Blockly.FieldDropdown(
+                    definition.options.map((option) => [
+                        option.description,
+                        `${option.flag} | ${option.longFlag}`,
+                    ]),
+                ),
+                "FLAG",
             );
-            unplugDuplicatesFromList(blocksList, (block) =>
-                block.getFieldValue("FLAG"),
+            this.setPreviousStatement(true, `${definition.name}_Option`);
+            this.setNextStatement(true, `${definition.name}_Option`);
+            this.setColour(OPTION_COLOR);
+            this.setTooltip(
+                `Opção (flag) para ${definition.name}. Pode ser encadeada com outras opções.`,
             );
-        });
-    },
-};
+        },
+    };
 
-Blockly.Blocks["ls_option"] = {
-    init: function() {
-        this.appendDummyInput().appendField(
-            new Blockly.FieldDropdown([
-                ["-a (inclui ocultos)", "-a"],
-                ["-l (detalhado)", "-l"],
-                ["-h (human readable)", "-h"],
-                ["-r (ordem reversa)", "-r"],
-                ["-t (por tempo)", "-t"],
-                ["-S (por tamanho)", "-S"],
-                ["-R (recursivo)", "-R"],
-            ]),
-            "FLAG",
-        );
-        this.setPreviousStatement(true, "Option");
-        this.setNextStatement(true, "Option");
-        this.setColour(OPTION_COLOR);
-        this.setTooltip(
-            "Opção (flag) para ls. Pode ser encadeada com outras opções.",
-        );
-    },
-};
+    for (const operand of definition.operands) {
+        Blockly.Blocks[`${definition.name}_${operand.name}_operand`] = {
+            init: function() {
+                const field = new Blockly.FieldTextInput(operand.defaultValue || "");
+                field.setValidator((text) => {
+                    for (const validation of operand.validations) {
+                        if (!new RegExp(validation.regex).test(text)) {
+                            this.setWarningText(validation.errorMessage);
+                            return null;
+                        }
+                    }
+                    this.setWarningText(null);
+                    return text;
+                });
+                this.appendDummyInput()
+                    .appendField(`${operand.name}:`)
+                    .appendField(field, "VALUE");
+                this.setPreviousStatement(true, `${definition.command}_Operand`);
+                this.setNextStatement(true, `${definition.command}_Operand`);
+                this.setColour(OPERAND_COLOR);
+                this.setTooltip(operand.description);
+            },
+        };
+    }
+}
 
-Blockly.Blocks["ls_file_operand"] = {
-    init: function() {
-        this.appendDummyInput().appendField(
-            new Blockly.FieldTextInput("arquivo.txt", function(text) {
-                if (text.includes("/") || text.includes("\0")) return null;
-                return text;
-            }),
-            "VALUE",
-        );
-        this.setPreviousStatement(true, "Operand");
-        this.setNextStatement(true, "Operand");
-        this.setColour(OPERAND_COLOR);
-        this.setTooltip("Arquivo (Linux). Não pode conter / ou null byte.");
-    },
-};
-
-Blockly.Blocks["ls_folder_operand"] = {
-    init: function() {
-        this.appendDummyInput().appendField(
-            new Blockly.FieldTextInput("pasta/", function(text) {
-                text = text.trim();
-                if (text.includes("\0")) return null;
-                if (/\/{2,}/.test(text) || text.split("/").some((part) => part === ""))
-                    return null;
-                if (!text.endsWith("/")) text += "/";
-                return text;
-            }),
-            "VALUE",
-        );
-        this.setPreviousStatement(true, "Operand");
-        this.setNextStatement(true, "Operand");
-        this.setColour(OPERAND_COLOR);
-        this.setTooltip("Pasta (Linux). Valida barra final e segmentos vazios.");
-    },
-};
-
-function createLsToolBox() {
+function createToolBoxCategoryFromDefininion(definition) {
+    const blockContent = (type) => ({ kind: "block", type: type });
     return {
         kind: "category",
-        name: "ls",
-        colour: LS_COLOR,
+        name: definition.command,
+        colour: definition.color,
         contents: [
-            { kind: "block", type: "ls" },
-            { kind: "block", type: "ls_option" },
-            { kind: "block", type: "ls_file_operand" },
-            { kind: "block", type: "ls_folder_operand" },
+            blockContent(definition.name),
+            blockContent(`${definition.name}_option`),
+            ...definition.operands.map((operand) =>
+                blockContent(`${definition.name}_${operand.name}_operand`),
+            ),
         ],
     };
 }
 
-function createToolbox() {
+function createToolbox(cli_definitions) {
     return {
         kind: "categoryToolbox",
-        contents: [createLsToolBox()],
+        contents: cli_definitions.commands.map((def) =>
+            createToolBoxCategoryFromDefininion(def),
+        ),
     };
 }
 
-function getBlocklyOptions() {
+function getBlocklyOptions(cli_definitions) {
     return {
-        toolbox: createToolbox(),
+        toolbox: createToolbox(cli_definitions),
         renderer: "zelos",
         trashcan: true,
         scrollbars: true,
@@ -344,3 +276,12 @@ function getBlocklyOptions() {
         },
     };
 }
+
+for (const definition of global_cli_definitions.commands) {
+    createBlocksFromDefinition(definition);
+}
+
+const workspace = Blockly.inject(
+    pageElements.blocklyArea,
+    getBlocklyOptions(global_cli_definitions),
+);

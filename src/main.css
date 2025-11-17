@@ -41,8 +41,22 @@ body {
     border-right: 2px solid #ccc;
 }
 
+.help-balloon {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    font-size: 0.9em;
+}
+
 .sidebar {
-    width: 350px;
+    width: 500px;
     height: 100%;
     background-color: #e9ecef;
     padding: 10px;
@@ -76,7 +90,7 @@ pre {
     border-radius: 5px;
     white-space: pre-wrap;
     word-wrap: break-word;
-    min-height: 100px;
+    min-height: 25vh;
     font-size: 0.9em;
 }
 

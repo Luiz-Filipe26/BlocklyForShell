@@ -1,0 +1,118 @@
+{
+  "commands": [
+    {
+      "command": "ls",
+      "name": "ls",
+      "description": "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
+      "color": "#ff0000",
+      "option_color": "#7fbf7f",
+      "options": [
+        {
+          "flag": "-l",
+          "description": "Usa o formato de listagem longa, mostrando detalhes.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-a",
+          "longFlag": "--all",
+          "description": "Mostra todas as entradas, incluindo as ocultas (que começam com '.').",
+          "takesArgument": false
+        },
+        {
+          "flag": "-h",
+          "longFlag": "--human-readable",
+          "description": "Com -l, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G).",
+          "takesArgument": false
+        },
+        {
+          "flag": "-t",
+          "description": "Ordena pela data de modificação, com os mais recentes primeiro.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-S",
+          "description": "Ordena por tamanho de arquivo, com os maiores primeiro.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-r",
+          "longFlag": "--reverse",
+          "description": "Inverte a ordem da ordenação.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-R",
+          "longFlag": "--recursive",
+          "description": "Lista os subdiretórios recursivamente.",
+          "takesArgument": false
+        }
+      ], "exclusiveOptions": [["-t", "-S"]],
+      "operands": [
+        {
+          "name": "file",
+          "description": "Um arquivo específico a ser listado.",
+          "color": "#a67f5f",
+          "type": "file",
+          "defaultValue": "arquivo.txt",
+          "cardinality": { "min": 0, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^/\\0;]*$",
+              "errorMessage": "Nome de arquivo inválido (não pode conter '/')."
+            }
+          ]
+        },
+        {
+          "name": "folder",
+          "description": "Um diretório a ser listado. Se omitido, usa o diretório atual.",
+          "color": "#a67f5f",
+          "type": "folder",
+          "defaultValue": ".",
+          "cardinality": { "min": 0, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^;\\0]*$",
+              "errorMessage": "Caminho de pasta contém caracteres inválidos."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "command": "cd",
+      "name": "cd",
+      "description": "Navegar entre pastas",
+      "color": "#0000ff",
+      "option_color": "#7fbf7f",
+      "options": [
+        {
+          "flag": "-l",
+          "description": "Manipule o operando .. logicamente; os componentes do link simbólico não devem ser resolvidos antes que os componentes .. sejam processados ",
+          "takesArgument": false
+        }
+      ],
+      "operands": [
+        {
+          "name": "folder",
+          "description": "Um diretório a ser navegado.",
+          "color": "#a67f5f",
+          "type": "folder",
+          "defaultValue": ".",
+          "cardinality": { "min": 1, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^;\\0]*$",
+              "errorMessage": "Caminho de pasta contém caracteres inválidos."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "Diretórios",
+      "commands": ["ls", "cd"]
+    }
+  ]
+}

@@ -5,13 +5,38 @@ import { createCommandBlock } from "./commandBlocks.js";
 import { createOptionBlock } from "./optionBlocks.js";
 import { createOperandBlocks } from "./operandBlocks.js";
 
+export function addLocalChangeListener(block, listenerFunction) {
+    if (!block.__localChangeHandlers) {
+        block.__localChangeHandlers = [];
+
+        block.setOnChange(() => {
+            for (const handler of block.__localChangeHandlers) {
+                try {
+                    handler(block);
+                } catch (error) {
+                    console.error("Erro em change-handler:", error);
+                }
+            }
+        });
+    }
+
+    block.__localChangeHandlers.push(listenerFunction);
+}
+
+export function removeLocalChangeListener(block, listenerFunction) {
+    if (!block.__localChangeHandlers) return;
+
+    block.__localChangeHandlers = block.__localChangeHandlers.filter(
+        (handler) => handler !== listenerFunction,
+    );
+}
+
 /* ===========================
    ICON / CARDINALITY HELPERS
    =========================== */
 
-// caminhos no public/
-const CARD_ICON_SRC = "/cardinality_icon.svg";
 const CARD_ICON_EMPTY = "/transparent.svg";
+const CARD_ICON_ALERT = "/cardinality_icon.svg";
 
 /**
  * Cria um FieldImage pronto para ser anexado ao HEADER.
@@ -22,43 +47,51 @@ export function createCardinalityField(size = 28) {
 }
 
 /**
- * Atualiza (ou cria) o campo CARDINALITY_ICON no HEADER do bloco.
- * - commandBlock: bloco raiz
- * - missing: número faltante (0 => esconde usando transparent.svg)
- * - options: { size, fieldName }
+ * Atualiza warningText + ícone com base nos problemas detectados.
+ *
+ * @param {Blockly.Block} commandBlock
+ * @param {{
+ *   optionsSetMissing: number,
+ *   operandsSetMissing: number,
+ *   missingOperands: Array<{name: string, amount: number}>
+ * }} problems
  */
-export function updateCardinalityField(commandBlock, missing, options = {}) {
-    const size = options.size ?? 28;
-    const fieldName = options.fieldName ?? "CARDINALITY_ICON";
-    const src = missing > 0 ? CARD_ICON_SRC : CARD_ICON_EMPTY;
+export function updateCardinalityIndicator(commandBlock, problems) {
+    const field = commandBlock.getField("CARDINALITY_ICON");
+    if (!field) return;
 
-    // tenta achar field
-    let field = commandBlock.getField(fieldName);
-    if (!field) {
-        // cria se não existir (append no HEADER)
-        const header = commandBlock.getInput("HEADER");
-        if (!header) return;
-        field = createCardinalityField(size);
-        header.appendField(field, fieldName);
+    const {
+        optionsSetMissing = 0,
+        operandsSetMissing = 0,
+        missingOperands = [],
+    } = problems;
+
+    const hasProblems =
+        optionsSetMissing > 0 ||
+        operandsSetMissing > 0 ||
+        missingOperands.length > 0;
+
+    if (!hasProblems) {
+        commandBlock.setWarningText(null);
+        field.setValue(CARD_ICON_EMPTY);
+        return;
+    }
+    let msg = "";
+
+    if (missingOperands.length > 0) {
+        msg += "Faltam operandos:\n";
+        for (const missing of missingOperands)
+            msg += ` - ${missing.name}: precisa de ${missing.amount}\n`;
     }
 
-    // atualiza fonte do FieldImage com as APIs disponíveis
-    if (typeof field.setSrc === "function") {
-        try { field.setSrc(src); return; } catch (e) {}
-    }
-    if (typeof field.setValue === "function") {
-        try { field.setValue(src); return; } catch (e) {}
-    }
+    if (operandsSetMissing > 0)
+        msg += `Faltam operandos obrigatórios (${operandsSetMissing} no mínimo).\n`;
 
-    // fallback: recria o campo (garante atualização em todas versões)
-    try {
-        const header = commandBlock.getInput("HEADER");
-        if (!header) return;
-        try { header.removeField(fieldName); } catch (e) {}
-        header.appendField(new Blockly.FieldImage(src, size, size, "cardinality"), fieldName);
-    } catch (e) {
-        // se falhar, silenciosamente ignora (não crítico)
-    }
+    if (optionsSetMissing > 0)
+        msg += `Faltam opções obrigatórias (${optionsSetMissing}).`;
+
+    commandBlock.setWarningText(msg);
+    field.setValue(CARD_ICON_ALERT);
 }
 
 /* ===========================
@@ -66,7 +99,12 @@ export function updateCardinalityField(commandBlock, missing, options = {}) {
    =========================== */
 
 export function createGenericHelpIcon(getHelpTextFn, size = 30, altText = "?") {
-    const helpIcon = new Blockly.FieldImage("/info_icon.svg", size, size, altText);
+    const helpIcon = new Blockly.FieldImage(
+        "/info_icon.svg",
+        size,
+        size,
+        altText,
+    );
 
     helpIcon.setOnClickHandler(() => {
         const helpText = getHelpTextFn();
@@ -82,20 +120,21 @@ export function createGenericHelpIcon(getHelpTextFn, size = 30, altText = "?") {
 /**
  * Define o comportamento do campo PARENT_INDICATOR (visível quando fora do comando).
  */
-export function setupParentIndicator(block, commandDefinition, textWhenOutside) {
-    block.setOnChange(() => {
+export function setupParentIndicator(
+    block,
+    commandDefinition,
+    textWhenOutside,
+) {
+    addLocalChangeListener(block, () => {
         const indicatorField = block.getField("PARENT_INDICATOR");
         if (!indicatorField) return;
 
-        const insideRoot = block.getSurroundParent()?.type === commandDefinition.name;
+        const insideRoot =
+            block.getSurroundParent()?.type === commandDefinition.name;
         indicatorField.setValue(insideRoot ? "" : textWhenOutside);
     });
 }
 
-/**
- * Registra todos os blocos referentes a um comando.
- * (mantive aqui por compatibilidade com sua organização)
- */
 export function createBlocksFromDefinition(commandDefinition) {
     createCommandBlock(commandDefinition);
     createOptionBlock(commandDefinition);

@@ -1,9 +1,13 @@
 // blockly/commandBlocks.js
 import * as Blockly from "blockly/core";
 import { buildCommandHelpHTML } from "./uiFeedback.js";
-import { getBlocksList, unplugDuplicatesFromList } from "./validators.js";
-import { createGenericHelpIcon, createCardinalityField } from "./blockBuilders.js";
-import { validateOperandCardinality } from "./operandBlocks.js";
+import { autoFixExcessOperands, collectCardinalityProblems, getBlocksList, unplugDuplicatesFromList } from "./validators.js";
+import {
+    createGenericHelpIcon,
+    createCardinalityField,
+    addLocalChangeListener,
+    updateCardinalityIndicator,
+} from "./blockBuilders.js";
 
 function appendCommandHeader(commandDefinition, block) {
     const helpIcon = createGenericHelpIcon(
@@ -38,7 +42,7 @@ function appendCommandInputs(commandDefinition, block) {
 }
 
 function setupCommandDeduplication(commandDefinition, block) {
-    block.setOnChange(() => {
+    addLocalChangeListener(block, () => {
         const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
         if (!firstOptionBlock) return;
 
@@ -52,16 +56,11 @@ function setupCommandDeduplication(commandDefinition, block) {
     });
 }
 
-function setupOperandCardinalityValidation(commandDefinition, block) {
-    block.setOnChange(() => {
-        for (const operandDefinition of commandDefinition.operands) {
-            const operandType = `${commandDefinition.name}_${operandDefinition.name}_operand`;
-            validateOperandCardinality(
-                block,
-                operandType,
-                operandDefinition.cardinality,
-            );
-        }
+function setupCardinalityPipeline(commandDefinition, block) {
+    addLocalChangeListener(block, () => {
+        const problems = collectCardinalityProblems(block, commandDefinition);
+        updateCardinalityIndicator(block, problems);
+        autoFixExcessOperands(block, commandDefinition);
     });
 }
 
@@ -71,7 +70,7 @@ export function createCommandBlock(commandDefinition) {
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);
             setupCommandDeduplication(commandDefinition, this);
-            setupOperandCardinalityValidation(commandDefinition, this);
+            setupCardinalityPipeline(commandDefinition, this);
         },
     };
 }

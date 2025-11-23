@@ -1,12 +1,7 @@
 // blockly/operandBlocks.js
 import * as Blockly from "blockly/core";
 
-import {
-    validateOperandValue,
-    getBlocksList,
-} from "./validators.js";
-
-import { updateCardinalityField } from "./blockBuilders.js";
+import { validateOperandValue } from "./validators.js";
 
 import { setupParentIndicator } from "./blockBuilders.js";
 
@@ -42,67 +37,6 @@ function appendOperandInputs(commandDefinition, operandDefinition, block) {
     block.setNextStatement(true, `${commandDefinition.name}_Operand`);
     block.setColour(operandDefinition.color || commandDefinition.color);
     block.setTooltip(operandDefinition.description);
-}
-
-/* ============================================================
-   CARDINALITY VALIDATION
-   ============================================================ */
-
-export function validateOperandCardinality(
-    commandBlock,
-    operandType,
-    cardinality,
-) {
-    const root = commandBlock.getInputTargetBlock("OPERANDS");
-
-    const blocks = root
-        ? getBlocksList(root).filter((b) => b.type === operandType)
-        : [];
-
-    const count = blocks.length;
-
-    const min = cardinality?.min ?? 0;
-    const max =
-        cardinality?.max === "unlimited"
-            ? Infinity
-            : (cardinality?.max ?? Infinity);
-
-    /* ------------------------------
-         1. VALIDAR FALTAS
-         ------------------------------ */
-
-    const missing = Math.max(0, min - count);
-
-    // Atualiza o campo de cardinalidade no header (cria se necessário)
-    updateCardinalityField(commandBlock, missing, { size: 28 });
-
-    if (missing > 0) {
-        commandBlock.setWarningText(
-            `Faltam operandos do tipo '${operandType}'. Necessário: min=${min}, atual=${count}.`,
-        );
-    } else {
-        commandBlock.setWarningText(null);
-    }
-
-    /* ------------------------------
-         2. REMOVER EXCESSO
-         ------------------------------ */
-
-    if (count > max) {
-        const excess = count - max;
-
-        for (let i = 0; i < excess; i++) {
-            const blockToRemove = blocks.pop();
-            if (blockToRemove) blockToRemove.unplug(true);
-        }
-
-        import("./uiFeedback.js").then(({ showToast }) => {
-            showToast(
-                commandBlock.workspace,
-                `Operando '${operandType}' removido (excesso). Máximo permitido = ${max}.`,
-            );
-        });
-    }
 }
 
 /* ============================================================

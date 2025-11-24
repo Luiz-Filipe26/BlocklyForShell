@@ -82,7 +82,7 @@
       "command": "cd",
       "name": "cd",
       "description": "Navegar entre pastas",
-      "color": "#0000ff",
+      "color": "#7fc37f",
       "option_color": "#7fbf7f",
       "options": [
         {

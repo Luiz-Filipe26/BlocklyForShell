@@ -103,34 +103,50 @@ export function collectCardinalityProblems(commandBlock, commandDefinition) {
 }
 
 /* ============================================
-   REMOÇÃO DE EXCESSO DE OPERANDS (opcional)
+   REMOÇÃO DE EXCESSO DE OPERANDS
    ============================================ */
 export function autoFixExcessOperands(commandBlock, commandDefinition) {
-    const opRoot = commandBlock.getInputTargetBlock("OPERANDS");
-    if (!opRoot) return;
+    const operandsRoot = commandBlock.getInputTargetBlock("OPERANDS");
+    if (!operandsRoot) return;
 
-    for (const operandDefinition of commandDefinition.operands) {
-        const operandType = `${commandDefinition.name}_${operandDefinition.name}_operand`;
+    const allBlocks = getBlocksList(operandsRoot);
 
-        const blocks = getBlocksList(opRoot).filter((b) => b.type === operandType);
+    for (const operandDef of commandDefinition.operands) {
+        const max = operandDef.cardinality?.max;
+        if (typeof max !== 'number') continue;
 
-        const max =
-            operandDefinition.cardinality?.max === "unlimited"
-                ? Infinity
-                : (operandDefinition.cardinality?.max ?? Infinity);
+        const operandType = `${commandDefinition.name}_${operandDef.name}_operand`;
+        const blocksOfType = allBlocks.filter(b => b.type === operandType);
 
-        if (blocks.length > max) {
-            const excess = blocks.length - max;
-
-            for (let i = 0; i < excess; i++) {
-                const b = blocks.pop();
-                if (b) b.unplug(true);
-            }
-
+        if (blocksOfType.length > max) {
+            blocksOfType.slice(max).forEach(block => block.unplug(true));
             showToast(
-                commandBlock.workspace,
-                `Operando '${operandDefinition.name}' removido (máximo permitido = ${max}).`,
+                commandBlock.workspace, 
+                `Limite de ${max} excedido para '${operandDef.name}'.`
             );
+        }
+    }
+}
+
+export function checkAndFixExclusiveOptions(workspace, blocks, exclusiveGroups) {
+    if (!exclusiveGroups || exclusiveGroups.length === 0) return;
+
+    for (const group of exclusiveGroups) {
+        const foundBlocks = blocks.filter(block => 
+            group.includes(block.getFieldValue("FLAG"))
+        );
+
+        if (foundBlocks.length > 1) {
+            const blockToRemove = foundBlocks[foundBlocks.length - 1];
+            const flagToRemove = blockToRemove.getFieldValue("FLAG");
+            const conflictWith = foundBlocks[0].getFieldValue("FLAG");
+
+            blockToRemove.unplug(true);
+            showToast(
+                workspace, 
+                `Conflito: A opção '${flagToRemove}' não pode ser usada com '${conflictWith}'.`
+            );
+            return;
         }
     }
 }

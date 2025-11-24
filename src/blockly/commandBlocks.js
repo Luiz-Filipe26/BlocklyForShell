@@ -1,7 +1,7 @@
 // blockly/commandBlocks.js
 import * as Blockly from "blockly/core";
 import { buildCommandHelpHTML } from "./uiFeedback.js";
-import { autoFixExcessOperands, collectCardinalityProblems, getBlocksList, unplugDuplicatesFromList } from "./validators.js";
+import { autoFixExcessOperands, checkAndFixExclusiveOptions, collectCardinalityProblems, getBlocksList, unplugDuplicatesFromList } from "./validators.js";
 import {
     createGenericHelpIcon,
     createCardinalityField,
@@ -64,12 +64,34 @@ function setupCardinalityPipeline(commandDefinition, block) {
     });
 }
 
+function setupExclusiveOptionsValidation(commandDefinition, block) {
+    if (!commandDefinition.exclusiveOptions || commandDefinition.exclusiveOptions.length === 0) {
+        return;
+    }
+
+    addLocalChangeListener(block, () => {
+        const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
+        if (!firstOptionBlock) return;
+
+        const optionBlocks = getBlocksList(firstOptionBlock).filter(
+            (child) => child.type === `${commandDefinition.name}_option`
+        );
+
+        checkAndFixExclusiveOptions(
+            block.workspace, 
+            optionBlocks, 
+            commandDefinition.exclusiveOptions
+        );
+    });
+}
+
 export function createCommandBlock(commandDefinition) {
     Blockly.Blocks[commandDefinition.name] = {
         init: function() {
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);
             setupCommandDeduplication(commandDefinition, this);
+            setupExclusiveOptionsValidation(commandDefinition, this);
             setupCardinalityPipeline(commandDefinition, this);
         },
     };

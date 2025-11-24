@@ -53,6 +53,10 @@ export function createOptionBlock(commandDefinition) {
 
     Blockly.Blocks[type] = {
         init: function() {
+            this.semanticData = {
+                nodeType: "option",
+                relatedCommand: commandDefinition.command
+            };
             appendOptionInputs(commandDefinition, this);
             setupParentIndicator(
                 this,

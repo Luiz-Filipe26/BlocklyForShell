@@ -48,6 +48,12 @@ function createSingleOperandBlock(commandDefinition, operandDefinition) {
 
     Blockly.Blocks[type] = {
         init: function() {
+            this.semanticData = {
+                nodeType: "operand",
+                operandName: operandDefinition.name,
+                operandType: operandDefinition.type,
+                relatedCommand: commandDefinition.command,
+            };
             appendOperandInputs(commandDefinition, operandDefinition, this);
 
             setupParentIndicator(

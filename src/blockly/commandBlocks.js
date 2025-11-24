@@ -88,6 +88,10 @@ function setupExclusiveOptionsValidation(commandDefinition, block) {
 export function createCommandBlock(commandDefinition) {
     Blockly.Blocks[commandDefinition.name] = {
         init: function() {
+            this.semanticData = {
+                nodeType: "command",
+                commandName: commandDefinition.command
+            };
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);
             setupCommandDeduplication(commandDefinition, this);

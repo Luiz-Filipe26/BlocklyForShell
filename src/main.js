@@ -12,32 +12,16 @@ import { serializeWorkspaceToAST } from "./blockly/serializer.js";
 
 const pageElements = {
     blocklyArea: document.getElementById("blockly-area"),
-    codeOutput: document.getElementById("code-output"), // Necessário para mostrar o JSON
+    codeOutput: document.getElementById("code-output"),
 };
 
 let workspace;
 
-function createEnhancedToolbox(definitions) {
-    const generated = createToolbox(definitions);
-
-    // Adiciona a categoria "Estrutura" no topo com o bloco script_root
-    generated.contents.unshift({
-        kind: "category",
-        name: "Estrutura",
-        colour: "#333",
-        contents: [{ kind: "block", type: "script_root" }],
-    });
-
-    return generated;
-}
-
 const blocklyOptions = {
-    toolbox: createEnhancedToolbox(cliDefinitions),
+    toolbox: createToolbox(cliDefinitions), 
     renderer: "zelos",
     trashcan: true,
     scrollbars: true,
-    // Importante: Limita a apenas 1 bloco raiz por workspace
-    maxInstances: { script_root: 1 },
     zoom: {
         controls: true,
         wheel: true,
@@ -60,39 +44,33 @@ const blocklyOptions = {
 };
 
 function start() {
-    // 1. Inicializa os blocos de sistema (o container 'script_root')
     initSystemBlocks();
 
-    // 2. Inicializa os blocos dinâmicos a partir do JSON
     for (const def of cliDefinitions.commands) {
         createBlocksFromDefinition(def);
     }
 
-    // 3. Injeta o Blockly
-    workspace = Blockly.inject(pageElements.blocklyArea, blocklyOptions);
+    workspace = Blockly.inject(
+        pageElements.blocklyArea,
+        blocklyOptions,
+    );
 
-    // 4. Ativa o sistema de desabilitar blocos soltos (órfãos)
     disableOrphanBlocks(workspace);
 
-    // 5. Cria automaticamente o bloco raiz ao iniciar (Melhor UX)
-    const rootBlock = workspace.newBlock("script_root");
+    const rootBlock = workspace.newBlock('script_root');
     rootBlock.initSvg();
     rootBlock.render();
-    rootBlock.moveBy(50, 50); // Posiciona no canto superior esquerdo
+    rootBlock.moveBy(50, 50);
+    
 
-    // 6. Configura o listener para gerar a Árvore (JSON) em tempo real
     workspace.addChangeListener((event) => {
-        // Ignora eventos de UI (como arrastar o workspace ou clicar) para performance
         if (event.type === Blockly.Events.UI) return;
-
         const ast = serializeWorkspaceToAST(workspace);
-
+        
         if (ast) {
-            // Exibe o JSON formatado na área de código
             pageElements.codeOutput.textContent = JSON.stringify(ast, null, 2);
         } else {
-            pageElements.codeOutput.textContent =
-                "// Monte seu script dentro do bloco 'Script Principal'";
+            pageElements.codeOutput.textContent = "// Monte seu script dentro do bloco 'Script Principal'";
         }
     });
 }

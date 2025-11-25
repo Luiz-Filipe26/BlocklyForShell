@@ -4,7 +4,7 @@
       "command": "ls",
       "name": "ls",
       "description": "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
-      "color": "#ff0000",
+      "color": "#5b80a5",
       "option_color": "#7fbf7f",
       "options": [
         {
@@ -46,7 +46,8 @@
           "description": "Lista os subdiretórios recursivamente.",
           "takesArgument": false
         }
-      ], "exclusiveOptions": [["-t", "-S"]],
+      ],
+      "exclusiveOptions": [["-t", "-S"]],
       "operands": [
         {
           "name": "file",
@@ -109,10 +110,109 @@
       ]
     }
   ],
+  "operators": [
+    {
+      "id": "pipe",
+      "command": "|",
+      "name": "pipe",
+      "description": "Redireciona a saída do comando anterior para a entrada do próximo (Pipe).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "redirect_out",
+      "command": ">",
+      "name": "redirect_out",
+      "description": "Salva a saída do comando em um arquivo (sobrescreve).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "redirect_append",
+      "command": ">>",
+      "name": "redirect_append",
+      "description": "Adiciona a saída do comando ao final de um arquivo (append).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "and",
+      "command": "&&",
+      "name": "and",
+      "description": "Executa o próximo comando apenas se o anterior tiver sucesso.",
+      "color": "#b1745b"
+    },
+    {
+      "id": "or",
+      "command": "||",
+      "name": "or",
+      "description": "Executa o próximo comando apenas se o anterior falhar.",
+      "color": "#b1745b"
+    }
+  ],
+  "controls": [
+    {
+      "id": "if_statement",
+      "command": "if",
+      "name": "if_statement",
+      "description": "Executa comandos condicionalmente baseado no sucesso de um comando teste.",
+      "color": "#dbaa25",
+      "slots": [
+        {
+          "name": "CONDITION",
+          "type": "statement",
+          "label": "Se (comando):",
+          "check": "command"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": "Então faça:",
+          "check": "command"
+        },
+        {
+          "name": "ELSE",
+          "type": "statement",
+          "label": "Senão faça:",
+          "check": "command"
+        }
+      ]
+    },
+    {
+      "id": "while_loop",
+      "command": "while",
+      "name": "while_loop",
+      "description": "Repete comandos enquanto a condição for verdadeira.",
+      "color": "#dbaa25",
+      "slots": [
+        {
+          "name": "CONDITION",
+          "type": "statement",
+          "label": "Enquanto (comando):",
+          "check": "command"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": "Faça:",
+          "check": "command"
+        }
+      ]
+    }
+  ],
   "categories": [
     {
       "name": "Diretórios",
       "commands": ["ls", "cd"]
+    },
+    {
+      "name": "Fluxo & Lógica",
+      "commands": [
+        "pipe",
+        "redirect_out",
+        "redirect_append",
+        "and",
+        "or",
+        "if_statement",
+        "while_loop"
+      ]
     }
   ]
 }

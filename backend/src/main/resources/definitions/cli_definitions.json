@@ -1,0 +1,218 @@
+{
+  "commands": [
+    {
+      "command": "ls",
+      "name": "ls",
+      "description": "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
+      "color": "#5b80a5",
+      "option_color": "#7fbf7f",
+      "options": [
+        {
+          "flag": "-l",
+          "description": "Usa o formato de listagem longa, mostrando detalhes.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-a",
+          "longFlag": "--all",
+          "description": "Mostra todas as entradas, incluindo as ocultas (que começam com '.').",
+          "takesArgument": false
+        },
+        {
+          "flag": "-h",
+          "longFlag": "--human-readable",
+          "description": "Com -l, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G).",
+          "takesArgument": false
+        },
+        {
+          "flag": "-t",
+          "description": "Ordena pela data de modificação, com os mais recentes primeiro.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-S",
+          "description": "Ordena por tamanho de arquivo, com os maiores primeiro.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-r",
+          "longFlag": "--reverse",
+          "description": "Inverte a ordem da ordenação.",
+          "takesArgument": false
+        },
+        {
+          "flag": "-R",
+          "longFlag": "--recursive",
+          "description": "Lista os subdiretórios recursivamente.",
+          "takesArgument": false
+        }
+      ],
+      "exclusiveOptions": [["-t", "-S"]],
+      "operands": [
+        {
+          "name": "file",
+          "description": "Um arquivo específico a ser listado.",
+          "color": "#a67f5f",
+          "type": "file",
+          "defaultValue": "arquivo.txt",
+          "cardinality": { "min": 0, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^/\\0;]*$",
+              "errorMessage": "Nome de arquivo inválido (não pode conter '/')."
+            }
+          ]
+        },
+        {
+          "name": "folder",
+          "description": "Um diretório a ser listado. Se omitido, usa o diretório atual.",
+          "color": "#a67f5f",
+          "type": "folder",
+          "defaultValue": ".",
+          "cardinality": { "min": 0, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^;\\0]*$",
+              "errorMessage": "Caminho de pasta contém caracteres inválidos."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "command": "cd",
+      "name": "cd",
+      "description": "Navegar entre pastas",
+      "color": "#7fc37f",
+      "option_color": "#7fbf7f",
+      "options": [
+        {
+          "flag": "-l",
+          "description": "Manipule o operando .. logicamente; os componentes do link simbólico não devem ser resolvidos antes que os componentes .. sejam processados ",
+          "takesArgument": false
+        }
+      ],
+      "operands": [
+        {
+          "name": "folder",
+          "description": "Um diretório a ser navegado.",
+          "color": "#a67f5f",
+          "type": "folder",
+          "defaultValue": ".",
+          "cardinality": { "min": 1, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^;\\0]*$",
+              "errorMessage": "Caminho de pasta contém caracteres inválidos."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "id": "pipe",
+      "command": "|",
+      "name": "pipe",
+      "description": "Redireciona a saída do comando anterior para a entrada do próximo (Pipe).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "redirect_out",
+      "command": ">",
+      "name": "redirect_out",
+      "description": "Salva a saída do comando em um arquivo (sobrescreve).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "redirect_append",
+      "command": ">>",
+      "name": "redirect_append",
+      "description": "Adiciona a saída do comando ao final de um arquivo (append).",
+      "color": "#b1745b"
+    },
+    {
+      "id": "and",
+      "command": "&&",
+      "name": "and",
+      "description": "Executa o próximo comando apenas se o anterior tiver sucesso.",
+      "color": "#b1745b"
+    },
+    {
+      "id": "or",
+      "command": "||",
+      "name": "or",
+      "description": "Executa o próximo comando apenas se o anterior falhar.",
+      "color": "#b1745b"
+    }
+  ],
+  "controls": [
+    {
+      "id": "if_statement",
+      "command": "if",
+      "name": "if_statement",
+      "description": "Executa comandos condicionalmente baseado no sucesso de um comando teste.",
+      "color": "#dbaa25",
+      "slots": [
+        {
+          "name": "CONDITION",
+          "type": "statement",
+          "label": "Se (comando):",
+          "check": "command"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": "Então faça:",
+          "check": "command"
+        },
+        {
+          "name": "ELSE",
+          "type": "statement",
+          "label": "Senão faça:",
+          "check": "command"
+        }
+      ]
+    },
+    {
+      "id": "while_loop",
+      "command": "while",
+      "name": "while_loop",
+      "description": "Repete comandos enquanto a condição for verdadeira.",
+      "color": "#dbaa25",
+      "slots": [
+        {
+          "name": "CONDITION",
+          "type": "statement",
+          "label": "Enquanto (comando):",
+          "check": "command"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": "Faça:",
+          "check": "command"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "Diretórios",
+      "commands": ["ls", "cd"]
+    },
+    {
+      "name": "Fluxo & Lógica",
+      "commands": [
+        "pipe",
+        "redirect_out",
+        "redirect_append",
+        "and",
+        "or",
+        "if_statement",
+        "while_loop"
+      ]
+    }
+  ]
+}

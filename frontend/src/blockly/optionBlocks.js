@@ -1,9 +1,14 @@
 import * as Blockly from "blockly/core";
-import { createGenericHelpIcon, setupParentIndicator } from "./blockBuilders.js";
+import {
+    createGenericHelpIcon,
+    setupParentIndicator,
+} from "./blockBuilders.js";
 
 function buildOptionDropdown(commandDefinition) {
     const dropdownPairs = commandDefinition.options.map((optionDefinition) => {
-        const longFlagSuffix = optionDefinition.longFlag ? ` | ${optionDefinition.longFlag}` : "";
+        const longFlagSuffix = optionDefinition.longFlag
+            ? ` | ${optionDefinition.longFlag}`
+            : "";
         const summary = optionDefinition.description.split(".")[0];
 
         return [
@@ -16,7 +21,7 @@ function buildOptionDropdown(commandDefinition) {
         commandDefinition.options.map((optionDefinition) => [
             optionDefinition.flag,
             optionDefinition.description,
-        ])
+        ]),
     );
 
     return new Blockly.FieldDropdown(dropdownPairs, function(newValue) {
@@ -32,12 +37,13 @@ function appendOptionInputs(commandDefinition, block) {
     const helpIcon = createGenericHelpIcon(() => {
         const flag = block.getFieldValue("FLAG");
         const optionDefinition = commandDefinition.options.find(
-            (opt) => opt.flag === flag
+            (opt) => opt.flag === flag,
         );
         return optionDefinition ? optionDefinition.description : "";
     });
 
-    block.appendDummyInput("MAIN_INPUT")
+    block
+        .appendDummyInput("MAIN_INPUT")
         .appendField(`(opção de: ${commandDefinition.command})`, "PARENT_INDICATOR")
         .appendField(" ")
         .appendField(dropdown, "FLAG")
@@ -49,20 +55,24 @@ function appendOptionInputs(commandDefinition, block) {
 }
 
 export function createOptionBlock(commandDefinition) {
+    if (!commandDefinition.options || commandDefinition.options.length === 0) {
+        return;
+    }
+
     const type = `${commandDefinition.name}_option`;
 
     Blockly.Blocks[type] = {
         init: function() {
             this.semanticData = {
                 nodeType: "option",
-                relatedCommand: commandDefinition.command
+                relatedCommand: commandDefinition.command,
             };
             appendOptionInputs(commandDefinition, this);
             setupParentIndicator(
                 this,
                 commandDefinition,
-                `(opção de: ${commandDefinition.command})`
+                `(opção de: ${commandDefinition.command})`,
             );
-        }
+        },
     };
 }

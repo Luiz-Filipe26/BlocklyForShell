@@ -83,7 +83,7 @@ export function collectCardinalityProblems(commandBlock, commandDefinition) {
         const operandType = `${commandDefinition.name}_${operandDefinition.name}_operand`;
 
         const operandBlocksOfType = operandsRoot
-            ? getBlocksList(opRoot).filter((b) => b.type === operandType)
+            ? getBlocksList(operandsRoot).filter((b) => b.type === operandType)
             : [];
 
         const count = operandBlocksOfType.length;

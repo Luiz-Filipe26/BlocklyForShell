@@ -66,6 +66,13 @@ function createSingleOperandBlock(commandDefinition, operandDefinition) {
 }
 
 export function createOperandBlocks(commandDefinition) {
+    if (
+        !commandDefinition.operands ||
+        commandDefinition.operands.length === 0
+    ) {
+        return;
+    }
+
     for (const operandDef of commandDefinition.operands) {
         createSingleOperandBlock(commandDefinition, operandDef);
     }

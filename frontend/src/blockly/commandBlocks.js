@@ -25,15 +25,19 @@ function appendCommandHeader(commandDefinition, block) {
 }
 
 function appendCommandInputs(commandDefinition, block) {
-    block
-        .appendStatementInput("OPTIONS")
-        .setCheck(`${commandDefinition.name}_Option`)
-        .appendField("Opções:");
+    if (commandDefinition.options && commandDefinition.options.length > 0) {
+        block
+            .appendStatementInput("OPTIONS")
+            .setCheck(`${commandDefinition.name}_Option`)
+            .appendField("Opções:");
+    }
 
-    block
-        .appendStatementInput("OPERANDS")
-        .setCheck(`${commandDefinition.name}_Operand`)
-        .appendField("Operandos:");
+    if (commandDefinition.operands && commandDefinition.operands.length > 0) {
+        block
+            .appendStatementInput("OPERANDS")
+            .setCheck(`${commandDefinition.name}_Operand`)
+            .appendField("Operandos:");
+    }
 
     block.setPreviousStatement(true, "command");
     block.setNextStatement(true, "command");

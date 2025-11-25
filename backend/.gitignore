@@ -1,0 +1,24 @@
+# --- Build e Logs ---
+target/
+bin/
+*.class
+*.jar
+*.war
+*.log
+
+# --- Maven (Temporários) ---
+pom.xml.*
+dependency-reduced-pom.xml
+
+# --- IDEs (Eclipse, IntelliJ, VSCode) ---
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/
+.idea/
+*.iml
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db

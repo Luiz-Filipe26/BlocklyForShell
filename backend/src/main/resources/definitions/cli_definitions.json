@@ -47,7 +47,9 @@
           "takesArgument": false
         }
       ],
-      "exclusiveOptions": [["-t", "-S"]],
+      "exclusiveOptions": [
+        ["-t", "-S"]
+      ],
       "operands": [
         {
           "name": "file",
@@ -88,7 +90,7 @@
       "options": [
         {
           "flag": "-l",
-          "description": "Manipule o operando .. logicamente; os componentes do link simbólico não devem ser resolvidos antes que os componentes .. sejam processados ",
+          "description": "Manipule o operando .. logicamente.",
           "takesArgument": false
         }
       ],
@@ -104,6 +106,41 @@
             {
               "regex": "^[^;\\0]*$",
               "errorMessage": "Caminho de pasta contém caracteres inválidos."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "command": "mkdir",
+      "name": "mkdir",
+      "description": "Criar pastas",
+      "color": "#8e44ad", 
+      "option_color": "#7fbf7f",
+      "options": [
+        {
+           "flag": "-p",
+           "description": "Cria diretórios pais conforme necessário (parents), sem erro se existir.",
+           "takesArgument": false
+        },
+        {
+           "flag": "-v",
+           "description": "Mostra uma mensagem para cada diretório criado (verbose).",
+           "takesArgument": false
+        }
+      ],
+      "operands": [
+        {
+          "name": "folder_name",
+          "description": "Nome da pasta a ser criada.",
+          "color": "#a67f5f",
+          "type": "string",
+          "defaultValue": "nova_pasta",
+          "cardinality": { "min": 1, "max": "unlimited" },
+          "validations": [
+            {
+              "regex": "^[^/\\0;]*$",
+              "errorMessage": "Nome de pasta inválido."
             }
           ]
         }
@@ -200,7 +237,7 @@
   "categories": [
     {
       "name": "Diretórios",
-      "commands": ["ls", "cd"]
+      "commands": ["ls", "cd", "mkdir"]
     },
     {
       "name": "Fluxo & Lógica",

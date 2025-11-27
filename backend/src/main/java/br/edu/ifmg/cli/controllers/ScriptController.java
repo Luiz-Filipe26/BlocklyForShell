@@ -23,10 +23,11 @@ public class ScriptController {
             AstScript script = ctx.bodyAsClass(AstScript.class);
 
             String shellScript = generator.generate(script);
-
+            
             ctx.json(new GeneratedScript(shellScript));
 
         } catch (Exception e) {
+        	e.printStackTrace();
             ctx.status(400).json(new GeneratedScript("ERRO: " + e.getMessage()));
         }
     }

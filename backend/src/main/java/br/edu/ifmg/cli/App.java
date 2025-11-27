@@ -2,6 +2,7 @@ package br.edu.ifmg.cli;
 
 import br.edu.ifmg.cli.controllers.DefinitionController;
 import br.edu.ifmg.cli.controllers.ExecutionController;
+import br.edu.ifmg.cli.controllers.ScriptController;
 import br.edu.ifmg.cli.services.SandboxRunner;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
@@ -27,6 +28,7 @@ public class App {
 
         new DefinitionController().registerRoutes(app);
         new ExecutionController(scriptGenerator, sandboxRunner).registerRoutes(app);
+        new ScriptController(scriptGenerator).registerRoutes(app);
 
         app.start(APP_PORT);
     }

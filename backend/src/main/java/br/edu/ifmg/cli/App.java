@@ -1,40 +1,33 @@
 package br.edu.ifmg.cli;
 
+import br.edu.ifmg.cli.controllers.DefinitionController;
+import br.edu.ifmg.cli.controllers.ExecutionController;
+import br.edu.ifmg.cli.services.SandboxRunner;
+import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
-import io.javalin.http.Context;
-import java.nio.charset.StandardCharsets;
 
 public class App {
+	private static final String[] CORS_ALLOWED_HOSTS = {"http://localhost:5173"};
+	private static int APP_PORT = 7000;
 
     public static void main(String[] args) {
-        Javalin app = Javalin.create(config -> {
+        var app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> {
-                    it.allowHost("http://localhost:5173");
+                	for(var host : CORS_ALLOWED_HOSTS) {
+                		it.allowHost(host);
+                	}
                 });
             });
-        }).start(7000);
+            config.http.defaultContentType = "application/json";
+        });
+        
+        var scriptGenerator = new ScriptGenerator();
+        var sandboxRunner = new SandboxRunner();
 
-        app.get("/", ctx -> ctx.result("Backend CLI Learning rodando!"));
-        app.get("/api/definitions", App::getDefinitions);
-    }
+        new DefinitionController().registerRoutes(app);
+        new ExecutionController(scriptGenerator, sandboxRunner).registerRoutes(app);
 
-    private static void getDefinitions(Context ctx) {
-        var resourcePath = "/definitions/cli_definitions.json";
-
-        try (var inputStream = App.class.getResourceAsStream(resourcePath)) {
-
-            if (inputStream == null) {
-                ctx.status(404).result("Arquivo de definições não encontrado.");
-                return;
-            }
-            var json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
-            ctx.contentType("application/json").result(json);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            ctx.status(500).result("Erro interno ao ler definições.");
-        }
+        app.start(APP_PORT);
     }
 }

@@ -11,6 +11,9 @@ import { serializeWorkspaceToAST } from "./blockly/serializer.js";
 const pageElements = {
     blocklyArea: document.getElementById("blockly-area"),
     codeOutput: document.getElementById("code-output"),
+    cliOutput: document.getElementById("cli-output"),
+    runBtn: document.getElementById("run-btn"),
+    clearBtn: document.getElementById("clear-btn"),
 };
 
 let workspace;
@@ -70,16 +73,77 @@ async function start() {
     rootBlock.render();
     rootBlock.moveBy(50, 50);
 
-    workspace.addChangeListener((event) => {
-        if (event.type === Blockly.Events.UI) return;
+    const MIN_INTERVAL_MS = 700;
+    let lastRequestTime = 0;
+    let pendingTimer = null;
+    let pendingScheduledAt = 0;
+
+    /**
+     * Envia a AST atual ao backend e atualiza codeOutput.
+     * Serializa só no momento do envio (para ter AST fresco).
+     */
+    async function sendAstToBackend() {
+        // recalcula AST no momento do envio
         const ast = serializeWorkspaceToAST(workspace);
 
-        if (ast) {
-            pageElements.codeOutput.textContent = JSON.stringify(ast, null, 2);
-        } else {
+        if (!ast) {
             pageElements.codeOutput.textContent =
                 "// Monte seu script dentro do bloco 'Script Principal'";
+            lastRequestTime = Date.now();
+            return;
         }
+
+        try {
+            const response = await fetch("http://localhost:7000/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ast),
+            });
+
+            if (!response.ok) {
+                pageElements.codeOutput.textContent =
+                    "// Erro ao gerar script no backend";
+                lastRequestTime = Date.now();
+                return;
+            }
+
+            const data = await response.json();
+            pageElements.codeOutput.textContent = data.script ?? "// Sem script";
+        } catch (err) {
+            pageElements.codeOutput.textContent = "// Falha ao conectar ao backend";
+        } finally {
+            lastRequestTime = Date.now();
+        }
+    }
+
+    workspace.addChangeListener((event) => {
+        if (event.type === Blockly.Events.UI) return;
+
+        const now = Date.now();
+        const sinceLast = now - lastRequestTime;
+
+        // se já passou o intervalo mínimo -> reagir **agora**
+        if (sinceLast >= MIN_INTERVAL_MS) {
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingTimer = null;
+                pendingScheduledAt = 0;
+            }
+            void sendAstToBackend();
+            return;
+        }
+
+        if (!pendingTimer) {
+            const wait = MIN_INTERVAL_MS - sinceLast;
+            pendingScheduledAt = now + wait;
+            pendingTimer = setTimeout(() => {
+                pendingTimer = null;
+                pendingScheduledAt = 0;
+                void sendAstToBackend();
+            }, wait);
+        }
+
+        // não fazer mais nada: esperamos o send agendado executar
     });
 }
 

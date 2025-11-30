@@ -8,16 +8,16 @@ O **Blockly for Shell** é uma ferramenta educacional que utiliza a metáfora de
 
 Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores instalados. Apenas o Java Runtime (JRE 17+).
 
-1. Baixe o arquivo [**blockly-for-shell.jar**](./blockly-for-shell.jar) que se encontra na raiz deste repositório.
+1. Baixe o arquivo [**blockly-for-shell.jar**](https://www.google.com/search?q=./blockly-for-shell.jar) que se encontra na raiz deste repositório.  
 2. Dê um **duplo clique** no arquivo baixado para iniciar.  
 3. Uma janela se abrirá. Clique em **"Abrir no Navegador"** e comece a programar\!
 
 ## **✨ Funcionalidades Principais**
 
-* **Programação Visual:** Construa scripts complexos arrastando e soltando blocos.
-* **Live Preview (AST):** Veja o código Shell Script ser gerado em tempo real à medida que você monta a lógica.
-* **Validação Semântica:** O sistema impede conexões inválidas (ex: tentar usar um parâmetro de arquivo onde se espera uma pasta).
-* **Arquitetura Orientada a Dados:** Todos os comandos (ls, mkdir, cd, etc.) são definidos em arquivos JSON externos, permitindo fácil extensão sem recompilar o código.
+* **Programação Visual:** Construa scripts complexos arrastando e soltando blocos.  
+* **Live Preview (AST):** Veja o código Shell Script ser gerado em tempo real à medida que você monta a lógica.  
+* **Validação Semântica:** O sistema impede conexões inválidas (ex: tentar usar um parâmetro de arquivo onde se espera uma pasta).  
+* **Arquitetura Orientada a Dados:** Todos os comandos (ls, mkdir, cd, etc.) são definidos em arquivos JSON externos, permitindo fácil extensão sem recompilar o código.  
 * **Zero Configuração:** O artefato final é um executável único (Fat JAR) que contém o servidor, o frontend e as dependências.
 
 ## **🛠️ Stack Tecnológica**
@@ -26,15 +26,15 @@ O projeto segue uma arquitetura **Full Stack Monolítica Desacoplada**, prioriza
 
 ### **Backend (Java 17\)**
 
-* **Javalin:** Servidor Web leve e performático para servir a API e os estáticos.
-* **Maven:** Gerenciamento de dependências e build.
-* **Jackson:** Processamento de JSON e serialização da AST.
+* **Javalin:** Servidor Web leve e performático para servir a API e os estáticos.  
+* **Maven:** Gerenciamento de dependências e build.  
+* **Jackson:** Processamento de JSON e serialização da AST.  
 * **SLF4J:** Logging estruturado.
 
 ### **Frontend (Modern JavaScript)**
 
-* **Vite 6:** Tooling de nova geração para build otimizado e rápido.
-* **Google Blockly:** Motor de renderização dos blocos visuais.
+* **Vite 6:** Tooling de nova geração para build otimizado e rápido.  
+* **Google Blockly:** Motor de renderização dos blocos visuais.  
 * **ES Modules:** Código modularizado e limpo (Vanilla JS moderno).
 
 ## **💻 Desenvolvimento (Build from Source)**
@@ -43,30 +43,30 @@ Se você deseja contribuir ou modificar o código, siga os passos abaixo para co
 
 ### **Pré-requisitos**
 
-* **Java JDK 17** ou superior.
-* **Node.js 20** ou superior (Recomendado LTS).
+* **Java JDK 17** ou superior.  
+* **Node.js 20** ou superior (Recomendado LTS).  
 * **Maven**.
 
 ### **Estrutura do Projeto**
 
 .  
-├── backend/
-│   ├── src/main/java/.../cli/
-│   │   ├── controllers/       \# Endpoints da API (Definições, Execução, Geração)
-│   │   ├── models/            \# DTOs e Records (AST, Resultados de Execução)
-│   │   ├── services/          \# Lógica de Negócio (Gerador de Bash, Sandbox)
-│   │   └── App.java           \# Ponto de entrada, Servidor Web e Launcher GUI
-│   ├── src/main/resources/
-│   │   └── definitions/       \# JSONs de definição dos comandos (Data-Driven)
-│   └── pom.xml                \# Configuração Maven e Plugins de Build
-├── frontend/
-│   ├── public/                \# Assets estáticos (Ícones SVG)
-│   ├── src/
-│   │   ├── blockly/           \# Lógica Visual (Builders, Serializer, Validators)
-│   │   ├── main.css           \# Estilização global
-│   │   └── main.js            \# Ponto de entrada e gerenciamento de estado
-│   ├── index.html             \# Template principal da aplicação
-│   └── vite.config.js         \# Configuração de Build e Chunking
+├── backend/  
+│   ├── src/main/java/.../cli/  
+│   │   ├── controllers/       \# Endpoints da API (Definições, Execução, Geração)  
+│   │   ├── models/            \# DTOs e Records (AST, Resultados de Execução)  
+│   │   ├── services/          \# Lógica de Negócio (Gerador de Bash, Sandbox)  
+│   │   └── App.java           \# Ponto de entrada, Servidor Web e Launcher GUI  
+│   ├── src/main/resources/  
+│   │   └── definitions/       \# JSONs de definição dos comandos (Data-Driven)  
+│   └── pom.xml                \# Configuração Maven e Plugins de Build  
+├── frontend/  
+│   ├── public/                \# Assets estáticos (Ícones SVG)  
+│   ├── src/  
+│   │   ├── blockly/           \# Lógica Visual (Builders, Serializer, Validators)  
+│   │   ├── main.css           \# Estilização global  
+│   │   └── main.js            \# Ponto de entrada e gerenciamento de estado  
+│   ├── index.html             \# Template principal da aplicação  
+│   └── vite.config.js         \# Configuração de Build e Chunking  
 └── build\_project.sh           \# Script de automação de build e distribuição
 
 ### **Compilando o Projeto**
@@ -85,20 +85,20 @@ Ao final, o executável blockly-for-shell.jar será gerado na **raiz do projeto*
 
 O sistema é **Data-Driven**. Você não precisa escrever código Java ou JavaScript para adicionar um comando simples como rm ou touch.
 
-1. Abra o arquivo backend/src/main/resources/definitions/cli\_definitions.json.
+1. Abra o arquivo backend/src/main/resources/definitions/cli\_definitions.json.  
 2. Adicione uma nova entrada no array commands:
 
-{
-  "command": "touch",
-  "name": "touch",
-  "description": "Atualiza o timestamp ou cria um arquivo vazio.",
-  "color": "\#4caf50",
-  "options": \[
-    { "flag": "-a", "description": "Muda apenas o tempo de acesso." }
-  \],
-  "operands": \[
-    { "name": "filename", "type": "file", "cardinality": { "min": 1 } } 
-  \]
+{  
+  "command": "touch",  
+  "name": "touch",  
+  "description": "Atualiza o timestamp ou cria um arquivo vazio.",  
+  "color": "\#4caf50",  
+  "options": \[  
+    { "flag": "-a", "description": "Muda apenas o tempo de acesso." }  
+  \],  
+  "operands": \[  
+    { "name": "filename", "type": "file", "cardinality": { "min": 1 } }  
+  \]  
 }
 
 3. Reinicie o servidor. O bloco aparecerá automaticamente na interface\!

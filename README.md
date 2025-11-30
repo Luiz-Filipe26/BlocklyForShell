@@ -32,7 +32,7 @@ O projeto segue uma arquitetura **Full Stack Monolítica Desacoplada**, prioriza
 
 * **Javalin:** Servidor Web leve e performático para servir a API e os estáticos.  
 * **Maven:** Gerenciamento de dependências e build.  
-* **Jackson:** Processamento de JSON e serialização da AST.  
+* **Gson:** Processamento de JSON e serialização da AST.  
 * **SLF4J:** Logging estruturado.
 
 ### **Frontend (Modern JavaScript)**

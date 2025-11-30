@@ -1,5 +1,21 @@
 package br.edu.ifmg.cli;
 
+import java.awt.Desktop;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.Arrays;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import br.edu.ifmg.cli.controllers.DefinitionController;
 import br.edu.ifmg.cli.controllers.ExecutionController;
 import br.edu.ifmg.cli.controllers.ScriptController;
@@ -7,11 +23,7 @@ import br.edu.ifmg.cli.services.SandboxRunner;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-
-import javax.swing.*;
-import java.awt.*;
-import java.net.URI;
-import java.util.Arrays;
+import io.javalin.json.JsonMapper;
 
 public class App {
 	private static final String[] CORS_ALLOWED_HOSTS = { "http://localhost:5173" };
@@ -27,8 +39,23 @@ public class App {
 	}
 
 	private static void startServer() {
+        Gson gson = new GsonBuilder().create();
+        JsonMapper gsonMapper = new JsonMapper() {
+            @Override
+            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+                return gson.toJson(obj, type);
+            }
+
+            @Override
+            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+                return gson.fromJson(json, targetType);
+            }
+        };
+		
 		var app = Javalin.create(config -> {
 			config.staticFiles.add("/public", Location.CLASSPATH);
+			
+            config.jsonMapper(gsonMapper);
 
 			config.bundledPlugins.enableCors(cors -> {
 				cors.addRule(it -> {

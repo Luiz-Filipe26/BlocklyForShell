@@ -5,8 +5,8 @@ set -e
 
 echo "--- [1/3] Construindo o Frontend ---"
 cd frontend
-npm install
-npm run build
+npm install --silent --no-fund
+npm run build --silent
 cd ..
 
 echo "--- [2/3] Integrando Frontend ao Backend ---"
@@ -18,7 +18,7 @@ cp -r frontend/dist/* backend/src/main/resources/public/
 
 echo "--- [3/3] Compilando e Gerando JAR ---"
 cd backend
-mvn clean package
+mvn -B clean package
 
 # 1. Identifica o arquivo gerado DENTRO da pasta target antes de copiar
 # O 'grep -v' ignora o arquivo 'original-*.jar' (que não tem as dependências)

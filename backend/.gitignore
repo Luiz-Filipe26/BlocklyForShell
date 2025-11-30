@@ -10,6 +10,9 @@ bin/
 pom.xml.*
 dependency-reduced-pom.xml
 
+# --- Frontend Build (Arquivos Gerados) ---
+src/main/resources/public/
+
 # --- IDEs (Eclipse, IntelliJ, VSCode) ---
 .classpath
 .project

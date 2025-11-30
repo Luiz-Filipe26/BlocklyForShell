@@ -29,6 +29,7 @@ cd ..
 
 # 2. Copia o arquivo identificado para a raiz
 cp "backend/$JAR_PATH" .
+chmod +x "$JAR_FILE"
 
 echo ""
 echo "✅ SUCESSO!"

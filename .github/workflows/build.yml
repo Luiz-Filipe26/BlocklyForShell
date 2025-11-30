@@ -1,12 +1,14 @@
-﻿name: Build and Continuous Release
+﻿name: Build and Release via Simple Tag
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch: # Permite rodar manualmente
+    tags:
+      - 'build*' 
+  
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: write 
 
 jobs:
   build:
@@ -32,33 +34,28 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
-    - name: Dar permissão de execução ao script de build
+    - name: Dar permissão de execução ao script
       run: chmod +x build_project.sh
 
-    - name: Rodar Script de Build Completo (Front e Back)
+    - name: Rodar Script de Build Completo
       run: ./build_project.sh
 
-    # 1. Cria ou move a Tag LATEST_BUILD para o commit atual
-    - name: Criar Tag de Build Contínuo
-      id: tag_action
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git tag -f LATEST_BUILD # Move a tag para o commit atual
-        git push origin LATEST_BUILD --force # Empurra a tag atualizada
-
-    # 2. Upload do JAR (Artefato Temporário)
+    # 1. Upload do Artefato Temporário (para você baixar o JAR nos logs)
     - name: Upload do JAR (Artifact)
       uses: actions/upload-artifact@v4
       with:
         name: blockly-for-shell-jar
         path: blockly-for-shell.jar
-        retention-days: 5
+        retention-days: 5 
 
-    # 3. Criar/Sobrescrever Release Permanente (Última Versão)
-    - name: Criar/Atualizar Release Permanente
+    # 2. Criação da Release Permanente
+    - name: Criar Release Permanente
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: LATEST_BUILD
+        tag_name: ${{ github.ref_name }}
+        name: Build via Tag ${{ github.ref_name }}
         files: blockly-for-shell.jar
+        body: |
+          Build sob demanda acionado pela tag `${{ github.ref_name }}`.
+          O arquivo .jar está atualizado e pronto para download.
         token: ${{ secrets.GITHUB_TOKEN }}

@@ -8,11 +8,13 @@ O **Blockly for Shell** é uma ferramenta educacional que utiliza a metáfora de
 
 Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores instalados. Apenas o Java Runtime (JRE 17+).
 
-1. Vá para a página de [**Última Versão (Release)**](./releases/tag/LATEST_BUILD) do repositório.
+1. Vá para a página de [**Última Versão (Release)**][latest-release].
 2. Baixe o arquivo `blockly-for-shell.jar` anexado à *Release*.
 3. **Apenas para usuários Linux:** Vá em Propriedades do arquivo e marque a opção "Permitir execução do arquivo como um programa".
 4. Dê um **duplo clique** no arquivo baixado para iniciar.
 5. Uma janela se abrirá. Clique em **"Abrir no Navegador"** e comece a programar!
+
+[latest-release]: https://github.com/Luiz-Filipe26/BlocklyForShell/releases/tag/LATEST_BUILD
 
 ## **✨ Funcionalidades Principais**
 

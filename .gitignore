@@ -1,0 +1,17 @@
+# Arquivos executáveis gerados na raiz
+*.jar
+*.exe
+
+# Arquivos de configuração de IDEs
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos de sistema (Mac e Windows)
+.DS_Store
+Thumbs.db

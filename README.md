@@ -4,13 +4,15 @@ Um ambiente interativo de **Programação Visual** para desmistificar a Linha de
 
 O **Blockly for Shell** é uma ferramenta educacional que utiliza a metáfora de blocos de encaixar (semelhante ao Scratch) para ensinar a lógica, sintaxe e composição de comandos de terminal (Bash). O objetivo é reduzir a carga cognitiva de iniciantes, permitindo que foquem na *lógica* da operação antes de memorizar a *sintaxe* textual.
 
-## **🚀 Como Rodar (Usuário Final)**
+## 🚀 Como Rodar (Usuário Final)
 
 Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores instalados. Apenas o Java Runtime (JRE 17+).
 
-1. Baixe o arquivo [**blockly-for-shell.jar**](https://www.google.com/search?q=./blockly-for-shell.jar) que se encontra na raiz deste repositório.  
-2. Dê um **duplo clique** no arquivo baixado para iniciar.  
-3. Uma janela se abrirá. Clique em **"Abrir no Navegador"** e comece a programar\!
+1. Vá para a página de [**Última Versão (Release)**](./releases/tag/LATEST_BUILD) do repositório.
+2. Baixe o arquivo `blockly-for-shell.jar` anexado à *Release*.
+3. **Apenas para usuários Linux:** Vá em Propriedades do arquivo e marque a opção "Permitir execução do arquivo como um programa".
+4. Dê um **duplo clique** no arquivo baixado para iniciar.
+5. Uma janela se abrirá. Clique em **"Abrir no Navegador"** e comece a programar!
 
 ## **✨ Funcionalidades Principais**
 

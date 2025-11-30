@@ -61,5 +61,4 @@ jobs:
       with:
         tag_name: LATEST_BUILD
         files: blockly-for-shell.jar
-        overwrite: true 
         token: ${{ secrets.GITHUB_TOKEN }}

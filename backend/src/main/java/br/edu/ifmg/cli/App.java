@@ -11,6 +11,7 @@ import io.javalin.http.staticfiles.Location;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URI;
+import java.util.Arrays;
 
 public class App {
 	private static final String[] CORS_ALLOWED_HOSTS = { "http://localhost:5173" };
@@ -28,16 +29,11 @@ public class App {
 	private static void startServer() {
 		var app = Javalin.create(config -> {
 			config.staticFiles.add("/public", Location.CLASSPATH);
-			
-            config.jetty.modifyHttpConfiguration(httpConfig -> {
-                httpConfig.setOutputBufferSize(5 * 1024 * 1024);
-            });
 
 			config.bundledPlugins.enableCors(cors -> {
 				cors.addRule(it -> {
-					for (var host : CORS_ALLOWED_HOSTS) {
-						it.allowHost(host);
-					}
+					Arrays.stream(CORS_ALLOWED_HOSTS).forEach(it::allowHost);
+					it.allowHost(APP_URL);
 				});
 			});
 
@@ -59,6 +55,7 @@ public class App {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 150);
         frame.setLocationRelativeTo(null);
+        frame.setLayout(null);
 
         var label = new JLabel("Servidor rodando em: " + APP_PORT);
         label.setBounds(0, 20, 280, 20);

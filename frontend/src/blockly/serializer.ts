@@ -30,7 +30,7 @@ export function serializeWorkspaceToAST(workspace: Blockly.WorkspaceSvg): AST.AS
           },
         ]
       : [],
-  } as AST.ScriptNode;
+  };
 }
 
 /**

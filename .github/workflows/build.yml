@@ -2,8 +2,8 @@
 
 on:
   push:
-    tags:
-      - 'build*' 
+    branches:
+      - 'main'
   
   workflow_dispatch:
 
@@ -13,6 +13,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[build]')"
 
     steps:
     - name: Checkout do Código
@@ -48,14 +49,14 @@ jobs:
         path: blockly-for-shell.jar
         retention-days: 5 
 
-    # 2. Criação da Release Permanente
-    - name: Criar Release Permanente
+    - name: Criar/Atualizar Release Única
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}
-        name: Build via Tag ${{ github.ref_name }}
+        tag_name: LATEST_BUILD 
+        name: 🚀 Versão Mais Recente (LATEST_BUILD)
         files: blockly-for-shell.jar
         body: |
-          Build sob demanda acionado pela tag `${{ github.ref_name }}`.
-          O arquivo .jar está atualizado e pronto para download.
-        token: ${{ secrets.GITHUB_TOKEN }}
+          Build disparado pelo commit: ${{ github.event.head_commit.message }}
+          Data: ${{ github.event.head_commit.timestamp }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

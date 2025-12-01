@@ -15,7 +15,7 @@ import {
     updateCardinalityIndicator,
 } from "./blockBuilders";
 import type { CLICommand } from "../types/cli";
-import type * as AST from "../types/ast";
+import { setBlockSemanticData } from "./metadataManager.ts";
 
 function appendCommandHeader(
     commandDefinition: CLICommand,
@@ -120,11 +120,10 @@ function setupExclusiveOptionsValidation(
 export function createCommandBlock(commandDefinition: CLICommand): void {
     Blockly.Blocks[commandDefinition.name] = {
         init: function (this: BlockSvg) {
-            const block = this as BlockSvg & { semanticData: AST.BlockSemanticData };
-            block.semanticData = {
+            setBlockSemanticData(this, {
                 nodeType: "command",
                 commandName: commandDefinition.command,
-            };
+            });
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);
             setupCommandDeduplication(commandDefinition, this);

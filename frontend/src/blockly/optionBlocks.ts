@@ -1,7 +1,7 @@
 import * as Blockly from "blockly/core";
 import { createGenericHelpIcon, setupParentIndicator } from "./blockBuilders";
 import type { CLICommand } from "../types/cli";
-import type * as AST from "../types/ast";
+import { setBlockSemanticData } from "./metadataManager.ts";
 
 function buildOptionDropdown(
     commandDefinition: CLICommand,
@@ -78,11 +78,10 @@ export function createOptionBlock(commandDefinition: CLICommand): void {
 
     Blockly.Blocks[type] = {
         init: function (this: Blockly.Block) {
-            const block = this as Blockly.Block & { semanticData: AST.BlockSemanticData };
-            block.semanticData = {
+            setBlockSemanticData(this, {
                 nodeType: "option",
                 relatedCommand: commandDefinition.command,
-            };
+            });
             appendOptionInputs(commandDefinition, this);
             setupParentIndicator(
                 this,

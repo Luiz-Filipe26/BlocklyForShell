@@ -1,9 +1,6 @@
 import * as Blockly from "blockly/core";
 import type * as AST from "../types/ast";
-
-interface BlockWithSemanticData extends Blockly.Block {
-    semanticData?: AST.BlockSemanticData;
-}
+import { getBlockSemanticData } from "./metadataManager.ts";
 
 const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
 
@@ -52,25 +49,23 @@ function serializeStack(startBlock: Blockly.Block | null): AST.ASTNode[] {
 }
 
 /**
- * Serializa um único bloco transformando-o em um objeto de dados puro.
+ * Serializa um bloco em um objeto de dados puro (AST Node).
  *
- * Estrutura de Saída:
+ * A função é intencionalmente genérica quanto ao tipo de bloco.
+ * Usa o WeakMap para recuperar os metadados semânticos (semanticData),
+ * que o Backend Java interpretará posteriormente.
+ *
+ * Estrutura de saída:
  * {
- *   nodeType: "command",
- *   commandName: "ls",
- *   fields: [
- *     { name: "FLAG", value: "-l" },
- *     { name: "VALUE", value: "texto" }
- *   ],
- *   inputs: [
- *     { name: "OPTIONS", children: [...] },
- *     { name: "OPERANDS", children: [...] }
- *   ]
+ *   fields: [...],
+ *   inputs: [...],
+ *   // Metadados essenciais usados pelo Backend Java para mapear o nó a um comando do Shell.
+ *   semanticData: { ... }
  * }
  */
+
 function serializeBlock(block: Blockly.Block): AST.ASTNode {
-    const blockWithSemanticData = block as BlockWithSemanticData;
-    const semanticData = blockWithSemanticData.semanticData;
+    const semanticData = getBlockSemanticData(block);
 
     const fields: AST.ASTField[] = [];
     block.inputList.forEach((input) => {
@@ -95,10 +90,6 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
         });
     });
 
-    // Constrói um nó AST genérico e copia o `semanticData` (se existir)
-    // sem interpretar campos específicos do domínio. Mantemos o serializador
-    // intencionalmente "burro"/agnóstico: ele apenas transpõe dados do bloco
-    // para o nó AST, sem tentar transformar em estruturas específicas de CLI.
     const node: AST.ASTNode = {
         nodeType: semanticData?.nodeType,
         fields,
@@ -107,9 +98,6 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
 
     if (semanticData) {
         // Anexa diretamente os dados semânticos do bloco ao nó AST.
-        // Quem precisar interpretar esses dados (por exemplo, um transformador
-        // que converta o AST cru em um AST específico de CLI) fará validações
-        // e transformações depois.
         node.semanticData = semanticData;
     }
 

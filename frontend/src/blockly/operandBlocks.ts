@@ -2,7 +2,7 @@ import * as Blockly from "blockly/core";
 import { validateOperandValue } from "./validators";
 import { setupParentIndicator } from "./blockBuilders";
 import type { CLICommand, CLIOperand } from "../types/cli";
-import type * as AST from "../types/ast";
+import { setBlockSemanticData } from "./metadataManager.ts";
 
 /* ============================================================
    INTERNAL HELPERS
@@ -57,13 +57,12 @@ function createSingleOperandBlock(
 
     Blockly.Blocks[type] = {
         init: function (this: Blockly.Block) {
-            const block = this as Blockly.Block & { semanticData: AST.BlockSemanticData };
-            block.semanticData = {
+            setBlockSemanticData(this, {
                 nodeType: "operand",
                 operandName: operandDefinition.name,
                 operandType: operandDefinition.type,
                 relatedCommand: commandDefinition.command,
-            };
+            });
             appendOperandInputs(commandDefinition, operandDefinition, this);
 
             setupParentIndicator(

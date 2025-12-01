@@ -14,7 +14,7 @@ Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores
 4. Dê um **duplo clique** no arquivo baixado para iniciar.
 5. Uma janela se abrirá. Clique em **"Abrir no Navegador"** e comece a programar!
 
-[latest-release]: https://github.com/Luiz-Filipe26/BlocklyForShell/releases/tag/build-now
+[latest-release]: https://github.com/Luiz-Filipe26/BlocklyForShell/releases/tag/LATEST_BUILD
 
 ## **✨ Funcionalidades Principais**
 

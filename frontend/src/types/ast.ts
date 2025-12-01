@@ -8,17 +8,11 @@ export interface ASTInput {
     children: ASTNode[];
 }
 
-export interface ASTBase {
-    nodeType?: string;
-    fields: ASTField[];
-    inputs: ASTInput[];
-}
 export interface ASTNode {
-    nodeType?: string;
+    nodeType: string; 
     fields: ASTField[];
     inputs: ASTInput[];
-    // Optional semantic data copied from the originating block (if any).
-    semanticData?: BlockSemanticData;
+    semanticData?: Omit<BlockSemanticData, "nodeType">;
 }
 
 export interface ScriptNode extends ASTNode {

@@ -1,6 +1,6 @@
 import * as Blockly from "blockly/core";
 import type * as AST from "../types/ast";
-import { getBlockSemanticData } from "./metadataManager.ts";
+import { getBlockSemanticData } from "./metadataManager";
 
 const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
 
@@ -50,22 +50,11 @@ function serializeStack(startBlock: Blockly.Block | null): AST.ASTNode[] {
 
 /**
  * Serializa um bloco em um objeto de dados puro (AST Node).
- *
- * A função é intencionalmente genérica quanto ao tipo de bloco.
- * Usa o WeakMap para recuperar os metadados semânticos (semanticData),
- * que o Backend Java interpretará posteriormente.
- *
- * Estrutura de saída:
- * {
- *   fields: [...],
- *   inputs: [...],
- *   // Metadados essenciais usados pelo Backend Java para mapear o nó a um comando do Shell.
- *   semanticData: { ... }
- * }
+ * Realiza a separação entre o nodeType (elevado para a raiz) e o restante
+ * dos dados semânticos.
  */
-
 function serializeBlock(block: Blockly.Block): AST.ASTNode {
-    const semanticData = getBlockSemanticData(block);
+    const rawSemanticData = getBlockSemanticData(block);
 
     const fields: AST.ASTField[] = [];
     block.inputList.forEach((input) => {
@@ -90,15 +79,23 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
         });
     });
 
+    let nodeType = "unknown";
+    let cleanedSemanticData: Omit<AST.BlockSemanticData, "nodeType"> | undefined;
+
+    if (rawSemanticData) {
+        const { nodeType: type, ...rest } = rawSemanticData;
+        nodeType = type;
+        cleanedSemanticData = rest;
+    }
+
     const node: AST.ASTNode = {
-        nodeType: semanticData?.nodeType,
+        nodeType,
         fields,
         inputs,
     };
 
-    if (semanticData) {
-        // Anexa diretamente os dados semânticos do bloco ao nó AST.
-        node.semanticData = semanticData;
+    if (cleanedSemanticData && Object.keys(cleanedSemanticData).length > 0) {
+        node.semanticData = cleanedSemanticData;
     }
 
     return node;

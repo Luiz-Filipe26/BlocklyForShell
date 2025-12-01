@@ -1,45 +1,57 @@
 package br.edu.ifmg.cli.services;
 
-import br.edu.ifmg.cli.models.AstScript;
 import br.edu.ifmg.cli.models.AstNode;
+import java.util.List;
 
 public class ScriptGenerator {
 
-    public String generate(AstScript script) {
+    /**
+     * Gera um Shell Script a partir de uma árvore AST.
+     * @param rootNode O nó raiz (geralmente do tipo "script").
+     * @return O código Bash gerado.
+     */
+    public String generate(AstNode rootNode) {
         StringBuilder sb = new StringBuilder();
 
-        if (!"script".equals(script.type()))
-            throw new IllegalArgumentException("AST root inválida.");
+        List<AstNode> commands = rootNode.getChildren("commands");
 
-        for (AstNode cmd : script.commands()) {
-            sb.append(generateCommand(cmd)).append("\n");
+        for (AstNode cmd : commands) {
+            String commandStr = generateCommand(cmd);
+            if (!commandStr.isEmpty()) {
+                sb.append(commandStr).append("\n");
+            }
         }
 
         return sb.toString().trim();
     }
 
-
     private String generateCommand(AstNode node) {
-        if (!"command".equals(node.nodeType()))
-            throw new IllegalArgumentException("Esperado nodeType 'command'.");
+        if (!"command".equals(node.getType())) {
+            return "";
+        }
+
+        // Se por algum motivo o semanticData não vier, aborta para evitar NullPointerException
+        if (node.semanticData() == null) {
+            return "";
+        }
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(node.commandName());
+        sb.append(node.semanticData().commandName());
 
-        // OPTIONS
-        var options = node.inputs().get("OPTIONS");
-        if (options != null) {
-            for (AstNode opt : options) {
-                sb.append(" ").append(generateOption(opt));
+        List<AstNode> options = node.getChildren("OPTIONS");
+        for (AstNode opt : options) {
+            String flag = generateOption(opt);
+            if (!flag.isEmpty()) {
+                sb.append(" ").append(flag);
             }
         }
 
-        // OPERANDS
-        var operands = node.inputs().get("OPERANDS");
-        if (operands != null) {
-            for (AstNode op : operands) {
-                sb.append(" ").append(generateOperand(op));
+        List<AstNode> operands = node.getChildren("OPERANDS");
+        for (AstNode op : operands) {
+            String value = generateOperand(op);
+            if (!value.isEmpty()) {
+                sb.append(" ").append(value);
             }
         }
 
@@ -47,16 +59,28 @@ public class ScriptGenerator {
     }
 
     private String generateOption(AstNode node) {
-        if (!"option".equals(node.nodeType()))
-            throw new IllegalArgumentException("Esperado nodeType 'option'.");
-
-        return node.fields().get("FLAG");
+        return node.getField("FLAG").orElse("");
     }
 
     private String generateOperand(AstNode node) {
-        if (!"operand".equals(node.nodeType()))
-            throw new IllegalArgumentException("Esperado nodeType 'operand'.");
+        String rawValue = node.getField("VALUE").orElse("");
 
-        return node.fields().get("VALUE");
+        // Sanitização - evita Shell Injection
+        return quoteArgument(rawValue);
+    }
+
+    /**
+     * Envolve o argumento em aspas simples para segurança no Bash.
+     * Trata corretamente aspas simples existentes dentro da string.
+     * * Ex: O'Neil -> 'O'\''Neil'
+     * Ex: arquivo com espaços -> 'arquivo com espaços'
+     * Ex: ; rm -rf / -> '; rm -rf /' (vira apenas uma string inofensiva)
+     */
+    private String quoteArgument(String rawInput) {
+        if (rawInput == null || rawInput.isEmpty()) {
+            return "''"; // Argumento vazio explícito
+        }
+        // Fecha a aspa, insere uma aspa escapada, reabre a aspa
+        return "'" + rawInput.replace("'", "'\\''") + "'";
     }
 }

@@ -1,10 +1,13 @@
 package br.edu.ifmg.cli;
 
 import java.awt.Desktop;
+import java.awt.Image;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -83,6 +86,15 @@ public class App {
         frame.setSize(300, 150);
         frame.setLocationRelativeTo(null);
         frame.setLayout(null);
+        
+        try (var stream = App.class.getResourceAsStream("/launcher_icon.png")) {
+            if (stream != null) {
+                Image icon = ImageIO.read(stream);
+                frame.setIconImages(List.of(icon)); 
+            }
+        } catch (Exception e) {
+            System.err.println("Aviso: Falha ao carregar o ícone da aplicação. " + e.getMessage());
+        }
 
         var label = new JLabel("Servidor rodando em: " + APP_PORT);
         label.setBounds(0, 20, 280, 20);

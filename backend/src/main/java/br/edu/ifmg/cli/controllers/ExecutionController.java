@@ -1,12 +1,11 @@
 package br.edu.ifmg.cli.controllers;
 
+import br.edu.ifmg.cli.models.AstNode;
+import br.edu.ifmg.cli.models.ExecutionResult;
+import br.edu.ifmg.cli.services.SandboxRunner;
+import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
-
-import br.edu.ifmg.cli.models.AstScript;
-import br.edu.ifmg.cli.services.ScriptGenerator;
-import br.edu.ifmg.cli.services.SandboxRunner;
-import br.edu.ifmg.cli.models.ExecutionResult;
 
 public class ExecutionController {
 
@@ -24,7 +23,7 @@ public class ExecutionController {
 
     private void run(Context ctx) {
         try {
-            AstScript script = ctx.bodyAsClass(AstScript.class);
+            AstNode script = ctx.bodyAsClass(AstNode.class);
 
             String shellScript = generator.generate(script);
 

@@ -1,6 +1,6 @@
 package br.edu.ifmg.cli.controllers;
 
-import br.edu.ifmg.cli.models.AstScript;
+import br.edu.ifmg.cli.models.AstNode;
 import br.edu.ifmg.cli.models.GeneratedScript;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
@@ -20,7 +20,7 @@ public class ScriptController {
 
     private void generateScript(Context ctx) {
         try {
-            AstScript script = ctx.bodyAsClass(AstScript.class);
+            AstNode script = ctx.bodyAsClass(AstNode.class);
 
             String shellScript = generator.generate(script);
             

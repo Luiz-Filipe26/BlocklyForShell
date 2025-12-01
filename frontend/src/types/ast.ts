@@ -1,6 +1,6 @@
 export interface ASTField {
   name: string;
-  value: unknown;
+  value: string;
 }
 
 export interface ASTInput {

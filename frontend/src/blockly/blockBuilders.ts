@@ -9,50 +9,53 @@ interface LocalChangeHandler {
   (block: Blockly.Block): void;
 }
 
-interface BlockWithLocalHandlers extends Blockly.Block {
-  __localChangeHandlers?: LocalChangeHandler[];
-}
-
 interface CardinalityProblems {
   optionsSetMissing?: number;
   operandsSetMissing?: number;
   missingOperands?: Array<{ name: string; amount: number }>;
 }
 
+const blockHandlersMap = new WeakMap<Blockly.Block, LocalChangeHandler[]>();
+
+interface LocalChangeHandler {
+  (block: Blockly.Block): void;
+}
+
 export function addLocalChangeListener(
   block: Blockly.Block,
   listenerFunction: LocalChangeHandler,
 ): void {
-  const customBlock = block as BlockWithLocalHandlers;
+  let handlers = blockHandlersMap.get(block);
 
-  if (!customBlock.__localChangeHandlers) {
-    customBlock.__localChangeHandlers = [];
+  if (!handlers) {
+    handlers = [];
+    blockHandlersMap.set(block, handlers);
 
     block.setOnChange(() => {
-      for (const handler of customBlock.__localChangeHandlers!) {
-        try {
-          handler(block);
-        } catch (error) {
-          console.error("Erro em change-handler:", error);
+      const currentHandlers = blockHandlersMap.get(block);
+      if (currentHandlers) {
+        for (const handler of currentHandlers) {
+          try {
+            handler(block);
+          } catch (error) {
+            console.error("Erro em change-handler:", error);
+          }
         }
       }
     });
   }
 
-  customBlock.__localChangeHandlers.push(listenerFunction);
+  handlers.push(listenerFunction);
 }
 
 export function removeLocalChangeListener(
   block: Blockly.Block,
   listenerFunction: LocalChangeHandler,
 ): void {
-  const customBlock = block as BlockWithLocalHandlers;
-
-  if (!customBlock.__localChangeHandlers) return;
-
-  customBlock.__localChangeHandlers = customBlock.__localChangeHandlers.filter(
-    (handler) => handler !== listenerFunction,
-  );
+  const handlers = blockHandlersMap.get(block);
+  if (!handlers) return;
+  const newHandlers = handlers.filter((handler) => handler !== listenerFunction);
+  blockHandlersMap.set(block, newHandlers);
 }
 
 /* ===========================

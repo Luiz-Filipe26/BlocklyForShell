@@ -78,7 +78,7 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
       if (field.name && field.getValue && !IGNORED_FIELDS.includes(field.name)) {
         fields.push({
           name: field.name,
-          value: field.getValue(),
+          value: String(field.getValue()),
         });
       }
     });

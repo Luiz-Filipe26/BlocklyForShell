@@ -1,14 +1,14 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  build: {
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ["blockly"],
+    build: {
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ["blockly"],
+                },
+            },
         },
-      },
     },
-  },
 });

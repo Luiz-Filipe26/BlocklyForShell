@@ -10,13 +10,13 @@ let currentHelpBalloon: HTMLDivElement | null = null;
  * @param duration A duração em milissegundos.
  */
 export function showToast(
-  workspace: Blockly.WorkspaceSvg,
-  message: string,
-  duration = 5000
+    workspace: Blockly.WorkspaceSvg,
+    message: string,
+    duration = 5000
 ): void {
-  const toast = document.createElement("div");
-  toast.textContent = message;
-  toast.style.cssText = `
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.cssText = `
         position: absolute;
         top: 10px;
         right: 10px;
@@ -30,16 +30,16 @@ export function showToast(
         transition: opacity 0.3s ease;
         z-index: 9999;
     `;
-  const workspaceContainer = workspace.getParentSvg().parentNode;
-  workspaceContainer?.appendChild(toast);
+    const workspaceContainer = workspace.getParentSvg().parentNode;
+    workspaceContainer?.appendChild(toast);
 
-  requestAnimationFrame(() => {
-    toast.style.opacity = "1";
-  });
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.addEventListener("transitionend", () => toast.remove());
-  }, duration);
+    requestAnimationFrame(() => {
+        toast.style.opacity = "1";
+    });
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.addEventListener("transitionend", () => toast.remove());
+    }, duration);
 }
 
 /**
@@ -48,64 +48,64 @@ export function showToast(
  * @param sourceElement O elemento SVG (o ícone) que o balão deve seguir.
  */
 export function showHelpBalloon(text: string, sourceElement: SVGElement): void {
-  if (currentHelpBalloon) {
-    currentHelpBalloon.remove();
-    currentHelpBalloon = null;
-  }
-
-  const balloon = document.createElement("div");
-  balloon.className = "help-balloon";
-  balloon.innerHTML = text;
-  document.body.appendChild(balloon);
-  currentHelpBalloon = balloon;
-
-  const rect = sourceElement.getBoundingClientRect();
-  const scrollX = window.scrollX;
-  const scrollY = window.scrollY;
-  balloon.style.left = `${scrollX + rect.right + 5}px`;
-  balloon.style.top = `${scrollY + rect.top}px`;
-
-  const closeListener = (event: Event): void => {
-    if (currentHelpBalloon && currentHelpBalloon.contains(event.target as Node)) {
-      return;
-    }
-    if (sourceElement.contains(event.target as Node)) {
-      return;
-    }
     if (currentHelpBalloon) {
-      currentHelpBalloon.remove();
-      currentHelpBalloon = null;
+        currentHelpBalloon.remove();
+        currentHelpBalloon = null;
     }
-    document.removeEventListener("click", closeListener, true);
-  };
 
-  setTimeout(() => {
-    document.addEventListener("click", closeListener, true);
-  }, 0);
+    const balloon = document.createElement("div");
+    balloon.className = "help-balloon";
+    balloon.innerHTML = text;
+    document.body.appendChild(balloon);
+    currentHelpBalloon = balloon;
+
+    const rect = sourceElement.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    balloon.style.left = `${scrollX + rect.right + 5}px`;
+    balloon.style.top = `${scrollY + rect.top}px`;
+
+    const closeListener = (event: Event): void => {
+        if (currentHelpBalloon && currentHelpBalloon.contains(event.target as Node)) {
+            return;
+        }
+        if (sourceElement.contains(event.target as Node)) {
+            return;
+        }
+        if (currentHelpBalloon) {
+            currentHelpBalloon.remove();
+            currentHelpBalloon = null;
+        }
+        document.removeEventListener("click", closeListener, true);
+    };
+
+    setTimeout(() => {
+        document.addEventListener("click", closeListener, true);
+    }, 0);
 }
 
 export function buildCommandHelpHTML(
-  commandDefinition: CliDefinitions["commands"][number]
+    commandDefinition: CliDefinitions["commands"][number]
 ): string {
-  let html = `
+    let html = `
         <h3>${commandDefinition.command}</h3>
         <p>${commandDefinition.description}</p>
         <strong>Opções disponíveis:</strong>
         <ul style="margin-left:20px; list-style-type:disc;">
     `;
 
-  for (const optionDefinition of commandDefinition.options) {
-    const longFlagSuffix = optionDefinition.longFlag
-      ? ` (${optionDefinition.longFlag})`
-      : "";
+    for (const optionDefinition of commandDefinition.options) {
+        const longFlagSuffix = optionDefinition.longFlag
+            ? ` (${optionDefinition.longFlag})`
+            : "";
 
-    html += `
+        html += `
             <li>
                 <strong>${optionDefinition.flag}</strong>${longFlagSuffix}:
                 ${optionDefinition.description}
             </li>
         `;
-  }
+    }
 
-  return html + "</ul>";
+    return html + "</ul>";
 }

@@ -1,28 +1,28 @@
 export interface ASTField {
-  name: string;
-  value: string;
+    name: string;
+    value: string;
 }
 
 export interface ASTInput {
-  name: string;
-  children: ASTNode[];
+    name: string;
+    children: ASTNode[];
 }
 
 export interface ASTBase {
-  nodeType?: string;
-  fields: ASTField[];
-  inputs: ASTInput[];
+    nodeType?: string;
+    fields: ASTField[];
+    inputs: ASTInput[];
 }
 export interface ASTNode {
-  nodeType?: string;
-  fields: ASTField[];
-  inputs: ASTInput[];
-  // Optional semantic data copied from the originating block (if any).
-  semanticData?: BlockSemanticData;
+    nodeType?: string;
+    fields: ASTField[];
+    inputs: ASTInput[];
+    // Optional semantic data copied from the originating block (if any).
+    semanticData?: BlockSemanticData;
 }
 
 export interface ScriptNode extends ASTNode {
-  nodeType: "script";
+    nodeType: "script";
 }
 
 export type AST = ScriptNode;
@@ -32,23 +32,23 @@ export type AST = ScriptNode;
    ============================================================ */
 
 export interface BlockSemanticDataCommand {
-  nodeType: "command";
-  commandName: string;
+    nodeType: "command";
+    commandName: string;
 }
 
 export interface BlockSemanticDataOperand {
-  nodeType: "operand";
-  operandName: string;
-  operandType: string;
-  relatedCommand: string;
+    nodeType: "operand";
+    operandName: string;
+    operandType: string;
+    relatedCommand: string;
 }
 
 export interface BlockSemanticDataOption {
-  nodeType: "option";
-  relatedCommand: string;
+    nodeType: "option";
+    relatedCommand: string;
 }
 
-export type BlockSemanticData = 
-  | BlockSemanticDataCommand 
-  | BlockSemanticDataOperand 
-  | BlockSemanticDataOption;
+export type BlockSemanticData =
+    | BlockSemanticDataCommand
+    | BlockSemanticDataOperand
+    | BlockSemanticDataOption;

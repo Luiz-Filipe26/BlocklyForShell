@@ -4,7 +4,8 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f0f2f5;
@@ -71,7 +72,7 @@ body {
     background-color: #fff;
     border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .panel h2 {
@@ -114,6 +115,7 @@ pre {
     background-color: #28a745;
     color: white;
 }
+
 #run-btn:hover {
     background-color: #218838;
 }
@@ -122,6 +124,7 @@ pre {
     background-color: #dc3545;
     color: white;
 }
+
 #clear-btn:hover {
     background-color: #c82333;
 }

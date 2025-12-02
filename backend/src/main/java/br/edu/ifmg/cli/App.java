@@ -22,6 +22,7 @@ import com.google.gson.GsonBuilder;
 import br.edu.ifmg.cli.controllers.DefinitionController;
 import br.edu.ifmg.cli.controllers.ExecutionController;
 import br.edu.ifmg.cli.controllers.ScriptController;
+import br.edu.ifmg.cli.services.DockerService;
 import br.edu.ifmg.cli.services.SandboxRunner;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
@@ -34,6 +35,7 @@ public class App {
 	private static final String APP_URL = "http://localhost:" + APP_PORT;
 
 	public static void main(String[] args) {
+		new DockerService().ensureImageExists();
 		var serverThread = new Thread(App::startServer);
 		serverThread.setName("JavalinServerThread");
 		serverThread.start();

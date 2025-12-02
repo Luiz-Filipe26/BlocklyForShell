@@ -8,6 +8,7 @@ import { initSystemBlocks } from "./blockly/systemBlocks";
 import { disableOrphanBlocks } from "./blockly/orphanHandler";
 import { serializeWorkspaceToAST } from "./blockly/serializer";
 import type { CliDefinitions } from "./types/cli";
+import { ExecutionResult } from "./types/api";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -116,7 +117,66 @@ async function start(): Promise<void> {
         }
     }
 
-    workspace!.addChangeListener((event) => {
+    pageElements.runBtn.addEventListener("click", async () => {
+        if (!workspace) return;
+
+        const ast = serializeWorkspaceToAST(workspace);
+        if (!ast) {
+            pageElements.cliOutput.textContent += "\n$ (Nenhum comando para executar)\n";
+            return;
+        }
+
+        const currentScript = pageElements.codeOutput.textContent || "";
+
+        pageElements.runBtn.disabled = true;
+
+        pageElements.cliOutput.textContent += `\n$ ${currentScript}\n`;
+        pageElements.cliOutput.scrollTop = pageElements.cliOutput.scrollHeight;
+
+        try {
+            const response = await fetch("http://localhost:7000/api/run", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ast),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+
+            const result: ExecutionResult = await response.json();
+
+            let outputText = "";
+
+            if (result.stdout) {
+                outputText += result.stdout;
+                if (!outputText.endsWith("\n")) outputText += "\n";
+            }
+
+            if (result.stderr) {
+                outputText += `[STDERR]: ${result.stderr}\n`;
+            }
+
+            pageElements.cliOutput.textContent += outputText;
+
+            if (result.exitCode !== 0) {
+                 pageElements.cliOutput.textContent += `(exit code: ${result.exitCode})\n`;
+            }
+
+        } catch (error) {
+            console.error(error);
+            pageElements.cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n`;
+        } finally {
+            pageElements.runBtn.disabled = false;
+            pageElements.cliOutput.scrollTop = pageElements.cliOutput.scrollHeight;
+        }
+    });
+
+    pageElements.clearBtn.addEventListener("click", () => {
+        pageElements.cliOutput.textContent = "$";
+    });
+
+    workspace.addChangeListener((event) => {
         // ignore UI-only events (e.g. click, selected)
         if (event.isUiEvent) return;
         const now = Date.now();

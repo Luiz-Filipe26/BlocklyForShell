@@ -23,6 +23,7 @@ import br.edu.ifmg.cli.controllers.DefinitionController;
 import br.edu.ifmg.cli.controllers.ExecutionController;
 import br.edu.ifmg.cli.controllers.ScriptController;
 import br.edu.ifmg.cli.services.DockerService;
+import br.edu.ifmg.cli.services.LevelService;
 import br.edu.ifmg.cli.services.SandboxRunner;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
@@ -44,23 +45,23 @@ public class App {
 	}
 
 	private static void startServer() {
-        Gson gson = new GsonBuilder().create();
-        JsonMapper gsonMapper = new JsonMapper() {
-            @Override
-            public String toJsonString(@NotNull Object obj, @NotNull Type type) {
-                return gson.toJson(obj, type);
-            }
+		Gson gson = new GsonBuilder().create();
+		JsonMapper gsonMapper = new JsonMapper() {
+			@Override
+			public String toJsonString(@NotNull Object obj, @NotNull Type type) {
+				return gson.toJson(obj, type);
+			}
 
-            @Override
-            public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
-                return gson.fromJson(json, targetType);
-            }
-        };
-		
+			@Override
+			public <T> T fromJsonString(@NotNull String json, @NotNull Type targetType) {
+				return gson.fromJson(json, targetType);
+			}
+		};
+
 		var app = Javalin.create(config -> {
 			config.staticFiles.add("/public", Location.CLASSPATH);
-			
-            config.jsonMapper(gsonMapper);
+
+			config.jsonMapper(gsonMapper);
 
 			config.bundledPlugins.enableCors(cors -> {
 				cors.addRule(it -> {
@@ -74,43 +75,47 @@ public class App {
 
 		var scriptGenerator = new ScriptGenerator();
 		var sandboxRunner = new SandboxRunner();
+		var levelService = new LevelService();
 
 		new DefinitionController().registerRoutes(app);
-		new ExecutionController(scriptGenerator, sandboxRunner).registerRoutes(app);
+		new ExecutionController(scriptGenerator, sandboxRunner, levelService).registerRoutes(app);
 		new ScriptController(scriptGenerator).registerRoutes(app);
 
 		app.start(APP_PORT);
 	}
 
 	private static void createLauncherGUI() {
-        var frame = new JFrame("TCC Launcher");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(300, 150);
-        frame.setLocationRelativeTo(null);
-        frame.setLayout(null);
-        
-        try (var stream = App.class.getResourceAsStream("/launcher_icon.png")) {
-            if (stream != null) {
-                Image icon = ImageIO.read(stream);
-                frame.setIconImages(List.of(icon)); 
-            }
-        } catch (Exception e) {
-            System.err.println("Aviso: Falha ao carregar o ícone da aplicação. " + e.getMessage());
-        }
+		var frame = new JFrame("TCC Launcher");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(300, 150);
+		frame.setLocationRelativeTo(null);
+		frame.setLayout(null);
 
-        var label = new JLabel("Servidor rodando em: " + APP_PORT);
-        label.setBounds(0, 20, 280, 20);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        frame.add(label);
+		try (var stream = App.class.getResourceAsStream("/launcher_icon.png")) {
+			if (stream != null) {
+				Image icon = ImageIO.read(stream);
+				frame.setIconImages(List.of(icon));
+			}
+		} catch (Exception e) {
+			System.err.println("Aviso: Falha ao carregar o ícone da aplicação. " + e.getMessage());
+		}
 
-        var openOnBrowserButton = new JButton("Abrir Navegador");
-        openOnBrowserButton.setBounds(50, 60, 180, 30);
-        openOnBrowserButton.addActionListener(e -> {
-            try { Desktop.getDesktop().browse(new URI(APP_URL)); }
-            catch (Exception ex) { ex.printStackTrace(); }
-        });
-        frame.add(openOnBrowserButton);
+		var label = new JLabel("Servidor rodando em: " + APP_PORT);
+		label.setBounds(0, 20, 280, 20);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		frame.add(label);
 
-        frame.setVisible(true);
+		var openOnBrowserButton = new JButton("Abrir Navegador");
+		openOnBrowserButton.setBounds(50, 60, 180, 30);
+		openOnBrowserButton.addActionListener(e -> {
+			try {
+				Desktop.getDesktop().browse(new URI(APP_URL));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		});
+		frame.add(openOnBrowserButton);
+
+		frame.setVisible(true);
 	}
 }

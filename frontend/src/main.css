@@ -129,3 +129,23 @@ pre {
 #clear-btn:hover {
     background-color: #c82333;
 }
+
+#level-select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    background-color: #fff;
+}
+
+.mission-box {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 10px;
+    font-size: 0.95em;
+    color: #0d47a1;
+    line-height: 1.4;
+    border-radius: 0 4px 4px 0;
+}

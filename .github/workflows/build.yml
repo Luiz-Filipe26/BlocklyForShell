@@ -52,7 +52,8 @@ jobs:
     - name: Criar/Atualizar Release Única
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: LATEST_BUILD 
+        tag_name: LATEST_BUILD
+        target_commitish: ${{ github.sha }}
         name: 🚀 Versão Mais Recente (LATEST_BUILD)
         files: blockly-for-shell.jar
         body: |

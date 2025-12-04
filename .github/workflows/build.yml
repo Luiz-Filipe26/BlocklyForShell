@@ -58,9 +58,9 @@ jobs:
         git push origin $TAG_NAME
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Criar/Atualizar Release Única
-      uses: softprops/action-gh-release@v1
+
+    - name: Fetch Tags Novamente
+      run: git fetch --tags
 
     - name: Criar/Atualizar Release Única
       uses: softprops/action-gh-release@v1

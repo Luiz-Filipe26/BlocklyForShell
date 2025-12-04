@@ -21,8 +21,7 @@ public class DockerService {
 				return;
 			if (!checkDockerPermissions())
 				return;
-
-			// Se chegou aqui, tenta buildar
+			
 			buildImage();
 
 		} catch (Exception e) {

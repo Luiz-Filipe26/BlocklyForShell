@@ -70,7 +70,7 @@ jobs:
         name: 🚀 Versão Mais Recente (LATEST_BUILD)
         files: blockly-for-shell.jar
         body: |
-          Build disparado pelo commit: ${{ github.event.head_commit.message }}
+          Build disparado pelo commit: ${{ github.sha }}
           Data: ${{ github.event.head_commit.timestamp }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

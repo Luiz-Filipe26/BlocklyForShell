@@ -4,6 +4,8 @@ import { createToolbox } from "./toolboxBuilder";
 import type { CliDefinitions } from "../types/cli";
 import { initSystemBlocks } from "./systemBlocks";
 import { createBlocksFromDefinition } from "./blockBuilders";
+import { createControlBlock } from "./controlBlocks";
+import { createOperatorBlock } from "./operatorBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
 
 function getBlocklyOptions(
@@ -58,6 +60,18 @@ export async function setupWorkspace(
 
         for (const definition of cliDefinitions.commands) {
             createBlocksFromDefinition(definition);
+        }
+
+        if (cliDefinitions.controls) {
+            for (const ctrl of cliDefinitions.controls) {
+                createControlBlock(ctrl);
+            }
+        }
+
+        if (cliDefinitions.operators) {
+            for (const op of cliDefinitions.operators) {
+                createOperatorBlock(op);
+            }
         }
 
         workspace = Blockly.inject(

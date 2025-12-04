@@ -9,7 +9,7 @@ export interface ASTInput {
 }
 
 export interface ASTNode {
-    nodeType: string; 
+    nodeType: string;
     fields: ASTField[];
     inputs: ASTInput[];
     semanticData?: Omit<BlockSemanticData, "nodeType">;
@@ -20,10 +20,6 @@ export interface ScriptNode extends ASTNode {
 }
 
 export type AST = ScriptNode;
-
-/* ============================================================
-   SEMANTIC DATA (attached to Blockly blocks)
-   ============================================================ */
 
 export interface BlockSemanticDataCommand {
     nodeType: "command";
@@ -42,7 +38,19 @@ export interface BlockSemanticDataOption {
     relatedCommand: string;
 }
 
+export interface BlockSemanticDataControl {
+    nodeType: "control";
+    commandName: string;
+}
+
+export interface BlockSemanticDataOperator {
+    nodeType: "operator";
+    commandName: string;
+}
+
 export type BlockSemanticData =
     | BlockSemanticDataCommand
     | BlockSemanticDataOperand
-    | BlockSemanticDataOption;
+    | BlockSemanticDataOption
+    | BlockSemanticDataControl
+    | BlockSemanticDataOperator;

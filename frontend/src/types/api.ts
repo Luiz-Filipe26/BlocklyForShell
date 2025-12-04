@@ -12,6 +12,11 @@ export interface Level {
     description: string;
 }
 
+export interface GameData {
+    levels: Level[];
+    levelOrder: string[];
+}
+
 export interface RunRequest {
     ast: AST | null;
     levelId: string | null;

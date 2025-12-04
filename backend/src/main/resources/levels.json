@@ -1,21 +1,22 @@
-[
-  {
-    "id": "lvl_01",
-    "title": "Primeiros Passos",
-    "description": "Crie um diretório chamado 'projetos' para organizar seu trabalho.",
-    "setupCommands": [
-      "rm -rf projetos" 
-    ],
-    "verificationScript": "if [ -d 'projetos' ]; then echo '✅ Pasta encontrada!'; exit 0; else echo '❌ A pasta projetos não existe.'; exit 1; fi"
-  },
-  {
-    "id": "lvl_02",
-    "title": "O Arquivo Secreto",
-    "description": "Mova o arquivo 'plano_secreto.txt' para dentro da pasta 'cofre'.",
-    "setupCommands": [
-      "mkdir cofre",
-      "touch plano_secreto.txt"
-    ],
-    "verificationScript": "if [ -f 'cofre/plano_secreto.txt' ] && [ ! -f 'plano_secreto.txt' ]; then echo '✅ Arquivo movido com sucesso!'; exit 0; else echo '❌ O arquivo não está no cofre ou ainda existe na origem.'; exit 1; fi"
-  }
-]
+{
+  "levels": [
+    {
+      "id": "intro_mkdir",
+      "title": "Criando Pastas",
+      "description": "Crie um diretório chamado 'projetos' para organizar seu trabalho.",
+      "setupCommands": ["rm -rf projetos"],
+      "verificationScript": "if [ -d 'projetos' ]; then echo '✅ Pasta encontrada!'; exit 0; else echo '❌ A pasta projetos não existe.'; exit 1; fi"
+    },
+    {
+      "id": "file_mv",
+      "title": "O Arquivo Secreto",
+      "description": "Mova o arquivo 'plano_secreto.txt' para dentro da pasta 'cofre'.",
+      "setupCommands": ["mkdir cofre", "touch plano_secreto.txt"],
+      "verificationScript": "if [ -f 'cofre/plano_secreto.txt' ] && [ ! -f 'plano_secreto.txt' ]; then echo '✅ Arquivo movido com sucesso!'; exit 0; else echo '❌ O arquivo não está no cofre ou ainda existe na origem.'; exit 1; fi"
+    }
+  ],
+  "levelOrder": [
+    "intro_mkdir",
+    "file_mv"
+  ]
+}

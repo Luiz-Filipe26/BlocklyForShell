@@ -1,4 +1,4 @@
-import { Level } from "../types/api";
+import { GameData, Level } from "../types/api";
 
 let currentLevelId: string | null = null;
 
@@ -11,10 +11,18 @@ export async function setupLevelSelector(
     levelDescription: HTMLDivElement,
 ) {
     try {
-        const response = await fetch("http://localhost:7000/api/levels");
+        const response = await fetch("http://localhost:7000/api/game-data");
         if (!response.ok) throw new Error("Falha ao buscar níveis");
 
-        const levels: Level[] = await response.json();
+        const gameData: GameData = await response.json();
+
+        const levelsMap = new Map(
+            gameData.levels.map((level) => [level.id, level]),
+        );
+
+        const sortedLevels = gameData.levelOrder
+            .map((id) => levelsMap.get(id))
+            .filter((level): level is Level => level !== undefined);
 
         levelSelect.innerHTML = "";
 
@@ -23,10 +31,13 @@ export async function setupLevelSelector(
         sandboxOption.text = "🛠️ Modo Livre (Sandbox)";
         levelSelect.appendChild(sandboxOption);
 
-        levels.forEach((level) => {
+        sortedLevels.forEach((level, index) => {
             const option = document.createElement("option");
             option.value = level.id;
-            option.text = `Level ${level.id}: ${level.title}`;
+
+            const visualIndex = index + 1;
+            option.text = `Nível ${visualIndex}: ${level.title}`;
+
             option.dataset.description = level.description;
             levelSelect.appendChild(option);
         });

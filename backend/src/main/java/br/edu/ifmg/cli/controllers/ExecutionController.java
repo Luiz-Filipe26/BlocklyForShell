@@ -25,11 +25,11 @@ public class ExecutionController {
 
     public void registerRoutes(Javalin app) {
         app.post("/api/run", this::run);
-        app.get("/api/levels", this::listLevels);
+        app.get("/api/game-data", this::getGameData); // Mudança de nome para clareza
     }
 
-    private void listLevels(Context ctx) {
-        ctx.json(levelService.getAllLevels());
+    private void getGameData(Context ctx) {
+        ctx.json(levelService.getGameData());
     }
 
     private void run(Context ctx) {

@@ -9,120 +9,104 @@ import java.util.Comparator;
 
 public class DockerService {
 
-    private static final String IMAGE_NAME = "blockly-shell-env";
-    private static final String DOCKERFILE_RESOURCE = "/docker/Dockerfile";
+	public static final String IMAGE_NAME = "blockly-shell-env";
 
-    /**
-     * Garante que o ambiente Docker está configurado, o usuário tem permissão 
-     * e a imagem necessária está construída.
-     */
-    public void ensureImageExists() {
-        System.out.println("🐳 Verificando ambiente Docker...");
-        
-        try {
-            if (!checkDockerBinary()) {
-                return;
-            }
+	public static final String DOCKERFILE_RESOURCE = "/docker/Dockerfile";
 
-            if (!checkDockerPermissions()) {
-                return;
-            }
+	public void ensureImageExists() {
+		System.out.println("🐳 [DockerService] Verificando ambiente...");
 
-            buildImage();
+		try {
+			if (!checkDockerBinary())
+				return;
+			if (!checkDockerPermissions())
+				return;
 
-        } catch (Exception e) {
-            System.err.println("❌ ERRO INTERNO DO DOCKER SERVICE: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+			// Se chegou aqui, tenta buildar
+			buildImage();
 
-    private boolean checkDockerBinary() throws InterruptedException, IOException {
-        try {
-            int dockerCheck = new ProcessBuilder("docker", "--version").start().waitFor();
-            if (dockerCheck != 0) {
-                System.err.println("❌ ERRO: Docker não encontrado ou falhou na execução.");
-                System.err.println("   -> Por favor, certifique-se de que o Docker está instalado e no seu PATH.");
-                return false;
-            }
-            return true;
-        } catch (IOException e) {
-            System.err.println("❌ ERRO CRÍTICO: Binário 'docker' não encontrado.");
-            System.err.println("   -> Certifique-se de que o Docker Engine está instalado.");
-            return false;
-        }
-    }
+		} catch (Exception e) {
+			System.err.println("❌ [DockerService] Erro crítico não tratado: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
-    private boolean checkDockerPermissions() throws InterruptedException, IOException {
-        Process process = new ProcessBuilder("docker", "ps").start();
-        int permCheck = process.waitFor();
-        
-        if (permCheck != 0) {
-            System.err.println("❌ ERRO DE PERMISSÃO: O usuário atual não pode acessar o daemon Docker.");
-            System.err.println("   -> SOLUÇÃO LINUX: Adicione seu usuário ao grupo 'docker' e faça login novamente:");
-            System.err.println("      $ sudo usermod -aG docker $USER");
-            System.err.println("      (Depois rode 'newgrp docker' ou faça logout)");
-            return false;
-        }
-        return true;
-    }
+	private boolean checkDockerBinary() {
+		try {
+			int exitCode = new ProcessBuilder("docker", "--version").start().waitFor();
+			if (exitCode != 0) {
+				System.err.println("❌ [DockerService] 'docker --version' retornou erro. O Docker está instalado?");
+				return false;
+			}
+			return true;
+		} catch (Exception e) {
+			System.err.println("❌ [DockerService] Não foi possível encontrar o binário 'docker' no PATH.");
+			return false;
+		}
+	}
 
-    private void buildImage() throws Exception {
-        Path tempDir = Files.createTempDirectory("blockly_docker_build");
-        
-        try {
-            System.out.println("🔨 Extraindo e construindo imagem '" + IMAGE_NAME + "'...");
+	private boolean checkDockerPermissions() {
+		try {
+			int exitCode = new ProcessBuilder("docker", "ps").start().waitFor();
+			if (exitCode != 0) {
+				System.err.println("❌ [DockerService] Permissão negada ao acessar o Docker Daemon.");
+				System.err.println("   -> Execute: sudo usermod -aG docker $USER");
+				System.err.println("   -> Depois faça Logout/Login.");
+				return false;
+			}
+			return true;
+		} catch (Exception e) {
+			System.err.println("❌ [DockerService] Erro ao verificar permissões: " + e.getMessage());
+			return false;
+		}
+	}
 
-            extractResource(DOCKERFILE_RESOURCE, tempDir.resolve("Dockerfile"));
-            
-            ProcessBuilder pb = new ProcessBuilder(
-                "docker", "build", "-t", IMAGE_NAME, "."
-            );
-            pb.directory(tempDir.toFile());
-            pb.redirectErrorStream(true);
-            
-            Process buildProcess = pb.start();
-            
-            // Opcional: Ler e logar a saída do build em tempo real se necessário
-            buildProcess.getInputStream().transferTo(System.out);
+	private void buildImage() throws Exception {
+		Path tempDir = Files.createTempDirectory("blockly_docker_build");
+		try {
+			System.out.println("🔨 [DockerService] Iniciando build da imagem '" + IMAGE_NAME + "'...");
 
-            int buildCode = buildProcess.waitFor();
+			extractResource(DOCKERFILE_RESOURCE, tempDir.resolve("Dockerfile"));
 
-            if (buildCode == 0) {
-                System.out.println("✅ Imagem Docker pronta para uso!");
-            } else {
-                System.err.println("❌ Falha ao construir imagem Docker (Código: " + buildCode + ").");
-            }
+			ProcessBuilder pb = new ProcessBuilder("docker", "build", "-t", IMAGE_NAME, ".");
+			pb.directory(tempDir.toFile());
+			pb.redirectErrorStream(true);
 
-        } finally {
-            // 3. Limpeza: Deleta a pasta temporária recursivamente
-            deleteDirectory(tempDir);
-        }
-    }
+			Process process = pb.start();
 
+			process.getInputStream().transferTo(System.out);
 
-    /**
-     * Copia um recurso do Classpath (dentro do JAR) para um arquivo no sistema de arquivos.
-     */
-    private void extractResource(String resourcePath, Path destination) throws IOException {
-        URL url = getClass().getResource(resourcePath);
-        if (url == null) throw new IOException("Recurso não encontrado: " + resourcePath);
-        try (var stream = url.openStream()) {
-            Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
+			int exitCode = process.waitFor();
 
-    /**
-     * Deleta um diretório e seu conteúdo recursivamente.
-     */
-    private void deleteDirectory(Path path) {
-        try {
-            Files.walk(path)
-                .sorted(Comparator.reverseOrder()) // Garante que filhos sejam deletados antes dos pais
-                .forEach(p -> {
-                    try { Files.delete(p); } catch (IOException ignored) {}
-                });
-        } catch (IOException e) {
-            System.err.println("Aviso: Falha ao limpar o diretório temporário: " + path);
-        }
-    }
+			if (exitCode == 0) {
+				System.out.println("✅ [DockerService] Imagem pronta com sucesso!");
+			} else {
+				System.err.println("❌ [DockerService] Falha no 'docker build'. Código de saída: " + exitCode);
+			}
+
+		} finally {
+			deleteDirectory(tempDir);
+		}
+	}
+
+	private void extractResource(String resourcePath, Path destination) throws IOException {
+		URL url = getClass().getResource(resourcePath);
+		if (url == null)
+			throw new IOException("Resource not found: " + resourcePath);
+		try (var stream = url.openStream()) {
+			Files.copy(stream, destination, StandardCopyOption.REPLACE_EXISTING);
+		}
+	}
+
+	private void deleteDirectory(Path path) {
+		try {
+			Files.walk(path).sorted(Comparator.reverseOrder()).forEach(p -> {
+				try {
+					Files.delete(p);
+				} catch (IOException ignored) {
+				}
+			});
+		} catch (IOException e) {
+		}
+	}
 }

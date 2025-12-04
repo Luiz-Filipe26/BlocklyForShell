@@ -5,6 +5,7 @@ import * as Blockly from "blockly/core";
 export async function runScript(
     workspace: Blockly.WorkspaceSvg,
     cliOutput: HTMLPreElement,
+    codeOutput: HTMLPreElement,
     runBtn: HTMLButtonElement,
     currentLevelId: string | null,
 ) {
@@ -14,12 +15,12 @@ export async function runScript(
         return;
     }
 
-    const currentScript = cliOutput.textContent || "";
-    cliOutput.textContent += `\n$ ${currentScript}\n`;
+    const commandToEcho = codeOutput.textContent || "";
+
+    cliOutput.textContent += `\n$ ${commandToEcho}\n`;
 
     runBtn.disabled = true;
     runBtn.textContent = "Executando...";
-
     cliOutput.scrollTop = cliOutput.scrollHeight;
 
     try {
@@ -39,10 +40,22 @@ export async function runScript(
         const result: ExecutionResult = await response.json();
 
         let outputText = "";
+
         if (result.stdout) {
-            outputText += result.stdout;
-            if (!outputText.endsWith("\n") && outputText.length > 0)
+            const cleanStdout = result.stdout
+                .split("\n")
+                .filter(
+                    (line) =>
+                        !line.includes("--- INICIO DA EXECUÇÃO ---") &&
+                        !line.includes("--- VERIFICACAO ---"),
+                )
+                .join("\n");
+
+            outputText += cleanStdout;
+
+            if (!outputText.endsWith("\n") && outputText.length > 0) {
                 outputText += "\n";
+            }
         }
 
         if (result.stderr) {
@@ -50,19 +63,21 @@ export async function runScript(
         }
 
         cliOutput.textContent += outputText;
-        if (!currentLevelId && result.exitCode !== 0) {
-            cliOutput.textContent += `(Processo finalizou com erro: ${result.exitCode})\n`;
-        }
 
-        if (!currentLevelId) return;
-
-        if (result.exitCode !== 0) {
-            cliOutput.textContent += `⚠️ O objetivo não foi atingido (exit code: ${result.exitCode}). Tente novamente.\n`;
+        if (!currentLevelId) {
+            if (result.exitCode !== 0) {
+                cliOutput.textContent += `(Processo finalizou com erro: ${result.exitCode})\n`;
+            }
             return;
         }
 
-        cliOutput.textContent +=
-            "✨ SUCESSO! Objetivo do nível concluído. ✨\n";
+        if (result.exitCode === 0) {
+            cliOutput.textContent +=
+                "✨ SUCESSO! Objetivo do nível concluído. ✨\n";
+        } else {
+            cliOutput.textContent +=
+                "⚠️ O objetivo não foi atingido. Verifique a mensagem acima e tente novamente.\n";
+        }
     } catch (error) {
         console.error(error);
         cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n`;

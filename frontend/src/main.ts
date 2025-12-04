@@ -40,6 +40,7 @@ async function start(): Promise<void> {
         runScript(
             workspace,
             pageElements.cliOutput,
+            pageElements.codeOutput,
             pageElements.runBtn,
             getCurrentLevelId(),
         );

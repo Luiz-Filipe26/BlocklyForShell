@@ -16,14 +16,15 @@ public class App {
             window.startLogRedirection();
             window.setVisible(true);
 
-            new Thread(() -> startBackendLogic(), "BackendInitThread").start();
+            new Thread(() -> startBackendLogic(window), "BackendInitThread").start();
         });
     }
 
-    private static void startBackendLogic() {
+    private static void startBackendLogic(LauncherWindow window) {
         try {
             new DockerService().ensureImageExists();
             new ServerInitializer().start(APP_PORT);
+            window.enableBrowserButton();
             
         } catch (Exception e) {
             System.err.println("❌ Erro fatal na inicialização: " + e.getMessage());

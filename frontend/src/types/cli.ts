@@ -26,11 +26,12 @@ export interface CLIOption {
 }
 
 export interface CLICommand {
-    command: string;
-    name: string;
+    id: string;
+    shellCommand: string;
+    presentationName: string;
     description: string;
     color: string;
-    option_color: string;
+    optionColor: string;
     options: CLIOption[];
     optionsMin?: number;
     exclusiveOptions?: string[][];

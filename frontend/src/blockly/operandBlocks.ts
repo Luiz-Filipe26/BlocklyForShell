@@ -33,14 +33,14 @@ function appendOperandInputs(
     block
         .appendDummyInput("MAIN_INPUT")
         .appendField(
-            `(operando de: ${commandDefinition.command})`,
+            `(operando de: ${commandDefinition.shellCommand})`,
             "PARENT_INDICATOR",
         )
         .appendField(`${operandDefinition.name}:`)
         .appendField(field, "VALUE");
 
-    block.setPreviousStatement(true, `${commandDefinition.name}_Operand`);
-    block.setNextStatement(true, `${commandDefinition.name}_Operand`);
+    block.setPreviousStatement(true, `${commandDefinition.id}_Operand`);
+    block.setNextStatement(true, `${commandDefinition.id}_Operand`);
     block.setColour(operandDefinition.color || commandDefinition.color);
     block.setTooltip(operandDefinition.description);
 }
@@ -53,7 +53,7 @@ function createSingleOperandBlock(
     commandDefinition: CLICommand,
     operandDefinition: CLIOperand,
 ): void {
-    const type = `${commandDefinition.name}_${operandDefinition.name}_operand`;
+    const type = `${commandDefinition.id}_${operandDefinition.name}_operand`;
 
     Blockly.Blocks[type] = {
         init: function (this: Blockly.Block) {
@@ -61,14 +61,14 @@ function createSingleOperandBlock(
                 nodeType: "operand",
                 operandName: operandDefinition.name,
                 operandType: operandDefinition.type,
-                relatedCommand: commandDefinition.command,
+                relatedCommand: commandDefinition.shellCommand,
             });
             appendOperandInputs(commandDefinition, operandDefinition, this);
 
             setupParentIndicator(
                 this,
                 commandDefinition,
-                `(operando de: ${commandDefinition.command})`,
+                `(operando de: ${commandDefinition.shellCommand})`,
             );
         },
     };

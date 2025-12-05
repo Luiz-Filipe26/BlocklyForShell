@@ -90,7 +90,7 @@ public class ScriptGenerator {
 		if (def == null)
 			return "# Erro: Operador não definido no JSON: " + opId;
 
-		String symbol = def.command();
+		String symbol = def.shellCommand();
 
 		AstNode left = getSingleChild(node, "A");
 		AstNode right = getSingleChild(node, "B");
@@ -109,7 +109,7 @@ public class ScriptGenerator {
 		if (def == null)
 			return "# Erro: Controle não definido no JSON: " + controlId;
 
-		String bashCommand = def.command();
+		String bashCommand = def.shellCommand();
 
 		if ("if".equals(bashCommand)) {
 			return generateIfTemplate(node);

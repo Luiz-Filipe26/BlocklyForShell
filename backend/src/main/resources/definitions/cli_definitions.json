@@ -1,11 +1,11 @@
 {
   "commands": [
     {
-      "command": "ls",
-      "name": "ls",
+      "shellCommand": "ls",
+      "presentationName": "ls",
       "description": "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
       "color": "#5b80a5",
-      "option_color": "#7fbf7f",
+      "optionColor": "#7fbf7f",
       "options": [
         {
           "flag": "-l",
@@ -82,11 +82,11 @@
       ]
     },
     {
-      "command": "cd",
-      "name": "cd",
+      "shellCommand": "cd",
+      "presentationName": "cd",
       "description": "Navegar entre pastas",
       "color": "#7fc37f",
-      "option_color": "#7fbf7f",
+      "optionColor": "#7fbf7f",
       "options": [
         {
           "flag": "-l",
@@ -112,11 +112,11 @@
       ]
     },
     {
-      "command": "mkdir",
-      "name": "mkdir",
+      "shellCommand": "mkdir",
+      "presentationName": "mkdir",
       "description": "Criar pastas",
       "color": "#8e44ad", 
-      "option_color": "#7fbf7f",
+      "optionColor": "#7fbf7f",
       "options": [
         {
            "flag": "-p",

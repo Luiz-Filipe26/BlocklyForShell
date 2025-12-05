@@ -57,16 +57,16 @@ function appendOptionInputs(
     block
         .appendDummyInput("MAIN_INPUT")
         .appendField(
-            `(opção de: ${commandDefinition.command})`,
+            `(opção de: ${commandDefinition.shellCommand})`,
             "PARENT_INDICATOR",
         )
         .appendField(" ")
         .appendField(dropdown, "FLAG")
         .appendField(helpIcon);
 
-    block.setPreviousStatement(true, `${commandDefinition.name}_Option`);
-    block.setNextStatement(true, `${commandDefinition.name}_Option`);
-    block.setColour(commandDefinition.option_color || commandDefinition.color);
+    block.setPreviousStatement(true, `${commandDefinition.id}_Option`);
+    block.setNextStatement(true, `${commandDefinition.id}_Option`);
+    block.setColour(commandDefinition.optionColor || commandDefinition.color);
 }
 
 export function createOptionBlock(commandDefinition: CLICommand): void {
@@ -74,19 +74,19 @@ export function createOptionBlock(commandDefinition: CLICommand): void {
         return;
     }
 
-    const type = `${commandDefinition.name}_option`;
+    const type = `${commandDefinition.id}_option`;
 
     Blockly.Blocks[type] = {
         init: function (this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "option",
-                relatedCommand: commandDefinition.command,
+                relatedCommand: commandDefinition.shellCommand,
             });
             appendOptionInputs(commandDefinition, this);
             setupParentIndicator(
                 this,
                 commandDefinition,
-                `(opção de: ${commandDefinition.command})`,
+                `(opção de: ${commandDefinition.shellCommand})`,
             );
         },
     };

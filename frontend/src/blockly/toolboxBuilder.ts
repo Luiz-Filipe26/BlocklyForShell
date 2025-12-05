@@ -28,20 +28,20 @@ type ToolboxItem = ToolboxCategory | ToolboxBlock;
  * Transforma um Comando em uma Categoria (Pasta) contendo o comando e seus filhos.
  */
 function transformCommandToCategory(def: CLICommand): ToolboxCategory {
-    const contents: ToolboxBlock[] = [{ kind: "block", type: def.name }];
+    const contents: ToolboxBlock[] = [{ kind: "block", type: def.id }];
 
-    contents.push({ kind: "block", type: `${def.name}_option` });
+    contents.push({ kind: "block", type: `${def.id}_option` });
 
     def.operands.forEach((op) => {
         contents.push({
             kind: "block",
-            type: `${def.name}_${op.name}_operand`,
+            type: `${def.id}_${op.name}_operand`,
         });
     });
 
     return {
         kind: "category",
-        name: def.command,
+        name: def.id,
         colour: def.color,
         contents,
     };
@@ -58,7 +58,7 @@ export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
     const itemRegistry = new Map<string, ToolboxItem>();
 
     cli_definitions.commands.forEach((command) => {
-        itemRegistry.set(command.command, transformCommandToCategory(command));
+        itemRegistry.set(command.id, transformCommandToCategory(command));
     });
 
     cli_definitions.controls.forEach((control) => {

@@ -1,7 +1,7 @@
 import * as Blockly from "blockly/core";
 
 import { createToolbox } from "./toolboxBuilder";
-import type { CliDefinitions } from "../types/cli";
+import type { CLICommand, CliDefinitions } from "../types/cli";
 import { initSystemBlocks } from "./systemBlocks";
 import { createBlocksFromDefinition } from "./blockBuilders";
 import { createControlBlock } from "./controlBlocks";
@@ -38,6 +38,24 @@ function getBlocklyOptions(
     };
 }
 
+interface RawCLICommand extends Omit<CLICommand, "id"> {
+    id?: string;
+}
+
+interface RawCliDefinitions extends Omit<CliDefinitions, "commands"> {
+    commands: RawCLICommand[];
+}
+
+function normalizeCliDefinitions(raw: RawCliDefinitions): CliDefinitions {
+    return {
+        ...raw,
+        commands: raw.commands.map((command) => ({
+            ...command,
+            id: command.id || command.shellCommand,
+        })),
+    };
+}
+
 async function createScriptRoot(workspace: Blockly.WorkspaceSvg) {
     const rootBlock = workspace.newBlock("script_root");
     rootBlock.initSvg();
@@ -56,7 +74,8 @@ export async function setupWorkspace(
         if (!response.ok)
             throw new Error(`Erro na API Definitions: ${response.status}`);
 
-        const cliDefinitions = await response.json();
+        const rawJson = await response.json();
+        const cliDefinitions = normalizeCliDefinitions(rawJson);
 
         for (const definition of cliDefinitions.commands) {
             createBlocksFromDefinition(definition);

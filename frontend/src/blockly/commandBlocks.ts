@@ -24,12 +24,12 @@ function appendCommandHeader(
     const helpIcon = createGenericHelpIcon(
         () => buildCommandHelpHTML(commandDefinition),
         30,
-        `Ajuda para ${commandDefinition.command}`,
+        `Ajuda para ${commandDefinition.presentationName}`,
     );
 
     block
         .appendDummyInput("HEADER")
-        .appendField(commandDefinition.name)
+        .appendField(commandDefinition.presentationName)
         .appendField(" ")
         .appendField(helpIcon)
         .appendField(createCardinalityField(28), "CARDINALITY_ICON");
@@ -42,14 +42,14 @@ function appendCommandInputs(
     if (commandDefinition.options && commandDefinition.options.length > 0) {
         block
             .appendStatementInput("OPTIONS")
-            .setCheck(`${commandDefinition.name}_Option`)
+            .setCheck(`${commandDefinition.id}_Option`)
             .appendField("Opções:");
     }
 
     if (commandDefinition.operands && commandDefinition.operands.length > 0) {
         block
             .appendStatementInput("OPERANDS")
-            .setCheck(`${commandDefinition.name}_Operand`)
+            .setCheck(`${commandDefinition.id}_Operand`)
             .appendField("Operandos:");
     }
 
@@ -68,7 +68,7 @@ function setupCommandDeduplication(
         if (!firstOptionBlock) return;
 
         const optionBlocks = getBlocksList(firstOptionBlock).filter(
-            (child) => child.type === `${commandDefinition.name}_option`,
+            (child) => child.type === `${commandDefinition.id}_option`,
         );
 
         unplugDuplicatesFromList(block.workspace, optionBlocks, (child) =>
@@ -104,7 +104,7 @@ function setupExclusiveOptionsValidation(
         if (!firstOptionBlock) return;
 
         const optionBlocks = getBlocksList(firstOptionBlock).filter(
-            (child) => child.type === `${commandDefinition.name}_option`,
+            (child) => child.type === `${commandDefinition.id}_option`,
         );
 
         if (commandDefinition.exclusiveOptions) {
@@ -118,11 +118,11 @@ function setupExclusiveOptionsValidation(
 }
 
 export function createCommandBlock(commandDefinition: CLICommand): void {
-    Blockly.Blocks[commandDefinition.name] = {
+    Blockly.Blocks[commandDefinition.id] = {
         init: function (this: BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "command",
-                commandName: commandDefinition.command,
+                commandName: commandDefinition.shellCommand,
             });
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);

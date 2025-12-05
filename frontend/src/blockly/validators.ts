@@ -98,7 +98,7 @@ export function collectCardinalityProblems(
     }
 
     for (const operandDefinition of commandDefinition.operands) {
-        const operandType = `${commandDefinition.name}_${operandDefinition.name}_operand`;
+        const operandType = `${commandDefinition.id}_${operandDefinition.name}_operand`;
 
         const operandBlocksOfType = operandsRoot
             ? getBlocksList(operandsRoot).filter((b) => b.type === operandType)
@@ -136,7 +136,7 @@ export function autoFixExcessOperands(
         const max = operandDef.cardinality?.max;
         if (typeof max !== "number") continue;
 
-        const operandType = `${commandDefinition.name}_${operandDef.name}_operand`;
+        const operandType = `${commandDefinition.id}_${operandDef.name}_operand`;
         const blocksOfType = allBlocks.filter((b) => b.type === operandType);
 
         if (blocksOfType.length > max) {

@@ -153,7 +153,7 @@ export function setupParentIndicator(
         if (!indicatorField) return;
 
         const insideRoot =
-            block.getSurroundParent()?.type === commandDefinition.name;
+            block.getSurroundParent()?.type === commandDefinition.id;
         indicatorField.setValue(insideRoot ? "" : textWhenOutside);
     });
 }

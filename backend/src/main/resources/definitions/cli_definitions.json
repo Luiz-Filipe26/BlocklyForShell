@@ -21,7 +21,7 @@
         {
           "flag": "-h",
           "longFlag": "--human-readable",
-          "description": "Com -l, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G).",
+          "description": "Com -h, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G).",
           "takesArgument": false
         },
         {

@@ -1,12 +1,11 @@
-import * as Blockly from "blockly/core";
-import { BlockSvg } from "blockly/core";
+import * as Blockly from "blockly";
 import type { CLIControl } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager";
 import { createCardinalityField } from "./blockBuilders";
 
 export function createControlBlock(controlDefinition: CLIControl) {
     Blockly.Blocks[controlDefinition.name] = {
-        init: function(this: BlockSvg) {
+        init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "control",
                 commandName: controlDefinition.name,

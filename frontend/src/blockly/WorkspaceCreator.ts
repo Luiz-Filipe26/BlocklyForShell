@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 
 import { createToolbox } from "./toolboxBuilder";
 import type { CLICommand, CliDefinitions } from "../types/cli";
@@ -56,11 +56,38 @@ function normalizeCliDefinitions(raw: RawCliDefinitions): CliDefinitions {
     };
 }
 
-async function createScriptRoot(workspace: Blockly.WorkspaceSvg) {
+export async function createScriptRoot(workspace: Blockly.WorkspaceSvg) {
     const rootBlock = workspace.newBlock("script_root");
     rootBlock.initSvg();
     rootBlock.render();
     rootBlock.moveBy(50, 50);
+}
+
+function initCustomContextMenu() {
+    const CLEAR_OPTION_ID = "workspace_clear_all_custom";
+
+    try {
+        Blockly.ContextMenuRegistry.registry.unregister(CLEAR_OPTION_ID);
+    } catch (e) { }
+
+    Blockly.ContextMenuRegistry.registry.register({
+        displayText: "🗑️ Limpar e Resetar",
+        preconditionFn: function() {
+            return "enabled";
+        },
+        callback: function(scope) {
+            const workspace = scope.workspace;
+            if (!workspace) return;
+
+            if (confirm("Tem certeza que deseja apagar todos os blocos?")) {
+                workspace.clear();
+                createScriptRoot(workspace);
+            }
+        },
+        scopeType: Blockly.ContextMenuRegistry.ScopeType.WORKSPACE,
+        id: CLEAR_OPTION_ID,
+        weight: 0,
+    });
 }
 
 export async function setupWorkspace(
@@ -100,6 +127,8 @@ export async function setupWorkspace(
 
         disableOrphanBlocks(workspace);
         createScriptRoot(workspace);
+
+        initCustomContextMenu();
 
         return workspace;
     } catch (error) {

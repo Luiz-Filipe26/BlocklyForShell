@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 
 const ORPHAN_DISABLED_REASON = "orphan_block";
 

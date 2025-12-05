@@ -1,6 +1,6 @@
 import { ExecutionResult, RunRequest } from "../types/api";
 import { serializeWorkspaceToAST } from "./serializer";
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 
 export async function runScript(
     workspace: Blockly.WorkspaceSvg,

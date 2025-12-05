@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 import type { BlockSemanticData } from "../types/ast";
 
 // O WeakMap segura os dados sem impedir que o Garbage Collector limpe a memória

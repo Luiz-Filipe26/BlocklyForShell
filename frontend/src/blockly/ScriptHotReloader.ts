@@ -1,5 +1,5 @@
 import { serializeWorkspaceToAST } from "./serializer";
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 
 const MIN_INTERVAL_MS = 700;
 let lastRequestTime = 0;

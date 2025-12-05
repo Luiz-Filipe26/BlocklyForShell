@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 import { showHelpBalloon } from "./uiFeedback";
 import { createCommandBlock } from "./commandBlocks";
 import { createOptionBlock } from "./optionBlocks";

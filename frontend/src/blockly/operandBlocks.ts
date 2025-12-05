@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 import { validateOperandValue } from "./validators";
 import { setupParentIndicator } from "./blockBuilders";
 import type { CLICommand, CLIOperand } from "../types/cli";

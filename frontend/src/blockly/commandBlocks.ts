@@ -1,5 +1,4 @@
-import * as Blockly from "blockly/core";
-import { BlockSvg } from "blockly/core";
+import * as Blockly from "blockly";
 import { buildCommandHelpHTML } from "./uiFeedback";
 import {
     autoFixExcessOperands,
@@ -19,7 +18,7 @@ import { setBlockSemanticData } from "./metadataManager.ts";
 
 function appendCommandHeader(
     commandDefinition: CLICommand,
-    block: BlockSvg,
+    block: Blockly.BlockSvg,
 ): void {
     const helpIcon = createGenericHelpIcon(
         () => buildCommandHelpHTML(commandDefinition),
@@ -37,7 +36,7 @@ function appendCommandHeader(
 
 function appendCommandInputs(
     commandDefinition: CLICommand,
-    block: BlockSvg,
+    block: Blockly.BlockSvg,
 ): void {
     if (commandDefinition.options && commandDefinition.options.length > 0) {
         block
@@ -61,7 +60,7 @@ function appendCommandInputs(
 
 function setupCommandDeduplication(
     commandDefinition: CLICommand,
-    block: BlockSvg,
+    block: Blockly.BlockSvg,
 ): void {
     addLocalChangeListener(block, () => {
         const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
@@ -79,7 +78,7 @@ function setupCommandDeduplication(
 
 function setupCardinalityPipeline(
     commandDefinition: CLICommand,
-    block: BlockSvg,
+    block: Blockly.BlockSvg,
 ): void {
     addLocalChangeListener(block, () => {
         const problems = collectCardinalityProblems(block, commandDefinition);
@@ -90,7 +89,7 @@ function setupCardinalityPipeline(
 
 function setupExclusiveOptionsValidation(
     commandDefinition: CLICommand,
-    block: BlockSvg,
+    block: Blockly.BlockSvg,
 ): void {
     if (
         !commandDefinition.exclusiveOptions ||
@@ -119,7 +118,7 @@ function setupExclusiveOptionsValidation(
 
 export function createCommandBlock(commandDefinition: CLICommand): void {
     Blockly.Blocks[commandDefinition.id] = {
-        init: function (this: BlockSvg) {
+        init: function (this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "command",
                 commandName: commandDefinition.shellCommand,

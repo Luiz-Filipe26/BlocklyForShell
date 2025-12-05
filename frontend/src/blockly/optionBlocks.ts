@@ -1,4 +1,4 @@
-import * as Blockly from "blockly/core";
+import * as Blockly from "blockly";
 import { createGenericHelpIcon, setupParentIndicator } from "./blockBuilders";
 import type { CLICommand } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager.ts";

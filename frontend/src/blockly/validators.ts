@@ -1,5 +1,4 @@
-import * as Blockly from "blockly/core";
-import { BlockSvg } from "blockly/core";
+import * as Blockly from "blockly";
 import { showToast } from "./uiFeedback";
 import type { CLIValidation, CLICommand } from "../types/cli";
 
@@ -124,7 +123,7 @@ export function collectCardinalityProblems(
    REMOÇÃO DE EXCESSO DE OPERANDS
    ============================================ */
 export function autoFixExcessOperands(
-    commandBlock: BlockSvg,
+    commandBlock: Blockly.BlockSvg,
     commandDefinition: CLICommand,
 ): void {
     const operandsRoot = commandBlock.getInputTargetBlock("OPERANDS");

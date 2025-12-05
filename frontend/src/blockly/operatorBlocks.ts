@@ -1,11 +1,10 @@
-import * as Blockly from "blockly/core";
-import { BlockSvg } from "blockly/core";
+import * as Blockly from "blockly";
 import type { CLIOperator } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager";
 
 export function createOperatorBlock(operatorDefinition: CLIOperator) {
     Blockly.Blocks[operatorDefinition.name] = {
-        init: function (this: BlockSvg) {
+        init: function (this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "operator",
                 commandName: operatorDefinition.id,

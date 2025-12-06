@@ -45,5 +45,22 @@
                 </div>
             </aside>
         </main>
+        <dialog id="validation-modal" class="modal-overlay">
+            <div class="modal-content error-theme">
+                <div class="modal-header">
+                    <h2>⚠️ Correções Necessárias</h2>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        O script não pode ser executado pois contém blocos
+                        inválidos:
+                    </p>
+                    <ul id="validation-error-list"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button id="close-modal-btn">Entendi, vou corrigir</button>
+                </div>
+            </div>
+        </dialog>
     </body>
 </html>

@@ -14,7 +14,7 @@ export interface CLIOperand {
     color: string;
     type: "file" | "folder" | "string";
     defaultValue: string;
-    cardinality: CLICardinality;
+    cardinality?: CLICardinality;
     validations: CLIValidation[];
 }
 

@@ -1,5 +1,5 @@
 import * as Blockly from "blockly";
-import { validateOperandValue } from "./validators";
+import { renderBlockWarnings, validateOperandValue } from "./validators";
 import { setupParentIndicator } from "./blockBuilders";
 import type { CLICommand, CLIOperand } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager.ts";
@@ -16,9 +16,11 @@ function buildOperandField(
         operandDefinition.defaultValue || "",
     );
 
-    textField.setValidator((text: string): string | null =>
-        validateOperandValue(text, operandDefinition.validations, block),
-    );
+    textField.setValidator((newValue) => {
+        validateOperandValue(newValue, operandDefinition.validations, block);
+        renderBlockWarnings(block);
+        return newValue;
+    });
 
     return textField;
 }
@@ -56,7 +58,7 @@ function createSingleOperandBlock(
     const type = `${commandDefinition.id}_${operandDefinition.name}_operand`;
 
     Blockly.Blocks[type] = {
-        init: function (this: Blockly.Block) {
+        init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "operand",
                 operandName: operandDefinition.name,

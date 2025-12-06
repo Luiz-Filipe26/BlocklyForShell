@@ -4,15 +4,10 @@ import { createCommandBlock } from "./commandBlocks";
 import { createOptionBlock } from "./optionBlocks";
 import { createOperandBlocks } from "./operandBlocks";
 import type { CLICommand } from "../types/cli";
+import { getErrors } from "./validationManager";
 
 interface LocalChangeHandler {
     (block: Blockly.Block): void;
-}
-
-interface CardinalityProblems {
-    optionsSetMissing?: number;
-    operandsSetMissing?: number;
-    missingOperands?: Array<{ name: string; amount: number }>;
 }
 
 const blockHandlersMap = new WeakMap<Blockly.Block, LocalChangeHandler[]>();
@@ -54,7 +49,9 @@ export function removeLocalChangeListener(
 ): void {
     const handlers = blockHandlersMap.get(block);
     if (!handlers) return;
-    const newHandlers = handlers.filter((handler) => handler !== listenerFunction);
+    const newHandlers = handlers.filter(
+        (handler) => handler !== listenerFunction,
+    );
     blockHandlersMap.set(block, newHandlers);
 }
 
@@ -74,48 +71,18 @@ export function createCardinalityField(size: number = 28): Blockly.FieldImage {
 }
 
 /**
- * Atualiza warningText + ícone com base nos problemas detectados.
+ * Atualiza ícone de alerta de problemas.
  */
-export function updateCardinalityIndicator(
-    commandBlock: Blockly.Block,
-    problems: CardinalityProblems,
-): void {
+export function updateCardinalityIndicator(commandBlock: Blockly.Block): void {
     const field = commandBlock.getField("CARDINALITY_ICON");
-    if (!field) return;
+    if (!(field instanceof Blockly.FieldImage)) return;
 
-    const {
-        optionsSetMissing = 0,
-        operandsSetMissing = 0,
-        missingOperands = [],
-    } = problems;
+    const errors = getErrors(commandBlock);
+    const hasCardinalityProblems = errors.some((error) =>
+        error.id.startsWith("CARDINALITY_"),
+    );
 
-    const hasProblems =
-        optionsSetMissing > 0 ||
-        operandsSetMissing > 0 ||
-        missingOperands.length > 0;
-
-    if (!hasProblems) {
-        commandBlock.setWarningText(null);
-        (field as Blockly.FieldImage).setValue(CARD_ICON_EMPTY);
-        return;
-    }
-
-    let msg = "";
-
-    if (missingOperands.length > 0) {
-        msg += "Faltam operandos:\n";
-        for (const missing of missingOperands)
-            msg += ` - ${missing.name}: precisa de ${missing.amount}\n`;
-    }
-
-    if (operandsSetMissing > 0)
-        msg += `Faltam operandos obrigatórios (${operandsSetMissing} no mínimo).\n`;
-
-    if (optionsSetMissing > 0)
-        msg += `Faltam opções obrigatórias (${optionsSetMissing}).`;
-
-    commandBlock.setWarningText(msg);
-    (field as Blockly.FieldImage).setValue(CARD_ICON_ALERT);
+    field.setValue(hasCardinalityProblems ? CARD_ICON_ALERT : CARD_ICON_EMPTY);
 }
 
 /* ===========================
@@ -127,7 +94,12 @@ export function createGenericHelpIcon(
     size: number = 30,
     altText: string = "?",
 ): Blockly.FieldImage {
-    const helpIcon = new Blockly.FieldImage("/info_icon.svg", size, size, altText);
+    const helpIcon = new Blockly.FieldImage(
+        "/info_icon.svg",
+        size,
+        size,
+        altText,
+    );
 
     helpIcon.setOnClickHandler(() => {
         const helpText = getHelpTextFn();

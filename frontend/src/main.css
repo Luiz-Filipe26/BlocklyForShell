@@ -174,3 +174,94 @@ body {
 #clear-btn:hover {
     background-color: #c82333;
 }
+
+/* Estilos do Modal Nativo (<dialog>) */
+dialog {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 0;
+    margin: auto;
+    max-width: 500px;
+    width: 90%;
+    animation: fadeIn 0.2s ease-out;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    background-color: #dc3545; /* Vermelho Erro */
+    color: white;
+    padding: 15px 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.modal-body {
+    padding: 20px;
+    background-color: #fff;
+    font-size: 1rem;
+    color: #333;
+}
+
+#validation-error-list {
+    margin-top: 15px;
+    padding-left: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#validation-error-list li {
+    margin-bottom: 10px;
+    line-height: 1.4;
+    color: #c82333; /* Texto vermelho escuro */
+}
+
+/* Destaca o nome do bloco no erro */
+#validation-error-list strong {
+    color: #333;
+    font-weight: bold;
+}
+
+.modal-footer {
+    padding: 15px;
+    background-color: #f8f9fa;
+    text-align: right;
+    border-top: 1px solid #eee;
+}
+
+#close-modal-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#close-modal-btn:hover {
+    background-color: #5a6268;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

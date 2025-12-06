@@ -1,14 +1,31 @@
 import { ExecutionResult, RunRequest } from "../types/api";
 import { serializeWorkspaceToAST } from "./serializer";
 import * as Blockly from "blockly";
+import { getWorkspaceErrors } from "./validationManager";
+
+export interface RunDependencies {
+    cliOutput: HTMLPreElement;
+    codeOutput: HTMLPreElement;
+    runBtn: HTMLButtonElement;
+    validationModal: HTMLDialogElement;
+    validationErrorList: HTMLUListElement;
+    closeModalBtn: HTMLButtonElement;
+}
 
 export async function runScript(
     workspace: Blockly.WorkspaceSvg,
-    cliOutput: HTMLPreElement,
-    codeOutput: HTMLPreElement,
-    runBtn: HTMLButtonElement,
+    deps: RunDependencies,
     currentLevelId: string | null,
 ) {
+    const { cliOutput, codeOutput, runBtn } = deps;
+
+    const clientErrors = getWorkspaceErrors(workspace);
+
+    if (clientErrors.length > 0) {
+        showValidationModal(clientErrors, deps);
+        return;
+    }
+
     const ast = serializeWorkspaceToAST(workspace);
     if (!ast) {
         cliOutput.textContent += "\n$ (Nenhum comando para executar)\n";
@@ -86,4 +103,22 @@ export async function runScript(
         runBtn.textContent = "Executar";
         cliOutput.scrollTop = cliOutput.scrollHeight;
     }
+}
+
+function showValidationModal(
+    errors: Array<{ blockName: string; messages: string[] }>,
+    deps: RunDependencies,
+) {
+    const { validationModal, validationErrorList, closeModalBtn } = deps;
+
+    validationErrorList.innerHTML = "";
+
+    errors.forEach((item) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>[${item.blockName}]</strong>: ${item.messages.join(", ")}`;
+        validationErrorList.appendChild(li);
+    });
+
+    closeModalBtn.onclick = () => validationModal.close();
+    validationModal.showModal();
 }

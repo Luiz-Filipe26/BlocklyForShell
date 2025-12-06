@@ -19,6 +19,11 @@ const pageElements = {
     clearBtn: queryRequired<HTMLButtonElement>("clear-btn"),
     levelSelect: queryRequired<HTMLSelectElement>("level-select"),
     levelDescription: queryRequired<HTMLDivElement>("level-description"),
+    validationModal: queryRequired<HTMLDialogElement>("validation-modal"),
+    validationErrorList: queryRequired<HTMLUListElement>(
+        "validation-error-list",
+    ),
+    closeModalBtn: queryRequired<HTMLButtonElement>("close-modal-btn"),
 };
 
 async function start(): Promise<void> {
@@ -37,13 +42,7 @@ async function start(): Promise<void> {
     setupScriptHotReloader(workspace, pageElements.codeOutput);
 
     pageElements.runBtn.addEventListener("click", async () => {
-        runScript(
-            workspace,
-            pageElements.cliOutput,
-            pageElements.codeOutput,
-            pageElements.runBtn,
-            getCurrentLevelId(),
-        );
+        runScript(workspace, pageElements, getCurrentLevelId());
     });
 
     pageElements.clearBtn.addEventListener("click", () => {

@@ -3,9 +3,10 @@ import { buildCommandHelpHTML } from "./uiFeedback";
 import {
     autoFixExcessOperands,
     checkAndFixExclusiveOptions,
-    collectCardinalityProblems,
     getBlocksList,
+    renderBlockWarnings,
     unplugDuplicatesFromList,
+    validateCardinality,
 } from "./validators";
 import {
     createGenericHelpIcon,
@@ -81,8 +82,9 @@ function setupCardinalityPipeline(
     block: Blockly.BlockSvg,
 ): void {
     addLocalChangeListener(block, () => {
-        const problems = collectCardinalityProblems(block, commandDefinition);
-        updateCardinalityIndicator(block, problems);
+        validateCardinality(block, commandDefinition);
+        renderBlockWarnings(block);
+        updateCardinalityIndicator(block);
         autoFixExcessOperands(block, commandDefinition);
     });
 }
@@ -118,7 +120,7 @@ function setupExclusiveOptionsValidation(
 
 export function createCommandBlock(commandDefinition: CLICommand): void {
     Blockly.Blocks[commandDefinition.id] = {
-        init: function (this: Blockly.BlockSvg) {
+        init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "command",
                 commandName: commandDefinition.shellCommand,

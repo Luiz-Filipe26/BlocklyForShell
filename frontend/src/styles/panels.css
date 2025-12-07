@@ -47,28 +47,57 @@
     font-size: 0.9em;
 }
 
-.log-display {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 5px;
+/* Painel de Log (Rodapé da coluna do editor) */
+.bottom-panel {
     height: 150px;
+    background-color: #f8f9fa;
+    border-top: 2px solid #ccc; /* Separa do Blockly */
+    border-right: 2px solid #ccc; /* Separa da Sidebar */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.bottom-panel .panel-header {
+    padding: 5px 15px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #ddd;
+}
+
+.bottom-panel h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+    font-weight: 600;
+}
+
+.log-display {
+    flex: 1;
+    background-color: #fff;
+    padding: 5px;
     overflow-y: auto;
     font-family: "Consolas", monospace;
     font-size: 0.8em;
     color: #333;
+    border: none;
 }
 
 .log-entry {
-    padding: 2px 0;
+    padding: 2px 5px;
     border-bottom: 1px solid #eee;
     display: flex;
-    gap: 5px;
+    gap: 10px;
 }
 
-.log-entry.error { color: #dc3545; }
-.log-entry.warn { color: #856404; }
-.log-entry.info { color: #004085; }
+.log-entry.error {
+    color: #dc3545;
+}
+.log-entry.warn {
+    color: #856404;
+}
+.log-entry.info {
+    color: #004085;
+}
 
 .log-time {
     color: #999;

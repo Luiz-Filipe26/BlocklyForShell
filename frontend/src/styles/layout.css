@@ -11,18 +11,31 @@
     font-weight: 600;
 }
 
-.main-container {
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.content-wrapper {
     display: flex;
     flex: 1;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
     min-height: 0;
 }
 
+.editor-column {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 .blockly-workspace-area {
     flex: 1;
-    height: 100%;
-    border-right: 2px solid #ccc;
     position: relative;
+    border-right: 2px solid #ccc;
 }

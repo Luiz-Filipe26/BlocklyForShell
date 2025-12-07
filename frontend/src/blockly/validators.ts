@@ -1,8 +1,8 @@
 import * as Blockly from "blockly";
-import { showToast } from "./uiFeedback";
 import type { CLIValidation, CLICommand } from "../types/cli";
 import { clearError, getErrors, setError } from "./validationManager";
 import { getBlockSemanticData } from "./metadataManager";
+import { log, LogLevel, LogMode } from "./systemLogger";
 
 /**
  * Lista blocos em linha
@@ -23,7 +23,6 @@ export function getBlocksList(firstBlock: Blockly.Block): Blockly.Block[] {
  * Despluga blocos de opção duplicados
  */
 export function unplugDuplicatesFromList(
-    workspace: Blockly.WorkspaceSvg,
     blocks: Blockly.Block[],
     valueFn: (block: Blockly.Block) => string,
 ): void {
@@ -32,7 +31,11 @@ export function unplugDuplicatesFromList(
         const value = valueFn(block);
         if (seen.has(value)) {
             block.unplug(true);
-            showToast(workspace, `Opção "${value}" removida por duplicata`);
+            log(
+                `Opção "${value}" removida por duplicata`,
+                LogLevel.WARN,
+                LogMode.ToastAndConsole,
+            );
             return;
         }
         seen.add(value);
@@ -235,15 +238,15 @@ export function autoFixExcessOperands(
 
         if (blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
-        showToast(
-            commandBlock.workspace,
+        log(
             `Limite de ${max} excedido para '${operandDef.name}'.`,
+            LogLevel.WARN,
+            LogMode.ToastAndConsole,
         );
     }
 }
 
 export function checkAndFixExclusiveOptions(
-    workspace: Blockly.WorkspaceSvg,
     blocks: Blockly.Block[],
     exclusiveGroups: string[][],
 ): void {
@@ -260,9 +263,10 @@ export function checkAndFixExclusiveOptions(
         const conflictWith = foundBlocks[0].getFieldValue("FLAG");
 
         blockToRemove.unplug(true);
-        showToast(
-            workspace,
+        log(
             `Conflito: A opção '${flagToRemove}' não pode ser usada com '${conflictWith}'.`,
+            LogLevel.WARN,
+            LogMode.ToastAndConsole,
         );
         return;
     }

@@ -7,6 +7,7 @@ import { createBlocksFromDefinition } from "./blockBuilders";
 import { createControlBlock } from "./controlBlocks";
 import { createOperatorBlock } from "./operatorBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
+import { log, LogLevel, LogMode } from "./systemLogger";
 
 function getBlocklyOptions(
     cliDefinitions: CliDefinitions,
@@ -134,10 +135,12 @@ export async function setupWorkspace(
 
         return workspace;
     } catch (error) {
-        alert(
-            "Falha crítica ao iniciar a aplicação. Verifique se o Backend está rodando.",
+        log(
+            "Falha crítica ao iniciar a aplicação. Verifique se o Backend está rodando. Detalhes: " +
+            error,
+            LogLevel.ERROR,
+            LogMode.ToastAndConsole,
         );
-        console.error(error);
     }
     return null;
 }

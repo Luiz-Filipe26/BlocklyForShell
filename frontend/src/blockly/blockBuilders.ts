@@ -5,6 +5,7 @@ import { createOptionBlock } from "./optionBlocks";
 import { createOperandBlocks } from "./operandBlocks";
 import type { CLICommand } from "../types/cli";
 import { getErrors } from "./validationManager";
+import { log, LogLevel, LogMode } from "./systemLogger";
 
 interface LocalChangeHandler {
     (block: Blockly.Block): void;
@@ -33,7 +34,11 @@ export function addLocalChangeListener(
                     try {
                         handler(block);
                     } catch (error) {
-                        console.error("Erro em change-handler:", error);
+                        log(
+                            `Erro em change-handler: ${error}`,
+                            LogLevel.ERROR,
+                            LogMode.Console,
+                        );
                     }
                 }
             }

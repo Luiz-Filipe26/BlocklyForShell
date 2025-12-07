@@ -2,6 +2,7 @@ import { ExecutionResult, RunRequest } from "../types/api";
 import { serializeWorkspaceToAST } from "./serializer";
 import * as Blockly from "blockly";
 import { getWorkspaceErrors } from "./validationManager";
+import { log, LogLevel, LogMode } from "./systemLogger";
 
 export interface RunDependencies {
     cliOutput: HTMLPreElement;
@@ -96,7 +97,11 @@ export async function runScript(
                 "⚠️ O objetivo não foi atingido. Verifique a mensagem acima e tente novamente.\n";
         }
     } catch (error) {
-        console.error(error);
+        log(
+            `Erro de Conexão: ${error}`,
+            LogLevel.ERROR,
+            LogMode.ToastAndConsole,
+        );
         cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n`;
     } finally {
         runBtn.disabled = false;

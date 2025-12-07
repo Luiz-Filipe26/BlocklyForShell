@@ -4,7 +4,12 @@ import { setupWorkspace } from "./blockly/workspaceCreator";
 import { getCurrentLevelId, setupLevelSelector } from "./blockly/levelLoader";
 import { setupScriptHotReloader } from "./blockly/scriptHotReloader";
 import { runScript } from "./blockly/scriptRunner";
-import { initSystemLogger } from "./blockly/systemLogger";
+import {
+    initSystemLogger,
+    log,
+    LogLevel,
+    LogMode,
+} from "./blockly/systemLogger";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -32,7 +37,11 @@ async function start(): Promise<void> {
     const workspace = await setupWorkspace(pageElements.blocklyArea);
 
     if (workspace == null) {
-        alert("Não foi possível criar o workspace!");
+        log(
+            "Não foi possível criar o workspace! Aplicação abortada.",
+            LogLevel.ERROR,
+            LogMode.Console,
+        );
         return;
     }
 

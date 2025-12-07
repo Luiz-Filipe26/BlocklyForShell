@@ -1,4 +1,5 @@
 import { GameData, Level } from "../types/api";
+import { log, LogLevel, LogMode } from "./systemLogger";
 
 let currentLevelId: string | null = null;
 
@@ -57,7 +58,11 @@ export async function setupLevelSelector(
 
         levelSelect.dispatchEvent(new Event("change"));
     } catch (error) {
-        console.error("Erro ao carregar níveis:", error);
+        log(
+            `Erro ao carregar níveis: ${error}`,
+            LogLevel.ERROR,
+            LogMode.ToastAndConsole,
+        );
         levelSelect.innerHTML = "<option>Erro ao carregar níveis</option>";
         levelDescription.textContent =
             "Não foi possível conectar ao servidor para buscar os níveis.";

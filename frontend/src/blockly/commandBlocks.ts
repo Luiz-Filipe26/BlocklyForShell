@@ -1,5 +1,6 @@
 import * as Blockly from "blockly";
-import { buildCommandHelpHTML } from "./uiFeedback"; import {
+import { buildCommandHelpHTML } from "./uiFeedback";
+import {
     autoFixExcessOperands,
     checkAndFixExclusiveOptions,
     getBlocksList,
@@ -70,7 +71,7 @@ function setupCommandDeduplication(
             (child) => child.type === `${commandDefinition.id}_option`,
         );
 
-        unplugDuplicatesFromList(block.workspace, optionBlocks, (child) =>
+        unplugDuplicatesFromList(optionBlocks, (child) =>
             child.getFieldValue("FLAG"),
         );
     });
@@ -109,7 +110,6 @@ function setupExclusiveOptionsValidation(
 
         if (commandDefinition.exclusiveOptions) {
             checkAndFixExclusiveOptions(
-                block.workspace,
                 optionBlocks,
                 commandDefinition.exclusiveOptions,
             );

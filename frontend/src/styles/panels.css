@@ -1,0 +1,52 @@
+/* Terminal e Código */
+.sidebar pre {
+    background-color: #212529;
+    color: #f8f9fa;
+    font-family: "SF Mono", "Consolas", "Liberation Mono", Menlo, monospace;
+    padding: 10px;
+    border-radius: 5px;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.9em;
+
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Inputs e Selects */
+#level-select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    background-color: #fff;
+}
+
+/* Caixa de Missão */
+.mission-box {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 10px;
+    font-size: 0.95em;
+    color: #0d47a1;
+    line-height: 1.4;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Balão de Ajuda (Flutuante) */
+.help-balloon {
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    font-size: 0.9em;
+}

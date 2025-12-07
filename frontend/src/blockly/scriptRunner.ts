@@ -16,7 +16,7 @@ export async function runScript(
     workspace: Blockly.WorkspaceSvg,
     deps: RunDependencies,
     currentLevelId: string | null,
-) {
+): Promise<void> {
     const { cliOutput, codeOutput, runBtn } = deps;
 
     const clientErrors = getWorkspaceErrors(workspace);
@@ -108,7 +108,7 @@ export async function runScript(
 function showValidationModal(
     errors: Array<{ blockName: string; messages: string[] }>,
     deps: RunDependencies,
-) {
+): void {
     const { validationModal, validationErrorList, closeModalBtn } = deps;
 
     validationErrorList.innerHTML = "";

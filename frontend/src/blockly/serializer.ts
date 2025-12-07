@@ -8,7 +8,9 @@ const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
  * Serializa o workspace inteiro, começando pelo bloco 'script_root'.
  * Retorna um objeto AST (Abstract Syntax Tree) pronto para o backend.
  */
-export function serializeWorkspaceToAST(workspace: Blockly.WorkspaceSvg): AST.AST | null {
+export function serializeWorkspaceToAST(
+    workspace: Blockly.WorkspaceSvg,
+): AST.AST | null {
     const topBlocks = workspace.getTopBlocks(false);
     const rootBlock = topBlocks.find((block) => block.type === "script_root");
 
@@ -59,7 +61,11 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
     const fields: AST.ASTField[] = [];
     block.inputList.forEach((input) => {
         input.fieldRow.forEach((field) => {
-            if (field.name && field.getValue && !IGNORED_FIELDS.includes(field.name)) {
+            if (
+                field.name &&
+                field.getValue &&
+                !IGNORED_FIELDS.includes(field.name)
+            ) {
                 fields.push({
                     name: field.name,
                     value: String(field.getValue()),
@@ -80,7 +86,9 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
     });
 
     let nodeType = "unknown";
-    let cleanedSemanticData: Omit<AST.BlockSemanticData, "nodeType"> | undefined;
+    let cleanedSemanticData:
+        | Omit<AST.BlockSemanticData, "nodeType">
+        | undefined;
 
     if (rawSemanticData) {
         const { nodeType: type, ...rest } = rawSemanticData;

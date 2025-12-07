@@ -1,0 +1,78 @@
+.sidebar {
+    width: 500px;
+    height: 100%;
+    background-color: #e9ecef;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sidebar .panel {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 auto;
+}
+
+.sidebar .panel h2 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    flex-shrink: 0;
+}
+
+.sidebar .panel:has(pre) {
+    flex: 1;
+    min-height: 0;
+}
+
+.sidebar .level-panel {
+    max-height: 35vh;
+    overflow-y: auto;
+}
+
+.sidebar .action-buttons-panel {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.sidebar .btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar .btn-run {
+    background-color: #28a745;
+    color: white;
+}
+.sidebar .btn-run:hover {
+    background-color: #218838;
+}
+
+.sidebar .btn-clear {
+    background-color: #dc3545;
+    color: white;
+}
+.sidebar .btn-clear:hover {
+    background-color: #c82333;
+}

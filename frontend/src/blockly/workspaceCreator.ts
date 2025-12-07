@@ -56,14 +56,16 @@ function normalizeCliDefinitions(raw: RawCliDefinitions): CliDefinitions {
     };
 }
 
-export async function createScriptRoot(workspace: Blockly.WorkspaceSvg) {
+export async function createScriptRoot(
+    workspace: Blockly.WorkspaceSvg,
+): Promise<void> {
     const rootBlock = workspace.newBlock("script_root");
     rootBlock.initSvg();
     rootBlock.render();
     rootBlock.moveBy(50, 50);
 }
 
-function initCustomContextMenu() {
+function initCustomContextMenu(): void {
     const CLEAR_OPTION_ID = "workspace_clear_all_custom";
 
     try {

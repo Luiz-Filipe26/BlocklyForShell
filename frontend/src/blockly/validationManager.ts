@@ -1,11 +1,16 @@
 import * as Blockly from "blockly";
 
-export interface BlockError {
+export interface ErrorRecord {
     id: string;
     message: string;
 }
 
-const blockErrorsMap = new WeakMap<Blockly.Block, BlockError[]>();
+export interface BlockErrorReport {
+    blockName: string;
+    messages: string[];
+}
+
+const blockErrorsMap = new WeakMap<Blockly.Block, ErrorRecord[]>();
 
 export function setError(
     block: Blockly.Block,
@@ -28,7 +33,7 @@ export function clearError(block: Blockly.Block, errorId: string): void {
     );
 }
 
-export function getErrors(block: Blockly.Block): BlockError[] {
+export function getErrors(block: Blockly.Block): ErrorRecord[] {
     return blockErrorsMap.get(block) || [];
 }
 
@@ -37,8 +42,8 @@ export function getErrors(block: Blockly.Block): BlockError[] {
  */
 export function getWorkspaceErrors(
     workspace: Blockly.WorkspaceSvg,
-): Array<{ blockName: string; messages: string[] }> {
-    const report: Array<{ blockName: string; messages: string[] }> = [];
+): BlockErrorReport[] {
+    const report: BlockErrorReport[] = [];
     const allBlocks = workspace.getAllBlocks(false);
     for (const block of allBlocks) {
         if (!block.isEnabled()) continue;

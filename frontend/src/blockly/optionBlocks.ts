@@ -6,8 +6,8 @@ import { setBlockSemanticData } from "./metadataManager.ts";
 function buildOptionDropdown(
     commandDefinition: CLICommand,
 ): Blockly.FieldDropdown {
-    const dropdownPairs: Array<[string, string]> = commandDefinition.options.map(
-        (optionDefinition) => {
+    const dropdownPairs: Array<[string, string]> =
+        commandDefinition.options.map((optionDefinition) => {
             const longFlagSuffix = optionDefinition.longFlag
                 ? ` | ${optionDefinition.longFlag}`
                 : "";
@@ -17,8 +17,7 @@ function buildOptionDropdown(
                 `${optionDefinition.flag}${longFlagSuffix} (${summary})`,
                 optionDefinition.flag,
             ];
-        },
-    );
+        });
 
     const descriptionByFlag = new Map(
         commandDefinition.options.map((optionDefinition) => [
@@ -27,17 +26,17 @@ function buildOptionDropdown(
         ]),
     );
 
-    return new Blockly.FieldDropdown(
-        dropdownPairs,
-        function (this: Blockly.FieldDropdown, newValue: string): string {
-            const sourceBlock = this.sourceBlock_;
-            if (sourceBlock) {
-                const text = descriptionByFlag.get(newValue);
-                sourceBlock.setTooltip(text || "");
-            }
-            return newValue;
-        },
-    );
+    return new Blockly.FieldDropdown(dropdownPairs, function(
+        this: Blockly.FieldDropdown,
+        newValue: string,
+    ): string {
+        const sourceBlock = this.sourceBlock_;
+        if (sourceBlock) {
+            const text = descriptionByFlag.get(newValue);
+            sourceBlock.setTooltip(text || "");
+        }
+        return newValue;
+    });
 }
 
 function appendOptionInputs(
@@ -77,7 +76,7 @@ export function createOptionBlock(commandDefinition: CLICommand): void {
     const type = `${commandDefinition.id}_option`;
 
     Blockly.Blocks[type] = {
-        init: function (this: Blockly.Block) {
+        init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "option",
                 relatedCommand: commandDefinition.shellCommand,

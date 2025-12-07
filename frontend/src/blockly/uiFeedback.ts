@@ -12,7 +12,7 @@ let currentHelpBalloon: HTMLDivElement | null = null;
 export function showToast(
     workspace: Blockly.WorkspaceSvg,
     message: string,
-    duration = 5000
+    duration = 5000,
 ): void {
     const toast = document.createElement("div");
     toast.textContent = message;
@@ -66,7 +66,10 @@ export function showHelpBalloon(text: string, sourceElement: SVGElement): void {
     balloon.style.top = `${scrollY + rect.top}px`;
 
     const closeListener = (event: Event): void => {
-        if (currentHelpBalloon && currentHelpBalloon.contains(event.target as Node)) {
+        if (
+            currentHelpBalloon &&
+            currentHelpBalloon.contains(event.target as Node)
+        ) {
             return;
         }
         if (sourceElement.contains(event.target as Node)) {
@@ -85,7 +88,7 @@ export function showHelpBalloon(text: string, sourceElement: SVGElement): void {
 }
 
 export function buildCommandHelpHTML(
-    commandDefinition: CliDefinitions["commands"][number]
+    commandDefinition: CliDefinitions["commands"][number],
 ): string {
     let html = `
         <h3>${commandDefinition.presentationName}</h3>

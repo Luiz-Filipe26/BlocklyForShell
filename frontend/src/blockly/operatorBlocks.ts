@@ -2,9 +2,9 @@ import * as Blockly from "blockly";
 import type { CLIOperator } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager";
 
-export function createOperatorBlock(operatorDefinition: CLIOperator) {
+export function createOperatorBlock(operatorDefinition: CLIOperator): void {
     Blockly.Blocks[operatorDefinition.name] = {
-        init: function (this: Blockly.BlockSvg) {
+        init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "operator",
                 commandName: operatorDefinition.id,
@@ -14,11 +14,9 @@ export function createOperatorBlock(operatorDefinition: CLIOperator) {
                 .setCheck("command")
                 .appendField("Comando");
 
-            this.appendDummyInput()
-                .appendField(operatorDefinition.command);
+            this.appendDummyInput().appendField(operatorDefinition.command);
 
-            this.appendStatementInput("B")
-                .setCheck("command");
+            this.appendStatementInput("B").setCheck("command");
 
             this.setPreviousStatement(true, "command");
             this.setNextStatement(true, "command");

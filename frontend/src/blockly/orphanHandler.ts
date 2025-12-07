@@ -8,7 +8,7 @@ const ORPHAN_DISABLED_REASON = "orphan_block";
  * ele é desabilitado (fica cinza e não gera código).
  */
 export function disableOrphanBlocks(workspace: Blockly.WorkspaceSvg): void {
-    workspace.addChangeListener(function (event) {
+    workspace.addChangeListener(function(event) {
         // Ignora eventos de UI para performance
         if (event.isUiEvent) return;
 

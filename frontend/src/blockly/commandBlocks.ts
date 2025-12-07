@@ -1,6 +1,5 @@
 import * as Blockly from "blockly";
-import { buildCommandHelpHTML } from "./uiFeedback";
-import {
+import { buildCommandHelpHTML } from "./uiFeedback"; import {
     autoFixExcessOperands,
     checkAndFixExclusiveOptions,
     getBlocksList,

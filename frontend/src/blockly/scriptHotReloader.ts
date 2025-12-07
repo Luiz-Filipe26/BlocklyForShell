@@ -42,7 +42,7 @@ export async function sendAstToBackend(
 export function setupScriptHotReloader(
     workspace: Blockly.WorkspaceSvg,
     codeOutput: HTMLPreElement,
-) {
+) : void {
     workspace.addChangeListener((event) => {
         if (event.isUiEvent) return;
 

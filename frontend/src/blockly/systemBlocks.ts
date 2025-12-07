@@ -2,10 +2,9 @@ import * as Blockly from "blockly";
 
 export function initSystemBlocks(): void {
     Blockly.Blocks["script_root"] = {
-        init: function (this: Blockly.Block) {
+        init: function(this: Blockly.Block) {
             this.appendDummyInput().appendField("📜 Script Principal");
-            this.appendStatementInput("STACK")
-                .setCheck("command"); // Só aceita blocos do tipo "command" (nossos ls, cd, etc)
+            this.appendStatementInput("STACK").setCheck("command"); // Só aceita blocos do tipo "command" (nossos ls, cd, etc)
 
             this.setColour("#333333");
             this.setTooltip(

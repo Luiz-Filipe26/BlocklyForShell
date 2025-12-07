@@ -9,7 +9,7 @@ export function getCurrentLevelId(): string | null {
 export async function setupLevelSelector(
     levelSelect: HTMLSelectElement,
     levelDescription: HTMLDivElement,
-) {
+): Promise<void> {
     try {
         const response = await fetch("http://localhost:7000/api/game-data");
         if (!response.ok) throw new Error("Falha ao buscar níveis");

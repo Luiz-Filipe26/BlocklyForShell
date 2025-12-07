@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Blocks to Shell</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link href="./src/main.css" rel="stylesheet" />
+        <link href="./src/styles/main.css" rel="stylesheet" />
         <script type="module" src="./src/main.ts"></script>
     </head>
     <body>
@@ -14,12 +14,12 @@
         </header>
 
         <main class="main-container">
-            <div id="blockly-area"></div>
+            <div id="blockly-area" class="blockly-workspace-area"></div>
 
             <aside class="sidebar">
                 <div class="panel level-panel">
                     <h2>Missão Atual</h2>
-                    <select id="level-select">
+                    <select id="level-select" class="level-select-input">
                         <option value="">Carregando níveis...</option>
                     </select>
                     <div id="level-description" class="mission-box">
@@ -29,23 +29,24 @@
 
                 <div class="panel">
                     <h2>Código Gerado</h2>
-                    <pre id="code-output">
-// O código do shell aparecerá aqui...</pre
-                    >
+                    <pre id="code-output" class="terminal-display"></pre>
                 </div>
 
                 <div class="panel">
                     <h2>Saída do Terminal</h2>
-                    <pre id="cli-output">$</pre>
+                    <pre id="cli-output" class="terminal-display">$</pre>
                 </div>
 
-                <div id="action-buttons" class="panel">
-                    <button id="run-btn">Executar</button>
-                    <button id="clear-btn">Limpar Terminal</button>
+                <div id="action-buttons" class="panel action-buttons-panel">
+                    <button id="run-btn" class="btn btn-run">Executar</button>
+                    <button id="clear-btn" class="btn btn-clear">
+                        Limpar Terminal
+                    </button>
                 </div>
             </aside>
         </main>
-        <dialog id="validation-modal" class="modal-overlay">
+
+        <dialog id="validation-modal" class="validation-dialog">
             <div class="modal-content error-theme">
                 <div class="modal-header">
                     <h2>⚠️ Correções Necessárias</h2>
@@ -55,10 +56,12 @@
                         O script não pode ser executado pois contém blocos
                         inválidos:
                     </p>
-                    <ul id="validation-error-list"></ul>
+                    <ul id="validation-error-list" class="validation-list"></ul>
                 </div>
                 <div class="modal-footer">
-                    <button id="close-modal-btn">Entendi, vou corrigir</button>
+                    <button id="close-modal-btn" class="btn btn-close-modal">
+                        Entendi, vou corrigir
+                    </button>
                 </div>
             </div>
         </dialog>

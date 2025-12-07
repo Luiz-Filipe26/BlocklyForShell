@@ -3,7 +3,7 @@ import type { CLIControl } from "../types/cli";
 import { setBlockSemanticData } from "./metadataManager";
 import { createCardinalityField } from "./blockBuilders";
 
-export function createControlBlock(controlDefinition: CLIControl) {
+export function createControlBlock(controlDefinition: CLIControl) : void {
     Blockly.Blocks[controlDefinition.name] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {

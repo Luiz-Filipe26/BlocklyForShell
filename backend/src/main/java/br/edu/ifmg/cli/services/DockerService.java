@@ -74,9 +74,6 @@ public class DockerService {
 
             Process process = pb.start();
 
-            // Manteve-se System.out aqui pois é streaming de bytes do processo filho
-            // Converter isso para Logger linha a linha é complexo e talvez desnecessário agora.
-            // O LauncherWindow vai capturar isso de qualquer forma.
             process.getInputStream().transferTo(System.out);
 
             int exitCode = process.waitFor();

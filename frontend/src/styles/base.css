@@ -9,10 +9,10 @@ body {
     height: 100%;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f0f2f5;
-    overflow: hidden;
 }
 
 body {
     display: flex;
     flex-direction: column;
+    overflow: clip;
 }

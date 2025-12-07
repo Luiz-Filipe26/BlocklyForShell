@@ -14,52 +14,45 @@
         </header>
 
         <main class="main-layout">
-            <div class="content-wrapper">
-                <div class="editor-column">
-                    <div id="blockly-area" class="blockly-workspace-area"></div>
+            <div class="editor-column">
+                <div id="blockly-area" class="blockly-workspace-area"></div>
 
-                    <div class="bottom-panel system-log-panel">
-                        <div class="panel-header">
-                            <h2>Log do Sistema</h2>
-                        </div>
-                        <div
-                            id="system-log-container"
-                            class="log-display"
-                        ></div>
+                <div class="bottom-panel system-log-panel">
+                    <div class="panel-header">
+                        <h2>Log do Sistema</h2>
+                    </div>
+                    <div id="system-log-container" class="log-display"></div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="panel level-panel">
+                    <h2>Missão Atual</h2>
+                    <select id="level-select" class="level-select-input">
+                        <option value="">Carregando níveis...</option>
+                    </select>
+                    <div id="level-description" class="mission-box">
+                        Selecione um nível para ver a missão.
                     </div>
                 </div>
 
-                <aside class="sidebar">
-                    <div class="panel level-panel">
-                        <h2>Missão Atual</h2>
-                        <select id="level-select" class="level-select-input">
-                            <option value="">Carregando níveis...</option>
-                        </select>
-                        <div id="level-description" class="mission-box">
-                            Selecione um nível para ver a missão.
-                        </div>
-                    </div>
+                <div class="panel panel-expand">
+                    <h2>Código Gerado</h2>
+                    <pre id="code-output" class="terminal-display"></pre>
+                </div>
 
-                    <div class="panel">
-                        <h2>Código Gerado</h2>
-                        <pre id="code-output" class="terminal-display"></pre>
-                    </div>
+                <div class="panel panel-expand">
+                    <h2>Saída do Terminal</h2>
+                    <pre id="cli-output" class="terminal-display">$</pre>
+                </div>
 
-                    <div class="panel">
-                        <h2>Saída do Terminal</h2>
-                        <pre id="cli-output" class="terminal-display">$</pre>
-                    </div>
-
-                    <div id="action-buttons" class="panel action-buttons-panel">
-                        <button id="run-btn" class="btn btn-run">
-                            Executar
-                        </button>
-                        <button id="clear-btn" class="btn btn-clear">
-                            Limpar Terminal
-                        </button>
-                    </div>
-                </aside>
-            </div>
+                <div id="action-buttons" class="panel action-buttons-panel">
+                    <button id="run-btn" class="btn btn-run">Executar</button>
+                    <button id="clear-btn" class="btn btn-clear">
+                        Limpar Terminal
+                    </button>
+                </div>
+            </aside>
         </main>
 
         <dialog id="validation-modal" class="validation-dialog">

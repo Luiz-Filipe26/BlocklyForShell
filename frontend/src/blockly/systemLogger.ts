@@ -28,7 +28,7 @@ export function log(
     message: string,
     level: LogLevel = LogLevel.INFO,
     mode: LogMode = LogMode.Console,
-    toastDuration = 5000
+    toastDuration = 5000,
 ): void {
     if (mode === LogMode.Console || mode === LogMode.ToastAndConsole) {
         writeToPanel(message, level);
@@ -45,25 +45,12 @@ export function log(
     }
 }
 
-function showToast(message: string, duration: number): void {
+function showToast(message: string, duration = 5000): void {
     if (!activeWorkspace) return;
 
     const toast = document.createElement("div");
+    toast.className = "toast-message";
     toast.textContent = message;
-    toast.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 8px 12px;
-        background-color: #333;
-        color: #fff;
-        border-radius: 4px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        font-family: monospace;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 9999;
-    `;
 
     const workspaceContainer = activeWorkspace.getParentSvg().parentNode;
     workspaceContainer?.appendChild(toast);
@@ -71,6 +58,7 @@ function showToast(message: string, duration: number): void {
     requestAnimationFrame(() => {
         toast.style.opacity = "1";
     });
+
     setTimeout(() => {
         toast.style.opacity = "0";
         toast.addEventListener("transitionend", () => toast.remove());

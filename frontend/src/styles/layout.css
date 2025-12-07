@@ -13,13 +13,7 @@
 
 .main-layout {
     display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-}
-
-.content-wrapper {
-    display: flex;
+    flex-direction: row;
     flex: 1;
     overflow: hidden;
     min-height: 0;
@@ -30,7 +24,6 @@
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    height: 100%;
     overflow: hidden;
 }
 

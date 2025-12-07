@@ -1,6 +1,5 @@
 .sidebar {
     width: 450px;
-    height: 100%;
     background-color: #e9ecef;
     padding: 10px;
 
@@ -24,6 +23,11 @@
     flex: 0 0 auto;
 }
 
+.sidebar .panel-expand {
+    flex: 1;
+    min-height: 150px;
+}
+
 .sidebar .panel h2 {
     font-size: 1.1em;
     margin-bottom: 10px;
@@ -31,11 +35,6 @@
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
     flex-shrink: 0;
-}
-
-.sidebar .panel:has(pre) {
-    flex: 1;
-    min-height: 150px;
 }
 
 .sidebar .level-panel {

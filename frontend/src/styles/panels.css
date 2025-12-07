@@ -1,5 +1,4 @@
-/* Terminal e Código */
-.sidebar pre {
+.terminal-display {
     background-color: #212529;
     color: #f8f9fa;
     font-family: "SF Mono", "Consolas", "Liberation Mono", Menlo, monospace;
@@ -14,8 +13,7 @@
     overflow-y: auto;
 }
 
-/* Inputs e Selects */
-#level-select {
+.level-select-input {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
@@ -25,7 +23,6 @@
     background-color: #fff;
 }
 
-/* Caixa de Missão */
 .mission-box {
     background-color: #e3f2fd;
     border-left: 4px solid #2196f3;
@@ -36,7 +33,6 @@
     border-radius: 0 4px 4px 0;
 }
 
-/* Balão de Ajuda (Flutuante) */
 .help-balloon {
     position: absolute;
     background-color: #f9f9f9;
@@ -49,4 +45,34 @@
     font-family: Arial, sans-serif;
     color: #333;
     font-size: 0.9em;
+}
+
+.log-display {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 5px;
+    height: 150px;
+    overflow-y: auto;
+    font-family: "Consolas", monospace;
+    font-size: 0.8em;
+    color: #333;
+}
+
+.log-entry {
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    gap: 5px;
+}
+
+.log-entry.error { color: #dc3545; }
+.log-entry.warn { color: #856404; }
+.log-entry.info { color: #004085; }
+
+.log-time {
+    color: #999;
+    font-size: 0.9em;
+    min-width: 60px;
+    user-select: none;
 }

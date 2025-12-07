@@ -4,6 +4,7 @@ import { setupWorkspace } from "./blockly/workspaceCreator";
 import { getCurrentLevelId, setupLevelSelector } from "./blockly/levelLoader";
 import { setupScriptHotReloader } from "./blockly/scriptHotReloader";
 import { runScript } from "./blockly/scriptRunner";
+import { initSystemLogger } from "./blockly/systemLogger";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -24,6 +25,7 @@ const pageElements = {
         "validation-error-list",
     ),
     closeModalBtn: queryRequired<HTMLButtonElement>("close-modal-btn"),
+    systemLogContainer: queryRequired<HTMLDivElement>("system-log-container"),
 };
 
 async function start(): Promise<void> {
@@ -33,6 +35,8 @@ async function start(): Promise<void> {
         alert("Não foi possível criar o workspace!");
         return;
     }
+
+    initSystemLogger(pageElements.systemLogContainer, workspace);
 
     await setupLevelSelector(
         pageElements.levelSelect,

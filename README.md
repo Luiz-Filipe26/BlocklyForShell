@@ -70,6 +70,7 @@ Se você deseja contribuir ou modificar o código, siga os passos abaixo para co
 
 ### **Estrutura do Projeto**
 
+```
 .    
 ├── backend/    
 │   ├── src/main/java/.../cli/    
@@ -89,6 +90,7 @@ Se você deseja contribuir ou modificar o código, siga os passos abaixo para co
 │   ├── index.html       \# Template principal    
 │   └── vite.config.js   \# Configuração do Vite    
 └── build\_project.sh     \# Script de automação de build
+```
 
 ### **Compilando o Projeto**
 

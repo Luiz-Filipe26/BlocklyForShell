@@ -1,5 +1,8 @@
 package br.edu.ifmg.cli.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import br.edu.ifmg.cli.models.AstNode;
 import br.edu.ifmg.cli.models.GeneratedScript;
 import br.edu.ifmg.cli.services.ScriptGenerator;
@@ -8,27 +11,29 @@ import io.javalin.http.Context;
 
 public class ScriptController {
 
-    private final ScriptGenerator generator;
+	private static final Logger logger = LoggerFactory.getLogger(ScriptController.class);
 
-    public ScriptController(ScriptGenerator generator) {
-        this.generator = generator;
-    }
+	private final ScriptGenerator generator;
 
-    public void registerRoutes(Javalin app) {
-        app.post("/api/generate", this::generateScript);
-    }
+	public ScriptController(ScriptGenerator generator) {
+		this.generator = generator;
+	}
 
-    private void generateScript(Context ctx) {
-        try {
-            AstNode script = ctx.bodyAsClass(AstNode.class);
+	public void registerRoutes(Javalin app) {
+		app.post("/api/generate", this::generateScript);
+	}
 
-            String shellScript = generator.generate(script);
-            
-            ctx.json(new GeneratedScript(shellScript));
+	private void generateScript(Context ctx) {
+		try {
+			AstNode script = ctx.bodyAsClass(AstNode.class);
 
-        } catch (Exception e) {
-        	e.printStackTrace();
-            ctx.status(400).json(new GeneratedScript("ERRO: " + e.getMessage()));
-        }
-    }
+			String shellScript = generator.generate(script);
+
+			ctx.json(new GeneratedScript(shellScript));
+
+		} catch (Exception e) {
+			logger.error("Erro ao processar requisição", e);
+			ctx.status(400).json(new GeneratedScript("ERRO: " + e.getMessage()));
+		}
+	}
 }

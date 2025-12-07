@@ -7,86 +7,90 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DockerService {
 
 	public static final String IMAGE_NAME = "blockly-shell-env";
-
 	public static final String DOCKERFILE_RESOURCE = "/docker/Dockerfile";
+	
+	private static final Logger logger = LoggerFactory.getLogger(DockerService.class);
 
 	public void ensureImageExists() {
-		System.out.println("🐳 [DockerService] Verificando ambiente...");
+        logger.info("🐳 [DockerService] Verificando ambiente...");
 
-		try {
-			if (!checkDockerBinary())
-				return;
-			if (!checkDockerPermissions())
-				return;
-			
-			buildImage();
+        try {
+            if (!checkDockerBinary()) return;
+            if (!checkDockerPermissions()) return;
+            
+            buildImage();
 
-		} catch (Exception e) {
-			System.err.println("❌ [DockerService] Erro crítico não tratado: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            logger.error("❌ [DockerService] Erro crítico não tratado: ", e);
+        }
+    }
 
-	private boolean checkDockerBinary() {
-		try {
-			int exitCode = new ProcessBuilder("docker", "--version").start().waitFor();
-			if (exitCode != 0) {
-				System.err.println("❌ [DockerService] 'docker --version' retornou erro. O Docker está instalado?");
-				return false;
-			}
-			return true;
-		} catch (Exception e) {
-			System.err.println("❌ [DockerService] Não foi possível encontrar o binário 'docker' no PATH.");
-			return false;
-		}
-	}
+    private boolean checkDockerBinary() {
+        try {
+            int exitCode = new ProcessBuilder("docker", "--version").start().waitFor();
+            if (exitCode != 0) {
+                logger.error("❌ [DockerService] 'docker --version' retornou erro. O Docker está instalado?");
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            logger.error("❌ [DockerService] Não foi possível encontrar o binário 'docker' no PATH.");
+            return false;
+        }
+    }
 
-	private boolean checkDockerPermissions() {
-		try {
-			int exitCode = new ProcessBuilder("docker", "ps").start().waitFor();
-			if (exitCode != 0) {
-				System.err.println("❌ [DockerService] Permissão negada ao acessar o Docker Daemon.");
-				System.err.println("   -> Execute: sudo usermod -aG docker $USER");
-				System.err.println("   -> Depois faça Logout/Login.");
-				return false;
-			}
-			return true;
-		} catch (Exception e) {
-			System.err.println("❌ [DockerService] Erro ao verificar permissões: " + e.getMessage());
-			return false;
-		}
-	}
+    private boolean checkDockerPermissions() {
+        try {
+            int exitCode = new ProcessBuilder("docker", "ps").start().waitFor();
+            if (exitCode != 0) {
+                logger.error("❌ [DockerService] Permissão negada ao acessar o Docker Daemon.");
+                logger.error("   -> Execute: sudo usermod -aG docker $USER");
+                logger.error("   -> Depois faça Logout/Login.");
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            logger.error("❌ [DockerService] Erro ao verificar permissões: ", e);
+            return false;
+        }
+    }
 
-	private void buildImage() throws Exception {
-		Path tempDir = Files.createTempDirectory("blockly_docker_build");
-		try {
-			System.out.println("🔨 [DockerService] Iniciando build da imagem '" + IMAGE_NAME + "'...");
+    private void buildImage() throws Exception {
+        Path tempDir = Files.createTempDirectory("blockly_docker_build");
+        try {
+            logger.info("🔨 [DockerService] Iniciando build da imagem '{}'...", IMAGE_NAME);
 
-			extractResource(DOCKERFILE_RESOURCE, tempDir.resolve("Dockerfile"));
+            extractResource(DOCKERFILE_RESOURCE, tempDir.resolve("Dockerfile"));
 
-			ProcessBuilder pb = new ProcessBuilder("docker", "build", "-t", IMAGE_NAME, ".");
-			pb.directory(tempDir.toFile());
-			pb.redirectErrorStream(true);
+            ProcessBuilder pb = new ProcessBuilder("docker", "build", "-t", IMAGE_NAME, ".");
+            pb.directory(tempDir.toFile());
+            pb.redirectErrorStream(true);
 
-			Process process = pb.start();
+            Process process = pb.start();
 
-			process.getInputStream().transferTo(System.out);
+            // Manteve-se System.out aqui pois é streaming de bytes do processo filho
+            // Converter isso para Logger linha a linha é complexo e talvez desnecessário agora.
+            // O LauncherWindow vai capturar isso de qualquer forma.
+            process.getInputStream().transferTo(System.out);
 
-			int exitCode = process.waitFor();
+            int exitCode = process.waitFor();
 
-			if (exitCode == 0) {
-				System.out.println("✅ [DockerService] Imagem pronta com sucesso!");
-			} else {
-				System.err.println("❌ [DockerService] Falha no 'docker build'. Código de saída: " + exitCode);
-			}
+            if (exitCode == 0) {
+                logger.info("✅ [DockerService] Imagem pronta com sucesso!");
+            } else {
+                logger.error("❌ [DockerService] Falha no 'docker build'. Código de saída: {}", exitCode);
+            }
 
-		} finally {
-			deleteDirectory(tempDir);
-		}
-	}
+        } finally {
+            deleteDirectory(tempDir);
+        }
+    }
 
 	private void extractResource(String resourcePath, Path destination) throws IOException {
 		URL url = getClass().getResource(resourcePath);

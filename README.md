@@ -22,8 +22,10 @@ Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores
 
 Se você não conseguir rodar o Docker sem sudo, o aplicativo Java falhará. Resolva isso adicionando seu usuário ao grupo docker:
 
+```sh
 sudo usermod \-aG docker $USER  
 \# Faça logout e login novamente para aplicar a mudança.
+```
 
 ### **Inicialização**
 
@@ -92,40 +94,6 @@ Se você deseja contribuir ou modificar o código, siga os passos abaixo para co
 └── build\_project.sh     \# Script de automação de build
 ```
 
-### **Compilando o Projeto**
-
-O projeto conta com um script de automação (build\_project.sh para Linux/macOS ou .bat para Windows) que realiza todo o processo: instala dependências do frontend, gera o build do Vite, copia os assets para o backend e empacota o JAR final.
-
-\# 1\. Dê permissão de execução (Linux/macOS)  
-chmod \+x build\_project.sh
-
-\# 2\. Rode o script  
-./build\_project.sh
-
-Ao final, o executável blockly-for-shell.jar será gerado na **raiz do projeto**.
-
-## **🧩 Como Adicionar Novos Comandos**
-
-O sistema é **Data-Driven**. Você não precisa escrever código Java ou JavaScript para adicionar um comando simples como rm ou touch.
-
-1. Abra o arquivo backend/src/main/resources/definitions/cli\_definitions.json.  
-2. Adicione uma nova entrada no array commands:
-
-{    
- "command": "touch",    
- "name": "touch",    
- "description": "Atualiza o timestamp ou cria um arquivo vazio.",    
- "color": "\#4caf50",    
- "options": \[    
-   { "flag": "-a", "description": "Muda apenas o tempo de acesso." }    
- \],    
- "operands": \[    
-   { "name": "filename", "type": "file", "cardinality": { "min": 1 } }    
- \]    
-}
-
-3. Reinicie o servidor. O bloco aparecerá automaticamente na interface\!
-
 ## **🧠 Mecanismos de Validação e UX**
 
 O projeto implementa regras de validação em tempo real para garantir que os comandos gerados sejam sintaticamente válidos antes mesmo de serem executados.
@@ -141,3 +109,50 @@ Alguns comandos possuem flags que não podem coexistir (ex: ls \-t e ls \-S para
 ### **3\. Geração via AST (Abstract Syntax Tree)**
 
 Diferente de sistemas que apenas concatenam strings, o frontend serializa os blocos em uma estrutura de árvore JSON (AST). O backend Java recebe essa árvore, valida a estrutura e transcompila para Shell Script. Isso permite uma separação limpa entre a representação visual e a sintaxe final.
+
+### **Compilando o Projeto**
+
+O projeto conta com um script de automação (build\_project.sh para Linux/macOS ou .bat para Windows) que realiza todo o processo: instala dependências do frontend, gera o build do Vite, copia os assets para o backend e empacota o JAR final.
+
+\# 1\. Dê permissão de execução (Linux/macOS)  
+```sh
+chmod \+x build\_project.sh
+
+\# 2\. Rode o script  
+./build\_project.sh
+```
+
+Ao final, o executável blockly-for-shell.jar será gerado na **raiz do projeto**.
+
+## **🧩 Como Adicionar Novos Comandos**
+
+O sistema é **Data-Driven**. Você não precisa escrever código Java ou JavaScript para adicionar um comando simples como rm ou touch.
+
+1. Abra o arquivo backend/src/main/resources/definitions/cli\_definitions.json.  
+2. Adicione uma nova entrada no array commands:
+
+```json
+{
+  "command": "touch",
+  "name": "touch",
+  "description": "Atualiza o timestamp ou cria um arquivo vazio.",
+  "color": "#4caf50",
+  "options": [
+    {
+      "flag": "-a",
+      "description": "Muda apenas o tempo de acesso."
+    }
+  ],
+  "operands": [
+    {
+      "name": "filename",
+      "type": "file",
+      "cardinality": {
+        "min": 1
+      }
+    }
+  ]
+}
+```
+
+3. Reinicie o servidor. O bloco aparecerá automaticamente na interface\!

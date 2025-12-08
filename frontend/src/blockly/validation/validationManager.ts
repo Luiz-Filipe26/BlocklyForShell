@@ -1,4 +1,5 @@
 import * as Blockly from "blockly";
+import { getBlockSemanticData } from "../serialization/metadataManager";
 
 export interface ErrorRecord {
     id: string;
@@ -6,6 +7,7 @@ export interface ErrorRecord {
 }
 
 export interface BlockErrorReport {
+    blockId: string;
     blockName: string;
     messages: string[];
 }
@@ -44,21 +46,46 @@ export function getWorkspaceErrors(
     workspace: Blockly.WorkspaceSvg,
 ): BlockErrorReport[] {
     const report: BlockErrorReport[] = [];
+
     for (const block of workspace.getAllBlocks(false)) {
         if (!block.isEnabled()) continue;
-        const errors = getErrors(block);
-        if (errors.length == 0) continue;
 
-        const blockName =
-            block.getField("FLAG")?.getValue() ||
-            block.getField("VALUE")?.getValue() ||
-            block.type;
+        const errors = getErrors(block);
+        if (errors.length === 0) continue;
 
         report.push({
-            blockName: blockName,
-            messages: errors.map((e) => e.message),
+            blockId: block.id,
+            blockName: resolveBlockDisplayName(block),
+            messages: errors.map((error) => error.message),
         });
     }
 
     return report;
+}
+
+/**
+ * Helper para gerar um nome legível baseado na semântica do bloco.
+ */
+function resolveBlockDisplayName(block: Blockly.Block): string {
+    const data = getBlockSemanticData(block);
+
+    if (!data) return block.type;
+
+    switch (data.nodeType) {
+        case "command":
+        case "control":
+        case "operator":
+            return `[${data.nodeType}] ${data.commandName}`;
+
+        case "option":
+            const flag = block.getFieldValue("FLAG") || "?";
+            return `[Opção] ${flag}`;
+
+        case "operand":
+            const value = block.getFieldValue("VALUE") || "";
+            return `[Operando: ${data.operandName}] "${value}"`;
+
+        default:
+            return block.type;
+    }
 }

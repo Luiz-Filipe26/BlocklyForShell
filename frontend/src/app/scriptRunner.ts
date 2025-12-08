@@ -1,6 +1,9 @@
 import * as API from "@/types/api";
 import { serializeWorkspaceToAST } from "@/blockly/serialization/serializer";
-import { getWorkspaceErrors } from "@/blockly/validation/validationManager";
+import {
+    BlockErrorReport,
+    getWorkspaceErrors,
+} from "@/blockly/validation/validationManager";
 import * as Logger from "@/app/systemLogger";
 import * as Blockly from "blockly";
 
@@ -22,7 +25,7 @@ export async function runScript(
 
     const clientErrors = getWorkspaceErrors(workspace);
     if (clientErrors.length > 0) {
-        showValidationModal(clientErrors, deps);
+        showValidationModal(clientErrors, deps, workspace);
         return;
     }
 
@@ -59,8 +62,9 @@ export async function runScript(
 }
 
 function showValidationModal(
-    errors: Array<{ blockName: string; messages: string[] }>,
+    errors: BlockErrorReport[],
     deps: RunDependencies,
+    workspace: Blockly.WorkspaceSvg,
 ): void {
     const { validationModal, validationErrorList, closeModalBtn } = deps;
 
@@ -69,6 +73,18 @@ function showValidationModal(
     for (const item of errors) {
         const li = document.createElement("li");
         li.innerHTML = `<strong>[${item.blockName}]</strong>: ${item.messages.join(", ")}`;
+
+        li.style.cursor = "pointer";
+        li.title = "Clique para encontrar este bloco";
+        li.onclick = () => {
+            validationModal.close();
+            Blockly.WidgetDiv.hide();
+            workspace.centerOnBlock(item.blockId);
+            workspace.getAllBlocks(false).forEach((block) => block.unselect());
+            const block = workspace.getBlockById(item.blockId);
+            block?.select();
+        };
+
         validationErrorList.appendChild(li);
     }
 

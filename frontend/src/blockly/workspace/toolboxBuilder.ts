@@ -3,7 +3,7 @@ import type {
     CLICommand,
     CLIControl,
     CLIOperator,
-} from "../types/cli";
+} from "../../types/cli";
 
 interface ToolboxBlock {
     kind: "block";
@@ -24,36 +24,6 @@ interface ToolboxConfig {
 
 type ToolboxItem = ToolboxCategory | ToolboxBlock;
 
-/**
- * Transforma um Comando em uma Categoria (Pasta) contendo o comando e seus filhos.
- */
-function transformCommandToCategory(def: CLICommand): ToolboxCategory {
-    const contents: ToolboxBlock[] = [{ kind: "block", type: def.id }];
-
-    contents.push({ kind: "block", type: `${def.id}_option` });
-
-    def.operands.forEach((op) => {
-        contents.push({
-            kind: "block",
-            type: `${def.id}_${op.name}_operand`,
-        });
-    });
-
-    return {
-        kind: "category",
-        name: def.id,
-        colour: def.color,
-        contents,
-    };
-}
-
-function transformSimpleToBlock(def: CLIControl | CLIOperator): ToolboxBlock {
-    return {
-        kind: "block",
-        type: def.name,
-    };
-}
-
 export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
     const itemRegistry = new Map<string, ToolboxItem>();
 
@@ -61,11 +31,11 @@ export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
         itemRegistry.set(command.id, transformCommandToCategory(command));
     });
 
-    cli_definitions.controls.forEach((control) => {
+    cli_definitions.controls?.forEach((control) => {
         itemRegistry.set(control.id, transformSimpleToBlock(control));
     });
 
-    cli_definitions.operators.forEach((operation) => {
+    cli_definitions.operators?.forEach((operation) => {
         itemRegistry.set(operation.id, transformSimpleToBlock(operation));
     });
 
@@ -86,5 +56,33 @@ export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
     return {
         kind: "categoryToolbox",
         contents: categories,
+    };
+}
+
+/**
+ * Transforma um Comando em uma Categoria (Pasta) contendo o comando e seus filhos.
+ */
+function transformCommandToCategory(definition: CLICommand): ToolboxCategory {
+    return {
+        kind: "category",
+        name: definition.id,
+        colour: definition.color,
+        contents: [
+            { kind: "block", type: definition.id },
+            { kind: "block", type: `${definition.id}_option` },
+            ...definition.operands.map((operation) => ({
+                kind: "block" as const,
+                type: `${definition.id}_${operation.name}_operand`,
+            })),
+        ],
+    };
+}
+
+function transformSimpleToBlock(
+    definition: CLIControl | CLIOperator,
+): ToolboxBlock {
+    return {
+        kind: "block",
+        type: definition.name,
     };
 }

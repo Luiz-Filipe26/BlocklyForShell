@@ -27,10 +27,10 @@ export function setError(
 
 export function clearError(block: Blockly.Block, errorId: string): void {
     const errors = blockErrorsMap.get(block);
-    errors?.splice(
-        errors.findIndex((error) => error.id === errorId),
-        1,
-    );
+    if (!errors) return;
+    const index = errors.findIndex((error) => error.id === errorId);
+    if (index < 0) return;
+    errors.splice(index, 1);
 }
 
 export function getErrors(block: Blockly.Block): ErrorRecord[] {
@@ -44,11 +44,11 @@ export function getWorkspaceErrors(
     workspace: Blockly.WorkspaceSvg,
 ): BlockErrorReport[] {
     const report: BlockErrorReport[] = [];
-    const allBlocks = workspace.getAllBlocks(false);
-    for (const block of allBlocks) {
+    for (const block of workspace.getAllBlocks(false)) {
         if (!block.isEnabled()) continue;
         const errors = getErrors(block);
         if (errors.length == 0) continue;
+
         const blockName =
             block.getField("FLAG")?.getValue() ||
             block.getField("VALUE")?.getValue() ||

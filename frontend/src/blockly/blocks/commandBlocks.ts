@@ -1,30 +1,44 @@
 import * as Blockly from "blockly";
-import { buildCommandHelpHTML } from "./uiFeedback";
-import {
-    autoFixExcessOperands,
-    checkAndFixExclusiveOptions,
-    getBlocksList,
-    renderBlockWarnings,
-    unplugDuplicatesFromList,
-    validateCardinality,
-} from "./validators";
+import { buildCommandHelpHTML } from "../../app/uiFeedback";
+import { renderBlockWarnings } from "../validation/validationWarnings";
 import {
     createGenericHelpIcon,
     createCardinalityField,
     addLocalChangeListener,
     updateCardinalityIndicator,
-} from "./blockBuilders";
-import type { CLICommand } from "../types/cli";
-import { setBlockSemanticData } from "./metadataManager.ts";
+    getBlocksList,
+} from "./blockUtils";
+import type { CLICommand } from "../../types/cli";
+import { setBlockSemanticData } from "../serialization/metadataManager";
+import {
+    unplugExclusiveOptionsFromCommand,
+    unplugDuplicatesFromList,
+    autoFixExcessOperands,
+} from "../validation/autofix";
+import { validateCardinality } from "../validation/cardinalityValidator";
+
+export function createCommandBlock(commandDefinition: CLICommand): void {
+    Blockly.Blocks[commandDefinition.id] = {
+        init: function(this: Blockly.BlockSvg) {
+            setBlockSemanticData(this, {
+                nodeType: "command",
+                commandName: commandDefinition.shellCommand,
+            });
+            appendCommandHeader(commandDefinition, this);
+            appendCommandInputs(commandDefinition, this);
+            setupCommandDeduplication(commandDefinition, this);
+            setupExclusiveOptionsValidation(commandDefinition, this);
+            setupCardinalityPipeline(commandDefinition, this);
+        },
+    };
+}
 
 function appendCommandHeader(
     commandDefinition: CLICommand,
     block: Blockly.BlockSvg,
 ): void {
-    const helpIcon = createGenericHelpIcon(
-        () => buildCommandHelpHTML(commandDefinition),
-        30,
-        `Ajuda para ${commandDefinition.presentationName}`,
+    const helpIcon = createGenericHelpIcon(() =>
+        buildCommandHelpHTML(commandDefinition),
     );
 
     block
@@ -96,9 +110,8 @@ function setupExclusiveOptionsValidation(
     if (
         !commandDefinition.exclusiveOptions ||
         commandDefinition.exclusiveOptions.length === 0
-    ) {
+    )
         return;
-    }
 
     addLocalChangeListener(block, () => {
         const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
@@ -109,26 +122,10 @@ function setupExclusiveOptionsValidation(
         );
 
         if (commandDefinition.exclusiveOptions) {
-            checkAndFixExclusiveOptions(
+            unplugExclusiveOptionsFromCommand(
                 optionBlocks,
                 commandDefinition.exclusiveOptions,
             );
         }
     });
-}
-
-export function createCommandBlock(commandDefinition: CLICommand): void {
-    Blockly.Blocks[commandDefinition.id] = {
-        init: function(this: Blockly.BlockSvg) {
-            setBlockSemanticData(this, {
-                nodeType: "command",
-                commandName: commandDefinition.shellCommand,
-            });
-            appendCommandHeader(commandDefinition, this);
-            appendCommandInputs(commandDefinition, this);
-            setupCommandDeduplication(commandDefinition, this);
-            setupExclusiveOptionsValidation(commandDefinition, this);
-            setupCardinalityPipeline(commandDefinition, this);
-        },
-    };
 }

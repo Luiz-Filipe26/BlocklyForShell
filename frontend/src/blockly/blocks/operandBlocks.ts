@@ -1,0 +1,79 @@
+import * as Blockly from "blockly";
+import { validateOperandValue } from "../validation/valueValidators";
+import { setupParentIndicator } from "./blockUtils";
+import type { CLICommand, CLIOperand } from "../../types/cli";
+import { setBlockSemanticData } from "../serialization/metadataManager";
+import { renderBlockWarnings } from "../validation/validationWarnings";
+
+export function createOperandBlocks(commandDefinition: CLICommand): void {
+    if (!commandDefinition.operands || commandDefinition.operands.length === 0)
+        return;
+
+    for (const operandDef of commandDefinition.operands) {
+        createSingleOperandBlock(commandDefinition, operandDef);
+    }
+}
+
+function createSingleOperandBlock(
+    commandDefinition: CLICommand,
+    operandDefinition: CLIOperand,
+): void {
+    Blockly.Blocks[
+        `${commandDefinition.id}_${operandDefinition.name}_operand`
+    ] = {
+        init: function(this: Blockly.Block) {
+            setBlockSemanticData(this, {
+                nodeType: "operand",
+                operandName: operandDefinition.name,
+                operandType: operandDefinition.type,
+                relatedCommand: commandDefinition.shellCommand,
+            });
+            appendOperandInputs(commandDefinition, operandDefinition, this);
+
+            setupParentIndicator(
+                this,
+                commandDefinition,
+                `(operando de: ${commandDefinition.shellCommand})`,
+            );
+        },
+    };
+}
+
+function appendOperandInputs(
+    commandDefinition: CLICommand,
+    operandDefinition: CLIOperand,
+    block: Blockly.Block,
+): void {
+    const field = buildOperandField(operandDefinition, block);
+
+    block
+        .appendDummyInput("MAIN_INPUT")
+        .appendField(
+            `(operando de: ${commandDefinition.shellCommand})`,
+            "PARENT_INDICATOR",
+        )
+        .appendField(`${operandDefinition.name}:`)
+        .appendField(field, "VALUE");
+
+    block.setPreviousStatement(true, `${commandDefinition.id}_Operand`);
+    block.setNextStatement(true, `${commandDefinition.id}_Operand`);
+    block.setColour(operandDefinition.color || commandDefinition.color);
+    block.setTooltip(operandDefinition.description);
+}
+
+function buildOperandField(
+    operandDefinition: CLIOperand,
+    block: Blockly.Block,
+): Blockly.FieldTextInput {
+    const textField = new Blockly.FieldTextInput(
+        operandDefinition.defaultValue || "",
+    );
+
+    textField.setValidator((newValue) => {
+        validateOperandValue(newValue, operandDefinition.validations, block);
+        renderBlockWarnings(block);
+        return newValue;
+    });
+
+    return textField;
+}

@@ -70,7 +70,7 @@ export interface CLICategory {
 
 export interface CliDefinitions {
     commands: CLICommand[];
-    operators: CLIOperator[];
-    controls: CLIControl[];
+    operators?: CLIOperator[];
+    controls?: CLIControl[];
     categories: CLICategory[];
 }

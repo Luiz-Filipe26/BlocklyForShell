@@ -1,21 +1,17 @@
 import * as Blockly from "blockly";
-import { showHelpBalloon } from "./uiFeedback";
-import { createCommandBlock } from "./commandBlocks";
-import { createOptionBlock } from "./optionBlocks";
-import { createOperandBlocks } from "./operandBlocks";
-import type { CLICommand } from "../types/cli";
-import { getErrors } from "./validationManager";
-import { log, LogLevel, LogMode } from "./systemLogger";
+import { log, LogLevel, LogMode } from "../../app/systemLogger";
+import { showHelpBalloon } from "../../app/uiFeedback";
+import { CLICommand } from "../../types/cli";
+import { getErrors } from "../validation/validationManager";
 
 interface LocalChangeHandler {
     (block: Blockly.Block): void;
 }
+
+const CARD_ICON_EMPTY = "/transparent.svg";
+const CARD_ICON_ALERT = "/cardinality_icon.svg";
 
 const blockHandlersMap = new WeakMap<Blockly.Block, LocalChangeHandler[]>();
-
-interface LocalChangeHandler {
-    (block: Blockly.Block): void;
-}
 
 export function addLocalChangeListener(
     block: Blockly.Block,
@@ -60,12 +56,20 @@ export function removeLocalChangeListener(
     blockHandlersMap.set(block, newHandlers);
 }
 
-/* ===========================
-   ICON / CARDINALITY HELPERS
-   =========================== */
-
-const CARD_ICON_EMPTY = "/transparent.svg";
-const CARD_ICON_ALERT = "/cardinality_icon.svg";
+/**
+ * Lista blocos em linha
+ */
+export function getBlocksList(firstBlock: Blockly.Block): Blockly.Block[] {
+    const blocks: Blockly.Block[] = [];
+    for (
+        let current: Blockly.Block | null = firstBlock;
+        current;
+        current = current.getNextBlock()
+    ) {
+        blocks.push(current);
+    }
+    return blocks;
+}
 
 /**
  * Cria um FieldImage pronto para ser anexado ao HEADER.
@@ -90,14 +94,10 @@ export function updateCardinalityIndicator(commandBlock: Blockly.Block): void {
     field.setValue(hasCardinalityProblems ? CARD_ICON_ALERT : CARD_ICON_EMPTY);
 }
 
-/* ===========================
-   HELP ICON
-   =========================== */
-
 export function createGenericHelpIcon(
     getHelpTextFn: () => string,
-    size: number = 30,
     altText: string = "?",
+    size: number = 30,
 ): Blockly.FieldImage {
     const helpIcon = new Blockly.FieldImage(
         "/info_icon.svg",
@@ -133,12 +133,4 @@ export function setupParentIndicator(
             block.getSurroundParent()?.type === commandDefinition.id;
         indicatorField.setValue(insideRoot ? "" : textWhenOutside);
     });
-}
-
-export function createBlocksFromDefinition(
-    commandDefinition: CLICommand,
-): void {
-    createCommandBlock(commandDefinition);
-    createOptionBlock(commandDefinition);
-    createOperandBlocks(commandDefinition);
 }

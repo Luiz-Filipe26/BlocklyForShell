@@ -1,8 +1,6 @@
 import * as Blockly from "blockly";
-import type { BlockSemanticData } from "../types/ast";
+import type { BlockSemanticData } from "../../types/ast";
 
-// O WeakMap segura os dados sem impedir que o Garbage Collector limpe a memória
-// quando o bloco for deletado do workspace.
 const semanticDataMap = new WeakMap<Blockly.Block, BlockSemanticData>();
 
 export function setBlockSemanticData(

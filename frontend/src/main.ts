@@ -1,15 +1,15 @@
 import "blockly/blocks";
 import "blockly/msg/pt";
-import { setupWorkspace } from "./blockly/workspaceCreator";
-import { getCurrentLevelId, setupLevelSelector } from "./blockly/levelLoader";
-import { setupScriptHotReloader } from "./blockly/scriptHotReloader";
-import { runScript } from "./blockly/scriptRunner";
+import { setupWorkspace } from "./blockly/workspace/workspaceCreator";
+import { getCurrentLevelId, setupLevelSelector } from "./app/levelLoader";
+import { setupScriptHotReloader } from "./app/scriptHotReloader";
+import { runScript } from "./app/scriptRunner";
 import {
     initSystemLogger,
     log,
     LogLevel,
     LogMode,
-} from "./blockly/systemLogger";
+} from "./app/systemLogger";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);

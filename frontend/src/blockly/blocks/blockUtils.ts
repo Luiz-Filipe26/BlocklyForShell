@@ -59,15 +59,26 @@ export function removeLocalChangeListener(
 /**
  * Lista blocos em linha
  */
-export function getBlocksList(firstBlock: Blockly.Block): Blockly.Block[] {
+export function getBlocksList(
+    firstBlock: Blockly.Block | null,
+    filter?: string | ((block: Blockly.Block) => boolean),
+): Blockly.Block[] {
     const blocks: Blockly.Block[] = [];
+
     for (
         let current: Blockly.Block | null = firstBlock;
         current;
         current = current.getNextBlock()
     ) {
+        if (typeof filter === "string") {
+            if (current.type !== filter) continue;
+        } else if (typeof filter === "function") {
+            if (!filter(current)) continue;
+        }
+
         blocks.push(current);
     }
+
     return blocks;
 }
 

@@ -59,20 +59,30 @@ export function autoFixExcessOperands(
     commandBlock: Blockly.BlockSvg,
     commandDefinition: CLI.CLICommand,
 ): void {
-    const operandsRoot = commandBlock.getInputTargetBlock("OPERANDS");
-    if (!operandsRoot) return;
+    const allBlocks = getBlocksList(
+        commandBlock.getInputTargetBlock("OPERANDS"),
+    );
 
-    const allBlocks = getBlocksList(operandsRoot);
+    if (allBlocks.length === 0) return;
+
+    const blocksByType = new Map<string, Blockly.Block[]>();
+    for (const block of allBlocks) {
+        const list = blocksByType.get(block.type);
+        if (list) {
+            list.push(block);
+        } else {
+            blocksByType.set(block.type, [block]);
+        }
+    }
 
     for (const operandDef of commandDefinition.operands) {
         const max = operandDef.cardinality?.max ?? 0;
-        if (max == "unlimited") continue;
-
+        if (max === "unlimited") continue;
         const operandType = `${commandDefinition.id}_${operandDef.name}_operand`;
-        const blocksOfType = allBlocks.filter((b) => b.type === operandType);
-
-        if (blocksOfType.length <= max) continue;
+        const blocksOfType = blocksByType.get(operandType);
+        if (!blocksOfType || blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
+
         Logger.log(
             `Limite de ${max} excedido para '${operandDef.name}'.`,
             Logger.LogLevel.WARN,

@@ -49,8 +49,9 @@ function validateOptionsGroupCardinality(
 ): void {
     if (!commandDefinition.optionsMin) return;
 
-    const optionsRoot = block.getInputTargetBlock("OPTIONS");
-    const currentCount = optionsRoot ? getBlocksList(optionsRoot).length : 0;
+    const currentCount = getBlocksList(
+        block.getInputTargetBlock("OPTIONS"),
+    ).length;
     const missing = Math.max(0, commandDefinition.optionsMin - currentCount);
 
     if (missing == 0) return;
@@ -70,8 +71,9 @@ function validateOperandsGroupCardinality(
 ): void {
     if (!commandDefinition.operandsMin) return;
 
-    const operandsRoot = block.getInputTargetBlock("OPERANDS");
-    const currentCount = operandsRoot ? getBlocksList(operandsRoot).length : 0;
+    const currentCount = getBlocksList(
+        block.getInputTargetBlock("OPERANDS"),
+    ).length;
     const missing = Math.max(0, commandDefinition.operandsMin - currentCount);
 
     if (missing == 0) return;
@@ -91,14 +93,17 @@ function validateSpecificOperandsCardinality(
 ): void {
     if (commandDefinition.operands.length === 0) return;
 
-    const operandsRoot = block.getInputTargetBlock("OPERANDS");
-    const allBlocks = operandsRoot ? getBlocksList(operandsRoot) : [];
+    const allBlocks = getBlocksList(block.getInputTargetBlock("OPERANDS"));
+
+    const countsByType = new Map<string, number>();
+    for (const child of allBlocks) {
+        const current = countsByType.get(child.type) || 0;
+        countsByType.set(child.type, current + 1);
+    }
 
     for (const operandDef of commandDefinition.operands) {
         const operandType = `${commandDefinition.id}_${operandDef.name}_operand`;
-        const count = allBlocks.filter(
-            (block) => block.type === operandType,
-        ).length;
+        const count = countsByType.get(operandType) || 0;
         const min = operandDef.cardinality?.min ?? 0;
         const missing = Math.max(0, min - count);
 

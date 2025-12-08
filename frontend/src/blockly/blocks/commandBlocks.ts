@@ -72,11 +72,9 @@ function setupCommandDeduplication(
     block: Blockly.BlockSvg,
 ): void {
     BlockUtils.addLocalChangeListener(block, () => {
-        const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
-        if (!firstOptionBlock) return;
-
-        const optionBlocks = BlockUtils.getBlocksList(firstOptionBlock).filter(
-            (child) => child.type === `${commandDefinition.id}_option`,
+        const optionBlocks = BlockUtils.getBlocksList(
+            block.getInputTargetBlock("OPTIONS"),
+            `${commandDefinition.id}_option`,
         );
 
         unplugDuplicatesFromList(optionBlocks, (child) =>
@@ -108,11 +106,9 @@ function setupExclusiveOptionsValidation(
         return;
 
     BlockUtils.addLocalChangeListener(block, () => {
-        const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
-        if (!firstOptionBlock) return;
-
-        const optionBlocks = BlockUtils.getBlocksList(firstOptionBlock).filter(
-            (child) => child.type === `${commandDefinition.id}_option`,
+        const optionBlocks = BlockUtils.getBlocksList(
+            block.getInputTargetBlock("OPTIONS"),
+            `${commandDefinition.id}_option`,
         );
 
         if (commandDefinition.exclusiveOptions) {

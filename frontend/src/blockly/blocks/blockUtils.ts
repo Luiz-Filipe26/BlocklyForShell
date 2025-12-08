@@ -145,3 +145,13 @@ export function setupParentIndicator(
         indicatorField.setValue(insideRoot ? "" : textWhenOutside);
     });
 }
+
+/**
+ * Retorna o nome do slot (input) do bloco pai ao qual o bloco atual está conectado.
+ */
+export function getParentInputName(block: Blockly.Block): string | null {
+    const connection = block.previousConnection;
+    if (!connection || !connection.targetConnection) return null;
+    const parentInput = connection.targetConnection.getParentInput();
+    return parentInput?.name ?? null;
+}

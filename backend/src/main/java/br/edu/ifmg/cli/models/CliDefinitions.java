@@ -25,25 +25,26 @@ public record CliDefinitions(List<CommandDef> commands, List<OperatorDef> operat
 	public record ValidationDef(String regex, String errorMessage) {
 	}
 
-	public record OperatorDef(String id, String shellCommand, String presentationName, String description,
-			String color) {
+	public record OperatorDef(String id, String command, String name, String description, String color,
+			List<SlotDef> slots, List<String> slotsWithImplicitData) {
 	}
 
-	public record ControlDef(String id, String shellCommand, String presentationName, String description, String color,
+	public record ControlDef(String id, String command, String name, String description, String color, String syntaxEnd,
 			List<SlotDef> slots) {
 	}
 
-	public record SlotDef(String name, String type, String label, String check) {
+	public record SlotDef(String name, String type, String label, String check, String symbol, String symbolPlacement,
+			String syntaxPrefix, boolean obligatory) {
 	}
 
 	public record CategoryDef(String name, List<String> commands) {
 	}
 
 	public Map<String, OperatorDef> getOperatorsMap() {
-		return operators.stream().collect(Collectors.toUnmodifiableMap(OperatorDef::id, o -> o));
+		return operators.stream().collect(Collectors.toUnmodifiableMap(OperatorDef::id, operator -> operator));
 	}
 
 	public Map<String, ControlDef> getControlsMap() {
-		return controls.stream().collect(Collectors.toUnmodifiableMap(ControlDef::id, c -> c));
+		return controls.stream().collect(Collectors.toUnmodifiableMap(ControlDef::id, control -> control));
 	}
 }

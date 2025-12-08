@@ -150,38 +150,109 @@
   "operators": [
     {
       "id": "pipe",
-      "command": "|",
+      "command": "pipe",
       "name": "pipe",
       "description": "Redireciona a saída do comando anterior para a entrada do próximo (Pipe).",
-      "color": "#b1745b"
+      "color": "#b1745b",
+      "slots": [
+        { 
+            "name": "A", 
+            "type": "statement", 
+            "check": "command" 
+        },
+        { 
+            "name": "B", 
+            "type": "statement", 
+            "check": "command", 
+            "symbol": "|", 
+            "symbolPlacement": "before" 
+        }
+      ],
+      "slotsWithImplicitData": ["B"]
     },
     {
       "id": "redirect_out",
-      "command": ">",
+      "command": "redirect_out",
       "name": "redirect_out",
       "description": "Salva a saída do comando em um arquivo (sobrescreve).",
-      "color": "#b1745b"
+      "color": "#b1745b",
+      "slots": [
+        { 
+            "name": "A", 
+            "type": "statement", 
+            "check": "command" 
+        },
+        { 
+            "name": "B", 
+            "type": "statement", 
+            "check": "command", 
+            "symbol": ">", 
+            "symbolPlacement": "before" 
+        }
+      ]
     },
     {
       "id": "redirect_append",
-      "command": ">>",
+      "command": "redirect_append",
       "name": "redirect_append",
       "description": "Adiciona a saída do comando ao final de um arquivo (append).",
-      "color": "#b1745b"
+      "color": "#b1745b",
+      "slots": [
+        { 
+            "name": "A", 
+            "type": "statement", 
+            "check": "command" 
+        },
+        { 
+            "name": "B", 
+            "type": "statement", 
+            "check": "command", 
+            "symbol": ">>", 
+            "symbolPlacement": "before" 
+        }
+      ]
     },
     {
       "id": "and",
-      "command": "&&",
+      "command": "and",
       "name": "and",
       "description": "Executa o próximo comando apenas se o anterior tiver sucesso.",
-      "color": "#b1745b"
+      "color": "#b1745b",
+      "slots": [
+        { 
+            "name": "A", 
+            "type": "statement", 
+            "check": "command" 
+        },
+        { 
+            "name": "B", 
+            "type": "statement", 
+            "check": "command", 
+            "symbol": "&&", 
+            "symbolPlacement": "before" 
+        }
+      ]
     },
     {
       "id": "or",
-      "command": "||",
+      "command": "or",
       "name": "or",
       "description": "Executa o próximo comando apenas se o anterior falhar.",
-      "color": "#b1745b"
+      "color": "#b1745b",
+      "slots": [
+        { 
+            "name": "A", 
+            "type": "statement", 
+            "check": "command" 
+        },
+        { 
+            "name": "B", 
+            "type": "statement", 
+            "check": "command", 
+            "symbol": "||", 
+            "symbolPlacement": "before" 
+        }
+      ]
     }
   ],
   "controls": [
@@ -191,24 +262,31 @@
       "name": "if_statement",
       "description": "Executa comandos condicionalmente baseado no sucesso de um comando teste.",
       "color": "#dbaa25",
+      "syntaxEnd": "fi",
       "slots": [
         {
           "name": "CONDITION",
           "type": "statement",
+          "check": "command",
           "label": "Se (comando):",
-          "check": "command"
+          "syntaxPrefix": "",
+          "obligatory": true
         },
         {
           "name": "DO",
           "type": "statement",
-          "label": "Então faça:",
-          "check": "command"
+          "check": "command",
+          "label": "Então faça (then):",
+          "syntaxPrefix": "; then",
+          "obligatory": true
         },
         {
           "name": "ELSE",
           "type": "statement",
-          "label": "Senão faça:",
-          "check": "command"
+          "check": "command",
+          "label": "Senão (else):",
+          "syntaxPrefix": "else",
+          "obligatory": false
         }
       ]
     },
@@ -218,18 +296,23 @@
       "name": "while_loop",
       "description": "Repete comandos enquanto a condição for verdadeira.",
       "color": "#dbaa25",
+      "syntaxEnd": "done",
       "slots": [
         {
           "name": "CONDITION",
           "type": "statement",
+          "check": "command",
           "label": "Enquanto (comando):",
-          "check": "command"
+          "syntaxPrefix": "",
+          "obligatory": true
         },
         {
           "name": "DO",
           "type": "statement",
-          "label": "Faça:",
-          "check": "command"
+          "check": "command",
+          "label": "Faça (do):",
+          "syntaxPrefix": "; do",
+          "obligatory": true
         }
       ]
     }

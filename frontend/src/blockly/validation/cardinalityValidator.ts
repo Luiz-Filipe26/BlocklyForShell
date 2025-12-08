@@ -2,7 +2,7 @@ import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
 import { getBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { clearError, setError } from "./validationManager";
-import { getBlocksList } from "@/blockly/blocks/blockUtils";
+import { getBlocksList, getParentInputName } from "@/blockly/blocks/blockUtils";
 
 /**
  * Executa a Validação de Cardinalidade mínima e registra Erros de Falta de Componentes"
@@ -11,16 +11,13 @@ export function validateCardinality(
     commandBlock: Blockly.Block,
     commandDefinition: CLI.CLICommand,
 ): void {
-    clearAllCardinalityErrors(commandBlock, commandDefinition);
-
-    const parentBlock = commandBlock.getSurroundParent();
-    if (
-        parentBlock &&
-        getBlockSemanticData(parentBlock)?.nodeType === "operator"
-    )
-        return;
-
+    clearAllOperandCardinalityErrors(commandBlock, commandDefinition);
     validateOptionsGroupCardinality(commandBlock, commandDefinition);
+
+    if (shouldRelaxOperandChecks(commandBlock)) {
+        return;
+    }
+
     validateOperandsGroupCardinality(commandBlock, commandDefinition);
     validateSpecificOperandsCardinality(commandBlock, commandDefinition);
 }
@@ -28,7 +25,7 @@ export function validateCardinality(
 /**
  * Limpa todos os possíveis erros de cardinalidade do bloco.
  */
-function clearAllCardinalityErrors(
+function clearAllOperandCardinalityErrors(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
 ): void {
@@ -38,6 +35,37 @@ function clearAllCardinalityErrors(
     commandDefinition.operands.forEach((operand) =>
         clearError(block, `CARDINALITY_MISSING_OPERAND_${operand.name}`),
     );
+}
+
+function clearAllControlCardinalityErrors(
+    block: Blockly.Block,
+    controlDefinition: CLI.CLIControl,
+): void {
+    controlDefinition.slots.forEach((slot) =>
+        clearError(block, `CONTROL_MISSING_SLOT_${slot.name}`),
+    );
+}
+
+export function validateControlCardinality(
+    block: Blockly.Block,
+    controlDefinition: CLI.CLIControl,
+): void {
+    clearAllControlCardinalityErrors(block, controlDefinition);
+
+    for (const slot of controlDefinition.slots) {
+        if (!slot.obligatory) continue;
+
+        const targetBlock = block.getInputTargetBlock(slot.name);
+        const isEmpty = !targetBlock || getBlocksList(targetBlock).length === 0;
+
+        if (isEmpty) {
+            setError(
+                block,
+                `CONTROL_MISSING_SLOT_${slot.name}`,
+                `O campo "${(slot.label || slot.name).replace(":", "")}" é obrigatório.`,
+            );
+        }
+    }
 }
 
 /**
@@ -59,6 +87,20 @@ function validateOptionsGroupCardinality(
         block,
         "CARDINALITY_MIN_OPTIONS",
         `Faltam opções obrigatórias (${missing}).`,
+    );
+}
+
+/**
+ * Verifica se o bloco está conectado a um slot que já fornece dados (Ex: Pipe).
+ */
+function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
+    const parent = block.getSurroundParent();
+    const slotName = getParentInputName(block);
+    if (!parent || !slotName) return false;
+    const parentData = getBlockSemanticData(parent);
+    return Boolean(
+        parentData?.nodeType === "operator" &&
+        parentData.slotsWithImplicitData?.includes(slotName),
     );
 }
 

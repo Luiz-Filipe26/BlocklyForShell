@@ -46,6 +46,7 @@ export interface BlockSemanticDataControl {
 export interface BlockSemanticDataOperator {
     nodeType: "operator";
     commandName: string;
+    slotsWithImplicitData?: string[];
 }
 
 export type BlockSemanticData =

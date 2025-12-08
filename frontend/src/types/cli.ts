@@ -39,19 +39,25 @@ export interface CLICommand {
     operandsMin?: number;
 }
 
+export interface CLIControlSlot {
+    name: string;
+    type: "statement";
+    check: "command";
+    label?: string;
+    symbol?: string;
+    symbolPlacement?: "before" | "after";
+    syntaxPrefix?: string;
+    obligatory?: boolean;
+}
+
 export interface CLIOperator {
     id: string;
     command: string;
     name: string;
     description: string;
     color: string;
-}
-
-export interface CLIControlSlot {
-    name: string;
-    type: "statement";
-    label: string;
-    check: "command";
+    slots: CLIControlSlot[];
+    slotsWithImplicitData?: string[];
 }
 
 export interface CLIControl {
@@ -60,6 +66,7 @@ export interface CLIControl {
     name: string;
     description: string;
     color: string;
+    syntaxEnd: string;
     slots: CLIControlSlot[];
 }
 

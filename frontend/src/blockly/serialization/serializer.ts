@@ -5,10 +5,6 @@ import { findScriptRoot } from "@/blockly/blocks/systemBlocks";
 
 const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
 
-/**
- * Serializa o workspace inteiro, começando pelo bloco 'script_root'.
- * Retorna um objeto AST (Abstract Syntax Tree) pronto para o backend.
- */
 export function serializeWorkspaceToAST(
     workspace: Blockly.WorkspaceSvg,
 ): AST.AST | null {
@@ -24,7 +20,7 @@ export function serializeWorkspaceToAST(
             ? [
                 {
                     name: "commands",
-                    children: serializeStack(firstCommandBlock),
+                    children: serializeVerticalChain(firstCommandBlock),
                 },
             ]
             : [],
@@ -32,17 +28,18 @@ export function serializeWorkspaceToAST(
 }
 
 /**
- * Percorre uma pilha vertical de blocos (conexões Next/Previous).
- * Retorna um array de objetos serializados.
+ * Processamento sequencial
+ * Percorre a lista ligada vertical (Next Block) iterativamente.
  */
-function serializeStack(startBlock: Blockly.Block | null): AST.ASTNode[] {
+function serializeVerticalChain(
+    startBlock: Blockly.Block | null,
+): AST.ASTNode[] {
     const list: AST.ASTNode[] = [];
     let currentBlock = startBlock;
 
     while (currentBlock) {
-        if (currentBlock.isEnabled()) {
-            list.push(serializeBlock(currentBlock));
-        }
+        if (currentBlock.isEnabled()) list.push(serializeNode(currentBlock));
+
         currentBlock = currentBlock.getNextBlock();
     }
 
@@ -50,50 +47,13 @@ function serializeStack(startBlock: Blockly.Block | null): AST.ASTNode[] {
 }
 
 /**
- * Serializa um bloco em um objeto de dados puro (AST Node).
- * Realiza a separação entre o nodeType (elevado para a raiz) e o restante
- * dos dados semânticos.
+ * Processamento recursivo em profundidade
+ * Serializa um único nó e seus inputs aninhados.
  */
-function serializeBlock(block: Blockly.Block): AST.ASTNode {
-    const rawSemanticData = getBlockSemanticData(block);
-
-    const fields: AST.ASTField[] = [];
-    block.inputList.forEach((input) => {
-        input.fieldRow.forEach((field) => {
-            if (
-                field.name &&
-                field.getValue &&
-                !IGNORED_FIELDS.includes(field.name)
-            ) {
-                fields.push({
-                    name: field.name,
-                    value: String(field.getValue()),
-                });
-            }
-        });
-    });
-
-    const inputs: AST.ASTInput[] = [];
-    block.inputList.forEach((input) => {
-        if (!input.connection) return;
-
-        const targetBlock = input.connection.targetBlock();
-        inputs.push({
-            name: input.name,
-            children: targetBlock ? serializeStack(targetBlock) : [],
-        });
-    });
-
-    let nodeType = "unknown";
-    let cleanedSemanticData:
-        | Omit<AST.BlockSemanticData, "nodeType">
-        | undefined;
-
-    if (rawSemanticData) {
-        const { nodeType: type, ...rest } = rawSemanticData;
-        nodeType = type;
-        cleanedSemanticData = rest;
-    }
+function serializeNode(block: Blockly.Block): AST.ASTNode {
+    const fields = extractBlockFields(block);
+    const inputs = extractBlockInputs(block);
+    const { nodeType, semanticData } = resolveNodeSemantics(block);
 
     const node: AST.ASTNode = {
         nodeType,
@@ -101,9 +61,61 @@ function serializeBlock(block: Blockly.Block): AST.ASTNode {
         inputs,
     };
 
-    if (cleanedSemanticData && Object.keys(cleanedSemanticData).length > 0) {
-        node.semanticData = cleanedSemanticData;
+    if (semanticData) {
+        node.semanticData = semanticData;
     }
 
     return node;
+}
+
+function resolveNodeSemantics(block: Blockly.Block): {
+    nodeType: string;
+    semanticData?: Omit<AST.BlockSemanticData, "nodeType">;
+} {
+    const rawData = getBlockSemanticData(block);
+
+    if (!rawData) {
+        return { nodeType: "unknown" };
+    }
+
+    const { nodeType, ...semanticAttributes } = rawData;
+
+    return {
+        nodeType,
+        semanticData: semanticAttributes,
+    };
+}
+
+function extractBlockInputs(block: Blockly.Block): AST.ASTInput[] {
+    const inputs: AST.ASTInput[] = [];
+    block.inputList.forEach((input) => {
+        if (!input.connection) return;
+        const targetBlock = input.connection.targetBlock();
+        inputs.push({
+            name: input.name,
+            children: targetBlock ? serializeVerticalChain(targetBlock) : [],
+        });
+    });
+
+    return inputs;
+}
+
+function extractBlockFields(block: Blockly.Block): AST.ASTField[] {
+    const fields: AST.ASTField[] = [];
+
+    block.inputList.forEach((input) => {
+        input.fieldRow.forEach((field) => {
+            const name = field.name;
+            const value = field.getValue();
+
+            if (name && value !== null && !IGNORED_FIELDS.includes(name)) {
+                fields.push({
+                    name: name,
+                    value: String(value),
+                });
+            }
+        });
+    });
+
+    return fields;
 }

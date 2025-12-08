@@ -1,7 +1,7 @@
-import { ExecutionResult, RunRequest } from "../types/api";
-import { serializeWorkspaceToAST } from "../blockly/serialization/serializer";
-import { getWorkspaceErrors } from "../blockly/validation/validationManager";
-import { log, LogLevel, LogMode } from "./systemLogger";
+import * as API from "@/types/api";
+import { serializeWorkspaceToAST } from "@/blockly/serialization/serializer";
+import { getWorkspaceErrors } from "@/blockly/validation/validationManager";
+import * as Logger from "@/app/systemLogger";
 import * as Blockly from "blockly";
 
 interface RunDependencies {
@@ -41,14 +41,14 @@ export async function runScript(
     cliOutput.scrollTop = cliOutput.scrollHeight;
 
     try {
-        const payload: RunRequest = { ast, levelId: currentLevelId };
+        const payload: API.RunRequest = { ast, levelId: currentLevelId };
         const result = await requestExecution(payload);
         renderExecutionOutput(result, cliOutput, currentLevelId);
     } catch (error) {
-        log(
+        Logger.log(
             `Erro de Conexão: ${error}`,
-            LogLevel.ERROR,
-            LogMode.ToastAndConsole,
+            Logger.LogLevel.ERROR,
+            Logger.LogMode.ToastAndConsole,
         );
         cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n`;
     } finally {
@@ -76,7 +76,9 @@ function showValidationModal(
     validationModal.showModal();
 }
 
-async function requestExecution(payload: RunRequest): Promise<ExecutionResult> {
+async function requestExecution(
+    payload: API.RunRequest,
+): Promise<API.ExecutionResult> {
     const response = await fetch("http://localhost:7000/api/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,7 +93,7 @@ async function requestExecution(payload: RunRequest): Promise<ExecutionResult> {
 }
 
 function renderExecutionOutput(
-    result: ExecutionResult,
+    result: API.ExecutionResult,
     cliOutput: HTMLPreElement,
     currentLevelId: string | null,
 ): void {

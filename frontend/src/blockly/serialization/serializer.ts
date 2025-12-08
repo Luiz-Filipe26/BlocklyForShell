@@ -1,7 +1,7 @@
 import * as Blockly from "blockly";
-import type * as AST from "../../types/ast";
+import type * as AST from "@/types/ast";
 import { getBlockSemanticData } from "./metadataManager";
-import { findScriptRoot } from "../blocks/systemBlocks";
+import { findScriptRoot } from "@/blockly/blocks/systemBlocks";
 
 const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
 

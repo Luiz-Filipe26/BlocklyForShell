@@ -1,8 +1,8 @@
 import * as Blockly from "blockly";
-import type { CLIOperator } from "../../types/cli";
-import { setBlockSemanticData } from "../serialization/metadataManager";
+import * as CLI from "@/types/cli";
+import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 
-export function createOperatorBlock(operatorDefinition: CLIOperator): void {
+export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
     Blockly.Blocks[operatorDefinition.name] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {

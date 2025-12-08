@@ -1,23 +1,17 @@
 import * as Blockly from "blockly";
-import { buildCommandHelpHTML } from "../../app/uiFeedback";
-import { renderBlockWarnings } from "../validation/validationWarnings";
-import {
-    createGenericHelpIcon,
-    createCardinalityField,
-    addLocalChangeListener,
-    updateCardinalityIndicator,
-    getBlocksList,
-} from "./blockUtils";
-import type { CLICommand } from "../../types/cli";
-import { setBlockSemanticData } from "../serialization/metadataManager";
+import { buildCommandHelpHTML } from "@/app/uiFeedback";
+import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
+import * as BlockUtils from "./blockUtils";
+import * as CLI from "@/types/cli";
+import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import {
     unplugExclusiveOptionsFromCommand,
     unplugDuplicatesFromList,
     autoFixExcessOperands,
-} from "../validation/autofix";
-import { validateCardinality } from "../validation/cardinalityValidator";
+} from "@/blockly/validation/autofix";
+import { validateCardinality } from "@/blockly/validation/cardinalityValidator";
 
-export function createCommandBlock(commandDefinition: CLICommand): void {
+export function createCommandBlock(commandDefinition: CLI.CLICommand): void {
     Blockly.Blocks[commandDefinition.id] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
@@ -34,10 +28,10 @@ export function createCommandBlock(commandDefinition: CLICommand): void {
 }
 
 function appendCommandHeader(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.BlockSvg,
 ): void {
-    const helpIcon = createGenericHelpIcon(() =>
+    const helpIcon = BlockUtils.createGenericHelpIcon(() =>
         buildCommandHelpHTML(commandDefinition),
     );
 
@@ -46,11 +40,11 @@ function appendCommandHeader(
         .appendField(commandDefinition.presentationName)
         .appendField(" ")
         .appendField(helpIcon)
-        .appendField(createCardinalityField(28), "CARDINALITY_ICON");
+        .appendField(BlockUtils.createCardinalityField(28), "CARDINALITY_ICON");
 }
 
 function appendCommandInputs(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.BlockSvg,
 ): void {
     if (commandDefinition.options && commandDefinition.options.length > 0) {
@@ -74,14 +68,14 @@ function appendCommandInputs(
 }
 
 function setupCommandDeduplication(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.BlockSvg,
 ): void {
-    addLocalChangeListener(block, () => {
+    BlockUtils.addLocalChangeListener(block, () => {
         const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
         if (!firstOptionBlock) return;
 
-        const optionBlocks = getBlocksList(firstOptionBlock).filter(
+        const optionBlocks = BlockUtils.getBlocksList(firstOptionBlock).filter(
             (child) => child.type === `${commandDefinition.id}_option`,
         );
 
@@ -92,19 +86,19 @@ function setupCommandDeduplication(
 }
 
 function setupCardinalityPipeline(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.BlockSvg,
 ): void {
-    addLocalChangeListener(block, () => {
+    BlockUtils.addLocalChangeListener(block, () => {
         validateCardinality(block, commandDefinition);
         renderBlockWarnings(block);
-        updateCardinalityIndicator(block);
+        BlockUtils.updateCardinalityIndicator(block);
         autoFixExcessOperands(block, commandDefinition);
     });
 }
 
 function setupExclusiveOptionsValidation(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.BlockSvg,
 ): void {
     if (
@@ -113,11 +107,11 @@ function setupExclusiveOptionsValidation(
     )
         return;
 
-    addLocalChangeListener(block, () => {
+    BlockUtils.addLocalChangeListener(block, () => {
         const firstOptionBlock = block.getInputTargetBlock("OPTIONS");
         if (!firstOptionBlock) return;
 
-        const optionBlocks = getBlocksList(firstOptionBlock).filter(
+        const optionBlocks = BlockUtils.getBlocksList(firstOptionBlock).filter(
             (child) => child.type === `${commandDefinition.id}_option`,
         );
 

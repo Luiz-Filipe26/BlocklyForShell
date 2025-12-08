@@ -1,9 +1,4 @@
-import type {
-    CliDefinitions,
-    CLICommand,
-    CLIControl,
-    CLIOperator,
-} from "../../types/cli";
+import * as CLI from "@/types/cli";
 
 interface ToolboxBlock {
     kind: "block";
@@ -24,7 +19,9 @@ interface ToolboxConfig {
 
 type ToolboxItem = ToolboxCategory | ToolboxBlock;
 
-export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
+export function createToolbox(
+    cli_definitions: CLI.CliDefinitions,
+): ToolboxConfig {
     const itemRegistry = new Map<string, ToolboxItem>();
 
     cli_definitions.commands.forEach((command) => {
@@ -62,7 +59,9 @@ export function createToolbox(cli_definitions: CliDefinitions): ToolboxConfig {
 /**
  * Transforma um Comando em uma Categoria (Pasta) contendo o comando e seus filhos.
  */
-function transformCommandToCategory(definition: CLICommand): ToolboxCategory {
+function transformCommandToCategory(
+    definition: CLI.CLICommand,
+): ToolboxCategory {
     return {
         kind: "category",
         name: definition.id,
@@ -79,7 +78,7 @@ function transformCommandToCategory(definition: CLICommand): ToolboxCategory {
 }
 
 function transformSimpleToBlock(
-    definition: CLIControl | CLIOperator,
+    definition: CLI.CLIControl | CLI.CLIOperator,
 ): ToolboxBlock {
     return {
         kind: "block",

@@ -1,7 +1,7 @@
 import * as Blockly from "blockly";
-import { log, LogLevel, LogMode } from "../../app/systemLogger";
-import { CLICommand } from "../../types/cli";
-import { getBlocksList } from "../blocks/blockUtils";
+import * as Logger from "@/app/systemLogger";
+import * as CLI from "@/types/cli";
+import { getBlocksList } from "@/blockly/blocks/blockUtils";
 
 /**
  * Despluga blocos de opção duplicados
@@ -15,10 +15,10 @@ export function unplugDuplicatesFromList(
         const value = valueFn(block);
         if (seen.has(value)) {
             block.unplug(true);
-            log(
+            Logger.log(
                 `Opção "${value}" removida por duplicata`,
-                LogLevel.WARN,
-                LogMode.ToastAndConsole,
+                Logger.LogLevel.WARN,
+                Logger.LogMode.ToastAndConsole,
             );
             return;
         }
@@ -43,10 +43,10 @@ export function unplugExclusiveOptionsFromCommand(
         const conflictWith = foundBlocks[0].getFieldValue("FLAG");
 
         blockToRemove.unplug(true);
-        log(
+        Logger.log(
             `Conflito: A opção '${flagToRemove}' não pode ser usada com '${conflictWith}'.`,
-            LogLevel.WARN,
-            LogMode.ToastAndConsole,
+            Logger.LogLevel.WARN,
+            Logger.LogMode.ToastAndConsole,
         );
         return;
     }
@@ -57,7 +57,7 @@ export function unplugExclusiveOptionsFromCommand(
  */
 export function autoFixExcessOperands(
     commandBlock: Blockly.BlockSvg,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     const operandsRoot = commandBlock.getInputTargetBlock("OPERANDS");
     if (!operandsRoot) return;
@@ -73,10 +73,10 @@ export function autoFixExcessOperands(
 
         if (blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
-        log(
+        Logger.log(
             `Limite de ${max} excedido para '${operandDef.name}'.`,
-            LogLevel.WARN,
-            LogMode.ToastAndConsole,
+            Logger.LogLevel.WARN,
+            Logger.LogMode.ToastAndConsole,
         );
     }
 }

@@ -1,8 +1,8 @@
 import * as Blockly from "blockly";
-import { log, LogLevel, LogMode } from "../../app/systemLogger";
-import { showHelpBalloon } from "../../app/uiFeedback";
-import { CLICommand } from "../../types/cli";
-import { getErrors } from "../validation/validationManager";
+import { log, LogLevel, LogMode } from "@/app/systemLogger";
+import { showHelpBalloon } from "@/app/uiFeedback";
+import * as CLI from "@/types/cli";
+import { getErrors } from "@/blockly/validation/validationManager";
 
 interface LocalChangeHandler {
     (block: Blockly.Block): void;
@@ -122,7 +122,7 @@ export function createGenericHelpIcon(
  */
 export function setupParentIndicator(
     block: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     textWhenOutside: string,
 ): void {
     addLocalChangeListener(block, () => {

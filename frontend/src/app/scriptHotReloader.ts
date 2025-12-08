@@ -1,5 +1,7 @@
-import { serializeWorkspaceToAST } from "../blockly/serialization/serializer";
+import { serializeWorkspaceToAST } from "@/blockly/serialization/serializer";
 import * as Blockly from "blockly";
+import * as API from "@/types/api";
+import * as Logger from "@/app/systemLogger";
 
 const MIN_INTERVAL_MS = 700;
 
@@ -58,12 +60,22 @@ async function sendAstToBackend(
 
         if (!response.ok) {
             codeOutput.textContent = "// Erro ao gerar script no backend";
+            Logger.log(
+                "Erro ao gerar script no backend",
+                Logger.LogLevel.ERROR,
+                Logger.LogMode.Console,
+            );
             return;
         }
 
-        const data = await response.json();
-        codeOutput.textContent = data.script ?? "// Sem script";
+        const data: API.GeneratedScript = await response.json();
+        codeOutput.textContent = data.script;
     } catch {
         codeOutput.textContent = "// Falha ao conectar ao backend";
+        Logger.log(
+            "Falha ao conectar no backend",
+            Logger.LogLevel.ERROR,
+            Logger.LogMode.Console,
+        );
     }
 }

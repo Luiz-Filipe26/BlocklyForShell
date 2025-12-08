@@ -1,9 +1,9 @@
 import * as Blockly from "blockly";
 import { createGenericHelpIcon, setupParentIndicator } from "./blockUtils";
-import type { CLICommand } from "../../types/cli";
-import { setBlockSemanticData } from "../serialization/metadataManager";
+import * as CLI from "@/types/cli";
+import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 
-export function createOptionBlock(commandDefinition: CLICommand): void {
+export function createOptionBlock(commandDefinition: CLI.CLICommand): void {
     if (!commandDefinition.options || commandDefinition.options.length === 0) {
         return;
     }
@@ -27,7 +27,7 @@ export function createOptionBlock(commandDefinition: CLICommand): void {
 }
 
 function appendOptionInputs(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
     block: Blockly.Block,
 ): void {
     const dropdown = buildOptionDropdown(commandDefinition);
@@ -56,7 +56,7 @@ function appendOptionInputs(
 }
 
 function buildOptionDropdown(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): Blockly.FieldDropdown {
     const dropdownPairs = commandDefinition.options.map((option) => {
         const longFlag = option.longFlag ? ` | ${option.longFlag}` : "";

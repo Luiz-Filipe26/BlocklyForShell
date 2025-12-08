@@ -1,20 +1,20 @@
 import * as Blockly from "blockly";
 
 import { createToolbox } from "./toolboxBuilder";
-import type { CLICommand, CliDefinitions } from "../../types/cli";
+import * as CLI from "@/types/cli"
 import {
     initSystemBlocks,
     SCRIPT_ROOT_BLOCK_TYPE,
-} from "../blocks/systemBlocks";
+} from "@/blockly/blocks/systemBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
-import { log, LogLevel, LogMode } from "../../app/systemLogger";
-import { createAllBlocksFromDefinition } from "../blocks/blocksBuilder";
+import * as Logger from "@/app/systemLogger";
+import { createAllBlocksFromDefinition } from "@/blockly/blocks/blocksBuilder";
 
-interface RawCLICommand extends Omit<CLICommand, "id"> {
+interface RawCLICommand extends Omit<CLI.CLICommand, "id"> {
     id?: string;
 }
 
-interface RawCliDefinitions extends Omit<CliDefinitions, "commands"> {
+interface RawCliDefinitions extends Omit<CLI.CliDefinitions, "commands"> {
     commands: RawCLICommand[];
 }
 
@@ -26,10 +26,10 @@ export async function setupWorkspace(
     initSystemBlocks();
     const response = await fetch("http://localhost:7000/api/definitions");
     if (!response.ok) {
-        log(
+        Logger.log(
             `Falha crítica ao iniciar a aplicação. Backend não responde. Código: ${response.status}`,
-            LogLevel.ERROR,
-            LogMode.ToastAndConsole,
+            Logger.LogLevel.ERROR,
+            Logger.LogMode.ToastAndConsole,
         );
         return null;
     }
@@ -51,7 +51,7 @@ export async function setupWorkspace(
 }
 
 function getBlocklyOptions(
-    cliDefinitions: CliDefinitions,
+    cliDefinitions: CLI.CliDefinitions,
 ): Blockly.BlocklyOptions {
     return {
         toolbox: createToolbox(cliDefinitions),
@@ -80,7 +80,7 @@ function getBlocklyOptions(
     };
 }
 
-function normalizeCliDefinitions(raw: RawCliDefinitions): CliDefinitions {
+function normalizeCliDefinitions(raw: RawCliDefinitions): CLI.CliDefinitions {
     return {
         ...raw,
         commands: raw.commands.map((command) => ({

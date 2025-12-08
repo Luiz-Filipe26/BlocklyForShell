@@ -1,4 +1,4 @@
-import type { CliDefinitions } from "../types/cli";
+import * as CLI from "@/types/cli";
 
 let currentHelpBalloon: HTMLDivElement | null = null;
 
@@ -40,7 +40,7 @@ export function showHelpBalloon(
 }
 
 export function buildCommandHelpHTML(
-    commandDefinition: CliDefinitions["commands"][number],
+    commandDefinition: CLI.CliDefinitions["commands"][number],
 ): string {
     let html = `
         <h3>${commandDefinition.presentationName}</h3>

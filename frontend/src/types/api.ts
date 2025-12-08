@@ -1,5 +1,9 @@
 import type { AST } from "./ast";
 
+export interface GeneratedScript {
+    script: string;
+}
+
 export interface ExecutionResult {
     stdout: string;
     stderr: string;

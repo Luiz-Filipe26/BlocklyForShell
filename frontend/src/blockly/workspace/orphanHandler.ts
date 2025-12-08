@@ -1,5 +1,5 @@
 import * as Blockly from "blockly";
-import { findScriptRoot } from "../blocks/systemBlocks";
+import { findScriptRoot } from "@/blockly/blocks/systemBlocks";
 
 const ORPHAN_DISABLED_REASON = "orphan_block";
 

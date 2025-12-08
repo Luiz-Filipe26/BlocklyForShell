@@ -1,5 +1,5 @@
 import * as Blockly from "blockly";
-import type { CLIValidation } from "../../types/cli";
+import * as CLI from "@/types/cli"
 import { clearError, setError } from "./validationManager";
 
 /**
@@ -7,7 +7,7 @@ import { clearError, setError } from "./validationManager";
  */
 export function validateOperandValue(
     text: string,
-    rules: CLIValidation[],
+    rules: CLI.CLIValidation[],
     block: Blockly.Block,
 ): void {
     rules.forEach((rule, index) => {

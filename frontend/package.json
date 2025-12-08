@@ -11,7 +11,8 @@
     },
     "devDependencies": {
         "typescript": "^5.9.3",
-        "vite": "^6.4.1"
+        "vite": "^6.4.1",
+        "vite-tsconfig-paths": "^5.1.4"
     },
     "dependencies": {
         "blockly": "^12.3.0"

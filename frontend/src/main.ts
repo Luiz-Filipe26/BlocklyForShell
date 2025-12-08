@@ -1,15 +1,10 @@
 import "blockly/blocks";
 import "blockly/msg/pt";
-import { setupWorkspace } from "./blockly/workspace/workspaceCreator";
-import { getCurrentLevelId, setupLevelSelector } from "./app/levelLoader";
-import { setupScriptHotReloader } from "./app/scriptHotReloader";
-import { runScript } from "./app/scriptRunner";
-import {
-    initSystemLogger,
-    log,
-    LogLevel,
-    LogMode,
-} from "./app/systemLogger";
+import { setupWorkspace } from "@/blockly/workspace/workspaceCreator";
+import { getCurrentLevelId, setupLevelSelector } from "@/app/levelLoader";
+import { setupScriptHotReloader } from "@/app/scriptHotReloader";
+import { runScript } from "@/app/scriptRunner";
+import * as Logger from "@/app/systemLogger";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -37,15 +32,15 @@ async function start(): Promise<void> {
     const workspace = await setupWorkspace(pageElements.blocklyArea);
 
     if (workspace == null) {
-        log(
+        Logger.log(
             "Não foi possível criar o workspace! Aplicação abortada.",
-            LogLevel.ERROR,
-            LogMode.Console,
+            Logger.LogLevel.ERROR,
+            Logger.LogMode.Console,
         );
         return;
     }
 
-    initSystemLogger(pageElements.systemLogContainer, workspace);
+    Logger.initSystemLogger(pageElements.systemLogContainer, workspace);
 
     await setupLevelSelector(
         pageElements.levelSelect,

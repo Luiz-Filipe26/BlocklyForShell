@@ -1,5 +1,5 @@
-import { GameData, Level } from "../types/api";
-import { log, LogLevel, LogMode } from "./systemLogger";
+import * as API from "@/types/api";
+import * as Logger from "@/app/systemLogger";
 
 let currentLevelId: string | null = null;
 
@@ -31,35 +31,35 @@ export async function setupLevelSelector(
     levelSelect.dispatchEvent(new Event("change"));
 }
 
-async function fetchGameData(): Promise<GameData | null> {
+async function fetchGameData(): Promise<API.GameData | null> {
     try {
         const response = await fetch("http://localhost:7000/api/game-data");
 
         if (!response.ok) {
-            log(
+            Logger.log(
                 "Falha ao buscar níveis.",
-                LogLevel.ERROR,
-                LogMode.ToastAndConsole,
+                Logger.LogLevel.ERROR,
+                Logger.LogMode.ToastAndConsole,
             );
             return null;
         }
 
         return response.json();
     } catch (err) {
-        log(
+        Logger.log(
             "Erro de conexão ao buscar níveis.",
-            LogLevel.ERROR,
-            LogMode.ToastAndConsole,
+            Logger.LogLevel.ERROR,
+            Logger.LogMode.ToastAndConsole,
         );
         return null;
     }
 }
 
-function getSortedLevels(gameData: GameData): Level[] {
+function getSortedLevels(gameData: API.GameData): API.Level[] {
     const levelsMap = new Map(gameData.levels.map((l) => [l.id, l]));
     return gameData.levelOrder
         .map((id) => levelsMap.get(id))
-        .filter((level): level is Level => level !== undefined);
+        .filter((level): level is API.Level => level !== undefined);
 }
 
 function buildSandboxOption(): HTMLOptionElement {
@@ -71,7 +71,7 @@ function buildSandboxOption(): HTMLOptionElement {
     return option;
 }
 
-function buildLevelOptions(levels: Level[]): HTMLOptionElement[] {
+function buildLevelOptions(levels: API.Level[]): HTMLOptionElement[] {
     return levels.map((level, index) => {
         const option = document.createElement("option");
         option.value = level.id;

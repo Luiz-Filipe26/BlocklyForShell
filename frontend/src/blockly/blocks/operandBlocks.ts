@@ -1,11 +1,11 @@
 import * as Blockly from "blockly";
-import { validateOperandValue } from "../validation/valueValidators";
+import { validateOperandValue } from "@/blockly/validation/valueValidators";
 import { setupParentIndicator } from "./blockUtils";
-import type { CLICommand, CLIOperand } from "../../types/cli";
-import { setBlockSemanticData } from "../serialization/metadataManager";
-import { renderBlockWarnings } from "../validation/validationWarnings";
+import * as CLI from "@/types/cli";
+import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
+import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
 
-export function createOperandBlocks(commandDefinition: CLICommand): void {
+export function createOperandBlocks(commandDefinition: CLI.CLICommand): void {
     if (!commandDefinition.operands || commandDefinition.operands.length === 0)
         return;
 
@@ -15,8 +15,8 @@ export function createOperandBlocks(commandDefinition: CLICommand): void {
 }
 
 function createSingleOperandBlock(
-    commandDefinition: CLICommand,
-    operandDefinition: CLIOperand,
+    commandDefinition: CLI.CLICommand,
+    operandDefinition: CLI.CLIOperand,
 ): void {
     Blockly.Blocks[
         `${commandDefinition.id}_${operandDefinition.name}_operand`
@@ -40,8 +40,8 @@ function createSingleOperandBlock(
 }
 
 function appendOperandInputs(
-    commandDefinition: CLICommand,
-    operandDefinition: CLIOperand,
+    commandDefinition: CLI.CLICommand,
+    operandDefinition: CLI.CLIOperand,
     block: Blockly.Block,
 ): void {
     const field = buildOperandField(operandDefinition, block);
@@ -62,7 +62,7 @@ function appendOperandInputs(
 }
 
 function buildOperandField(
-    operandDefinition: CLIOperand,
+    operandDefinition: CLI.CLIOperand,
     block: Blockly.Block,
 ): Blockly.FieldTextInput {
     const textField = new Blockly.FieldTextInput(

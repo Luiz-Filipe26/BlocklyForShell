@@ -1,19 +1,21 @@
 import { createCommandBlock } from "./commandBlocks";
 import { createOptionBlock } from "./optionBlocks";
 import { createOperandBlocks } from "./operandBlocks";
-import type { CLICommand, CliDefinitions } from "../../types/cli";
+import * as CLI from "@/types/cli";
 import { createControlBlock } from "./controlBlocks";
 import { createOperatorBlock } from "./operatorBlocks";
 
 export function createBlocksFromCommandDefinition(
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     createCommandBlock(commandDefinition);
     createOptionBlock(commandDefinition);
     createOperandBlocks(commandDefinition);
 }
 
-export function createAllBlocksFromDefinition(cliDefinitions: CliDefinitions) {
+export function createAllBlocksFromDefinition(
+    cliDefinitions: CLI.CliDefinitions,
+) {
     for (const definition of cliDefinitions.commands) {
         createBlocksFromCommandDefinition(definition);
     }

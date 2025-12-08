@@ -1,5 +1,5 @@
 import * as Blockly from "blockly";
-import type { BlockSemanticData } from "../../types/ast";
+import type { BlockSemanticData } from "@/types/ast";
 
 const semanticDataMap = new WeakMap<Blockly.Block, BlockSemanticData>();
 

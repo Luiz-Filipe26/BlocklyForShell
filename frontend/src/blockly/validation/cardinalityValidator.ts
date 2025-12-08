@@ -1,15 +1,15 @@
 import * as Blockly from "blockly";
-import { CLICommand } from "../../types/cli";
-import { getBlockSemanticData } from "../serialization/metadataManager";
+import * as CLI from "@/types/cli";
+import { getBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { clearError, setError } from "./validationManager";
-import { getBlocksList } from "../blocks/blockUtils";
+import { getBlocksList } from "@/blockly/blocks/blockUtils";
 
 /**
  * Executa a Validação de Cardinalidade mínima e registra Erros de Falta de Componentes"
  */
 export function validateCardinality(
     commandBlock: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     clearAllCardinalityErrors(commandBlock, commandDefinition);
 
@@ -30,7 +30,7 @@ export function validateCardinality(
  */
 function clearAllCardinalityErrors(
     block: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     clearError(block, "CARDINALITY_MIN_OPTIONS");
     clearError(block, "CARDINALITY_MIN_OPERANDS");
@@ -45,7 +45,7 @@ function clearAllCardinalityErrors(
  */
 function validateOptionsGroupCardinality(
     block: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     if (!commandDefinition.optionsMin) return;
 
@@ -66,7 +66,7 @@ function validateOptionsGroupCardinality(
  */
 function validateOperandsGroupCardinality(
     block: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     if (!commandDefinition.operandsMin) return;
 
@@ -87,7 +87,7 @@ function validateOperandsGroupCardinality(
  */
 function validateSpecificOperandsCardinality(
     block: Blockly.Block,
-    commandDefinition: CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): void {
     if (commandDefinition.operands.length === 0) return;
 

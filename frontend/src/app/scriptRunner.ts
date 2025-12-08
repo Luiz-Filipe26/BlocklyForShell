@@ -21,7 +21,7 @@ export async function runScript(
     deps: RunDependencies,
     currentLevelId: string | null,
 ): Promise<void> {
-    const { cliOutput, codeOutput, runBtn } = deps;
+    const { cliOutput, runBtn } = deps;
 
     const clientErrors = getWorkspaceErrors(workspace);
     if (clientErrors.length > 0) {
@@ -31,13 +31,12 @@ export async function runScript(
 
     const ast = serializeWorkspaceToAST(workspace);
     if (!ast) {
-        cliOutput.textContent += "\n$ (Nenhum comando para executar)\n";
+        cliOutput.textContent += " \n$";
         cliOutput.scrollTop = cliOutput.scrollHeight;
         return;
     }
 
-    const command = codeOutput.textContent ?? "";
-    cliOutput.textContent += `\n$ ${command}\n`;
+    cliOutput.textContent += " executar-script-atual\n";
 
     runBtn.disabled = true;
     runBtn.textContent = "Executando...";
@@ -53,7 +52,7 @@ export async function runScript(
             Logger.LogLevel.ERROR,
             Logger.LogMode.ToastAndConsole,
         );
-        cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n`;
+        cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n$`;
     } finally {
         runBtn.disabled = false;
         runBtn.textContent = "Executar";
@@ -116,8 +115,8 @@ function renderExecutionOutput(
     let output = "";
 
     if (result.stdout) {
-        const clean = cleanStdout(result.stdout);
-        output += clean + (clean.endsWith("\n") ? "" : "\n");
+        output += result.stdout;
+        if (!output.endsWith("\n")) output += "\n";
     }
 
     if (result.stderr) {
@@ -126,29 +125,15 @@ function renderExecutionOutput(
 
     cliOutput.textContent += output;
 
-    if (!currentLevelId) {
-        if (result.exitCode !== 0) {
-            cliOutput.textContent += `(Processo finalizou com erro: ${result.exitCode})\n`;
+    if (currentLevelId) {
+        if (result.exitCode === 0) {
+            cliOutput.textContent += "✨ SUCESSO! Objetivo concluído. ✨\n";
+        } else {
+            cliOutput.textContent += "⚠️ O objetivo não foi atingido.\n";
         }
-        return;
+    } else if (result.exitCode !== 0) {
+        cliOutput.textContent += `(Exit Code: ${result.exitCode})\n`;
     }
 
-    if (result.exitCode === 0) {
-        cliOutput.textContent +=
-            "✨ SUCESSO! Objetivo do nível concluído. ✨\n";
-    } else {
-        cliOutput.textContent +=
-            "⚠️ O objetivo não foi atingido. Verifique a mensagem acima e tente novamente.\n";
-    }
-}
-
-function cleanStdout(raw: string): string {
-    return raw
-        .split("\n")
-        .filter(
-            (line) =>
-                !line.includes("--- INICIO DA EXECUÇÃO ---") &&
-                !line.includes("--- VERIFICACAO ---"),
-        )
-        .join("\n");
+    cliOutput.textContent += "$";
 }

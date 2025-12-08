@@ -16,7 +16,6 @@ import br.edu.ifmg.cli.models.ExecutionResult;
 public class SandboxRunner {
 
 	private static final int TIMEOUT_SECONDS = 5;
-
 	private static final Logger logger = LoggerFactory.getLogger(SandboxRunner.class);
 
 	public ExecutionResult run(String userScript, List<String> setupCommands, String verificationScript) {
@@ -25,15 +24,18 @@ public class SandboxRunner {
 			volumeDir = Files.createTempDirectory("sandbox_vol_");
 
 			StringBuilder fullScript = new StringBuilder();
+
 			if (setupCommands != null && !setupCommands.isEmpty()) {
-				for (String cmd : setupCommands)
-					fullScript.append(cmd).append(" && ");
+				for (String cmd : setupCommands) {
+					fullScript.append(cmd).append(" > /dev/null 2>&1 && ");
+				}
 			}
-			fullScript.append("echo '--- INICIO DA EXECUÇÃO ---';\n");
+
 			fullScript.append(userScript).append(" ;\n");
-			fullScript.append("echo '--- VERIFICACAO ---';\n");
+
 			String verify = (verificationScript != null && !verificationScript.isBlank()) ? verificationScript
 					: "exit 0";
+
 			fullScript.append(verify);
 
 			ProcessBuilder pb = new ProcessBuilder("docker", "run", "--rm", "--net", "none", "--memory", "100m", "-v",

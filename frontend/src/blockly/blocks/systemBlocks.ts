@@ -12,7 +12,9 @@ export function initSystemBlocks(): void {
     Blockly.Blocks[BlockIDs.ROOT_BLOCK_TYPE] = {
         init: function(this: Blockly.Block) {
             this.appendDummyInput().appendField("📜 Script Principal");
-            this.appendStatementInput("STACK").setCheck("command");
+            this.appendStatementInput(BlockIDs.INPUTS.STACK).setCheck(
+                BlockIDs.commandStatementType(),
+            );
 
             this.setColour("#333333");
             this.setTooltip(

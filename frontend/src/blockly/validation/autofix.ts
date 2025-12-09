@@ -78,13 +78,13 @@ export function autoFixExcessOperands(
     for (const operandDef of commandDefinition.operands) {
         const max = operandDef.cardinality?.max ?? 0;
         if (max === "unlimited") continue;
-        const operandType = `${commandDefinition.id}_${operandDef.name}_operand`;
+        const operandType = `${commandDefinition.id}_${operandDef.label}_operand`;
         const blocksOfType = blocksByType.get(operandType);
         if (!blocksOfType || blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
 
         Logger.log(
-            `Limite de ${max} excedido para '${operandDef.name}'.`,
+            `Limite de ${max} excedido para '${operandDef.label}'.`,
             Logger.LogLevel.WARN,
             Logger.LogMode.ToastAndConsole,
         );

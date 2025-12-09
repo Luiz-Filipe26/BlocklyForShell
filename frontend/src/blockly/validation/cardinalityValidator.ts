@@ -33,7 +33,7 @@ function clearAllOperandCardinalityErrors(
     clearError(block, "CARDINALITY_MIN_OPERANDS");
 
     commandDefinition.operands.forEach((operand) =>
-        clearError(block, `CARDINALITY_MISSING_OPERAND_${operand.name}`),
+        clearError(block, `CARDINALITY_MISSING_OPERAND_${operand.label}`),
     );
 }
 
@@ -144,7 +144,7 @@ function validateSpecificOperandsCardinality(
     }
 
     for (const operandDef of commandDefinition.operands) {
-        const operandType = `${commandDefinition.id}_${operandDef.name}_operand`;
+        const operandType = `${commandDefinition.id}_${operandDef.label}_operand`;
         const count = countsByType.get(operandType) || 0;
         const min = operandDef.cardinality?.min ?? 0;
         const missing = Math.max(0, min - count);
@@ -152,8 +152,8 @@ function validateSpecificOperandsCardinality(
         if (missing == 0) continue;
         setError(
             block,
-            `CARDINALITY_MISSING_OPERAND_${operandDef.name}`,
-            `Falta operando: ${operandDef.name} (precisa de ${missing}).`,
+            `CARDINALITY_MISSING_OPERAND_${operandDef.label}`,
+            `Falta operando: ${operandDef.label} (precisa de ${missing}).`,
         );
     }
 }

@@ -37,7 +37,7 @@ function appendCommandHeader(
 
     block
         .appendDummyInput("HEADER")
-        .appendField(commandDefinition.presentationName)
+        .appendField(commandDefinition.label)
         .appendField(" ")
         .appendField(helpIcon)
         .appendField(BlockUtils.createCardinalityField(28), "CARDINALITY_ICON");

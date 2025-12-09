@@ -1,8 +1,9 @@
 {
   "commands": [
     {
+      "id": "ls",
       "shellCommand": "ls",
-      "presentationName": "ls",
+      "label": "ls",
       "description": "Lista o conteúdo de diretórios. Mostra informações sobre arquivos e pastas.",
       "color": "#5b80a5",
       "optionColor": "#7fbf7f",
@@ -52,7 +53,8 @@
       ],
       "operands": [
         {
-          "name": "file",
+          "id": "file",
+          "label": "Arquivo",
           "description": "Um arquivo específico a ser listado.",
           "color": "#a67f5f",
           "type": "file",
@@ -66,7 +68,8 @@
           ]
         },
         {
-          "name": "folder",
+          "id": "folder",
+          "label": "Pasta",
           "description": "Um diretório a ser listado. Se omitido, usa o diretório atual.",
           "color": "#a67f5f",
           "type": "folder",
@@ -82,8 +85,9 @@
       ]
     },
     {
+      "id": "cd",
       "shellCommand": "cd",
-      "presentationName": "cd",
+      "label": "cd",
       "description": "Navegar entre pastas",
       "color": "#7fc37f",
       "optionColor": "#7fbf7f",
@@ -96,7 +100,8 @@
       ],
       "operands": [
         {
-          "name": "folder",
+          "id": "folder",
+          "label": "Pasta",
           "description": "Um diretório a ser navegado.",
           "color": "#a67f5f",
           "type": "folder",
@@ -112,8 +117,9 @@
       ]
     },
     {
+      "id": "mkdir",
       "shellCommand": "mkdir",
-      "presentationName": "mkdir",
+      "label": "mkdir",
       "description": "Criar pastas",
       "color": "#8e44ad", 
       "optionColor": "#7fbf7f",
@@ -131,7 +137,8 @@
       ],
       "operands": [
         {
-          "name": "folder_name",
+          "id": "folder_name",
+          "label": "Nome da Pasta",
           "description": "Nome da pasta a ser criada.",
           "color": "#a67f5f",
           "type": "string",
@@ -150,8 +157,7 @@
   "operators": [
     {
       "id": "pipe",
-      "command": "pipe",
-      "name": "pipe",
+      "label": "pipe", 
       "description": "Redireciona a saída do comando anterior para a entrada do próximo (Pipe).",
       "color": "#b1745b",
       "slots": [
@@ -172,8 +178,7 @@
     },
     {
       "id": "redirect_out",
-      "command": "redirect_out",
-      "name": "redirect_out",
+      "label": "redirect_out",
       "description": "Salva a saída do comando em um arquivo (sobrescreve).",
       "color": "#b1745b",
       "slots": [
@@ -193,8 +198,7 @@
     },
     {
       "id": "redirect_append",
-      "command": "redirect_append",
-      "name": "redirect_append",
+      "label": "redirect_append",
       "description": "Adiciona a saída do comando ao final de um arquivo (append).",
       "color": "#b1745b",
       "slots": [
@@ -214,8 +218,7 @@
     },
     {
       "id": "and",
-      "command": "and",
-      "name": "and",
+      "label": "and",
       "description": "Executa o próximo comando apenas se o anterior tiver sucesso.",
       "color": "#b1745b",
       "slots": [
@@ -235,8 +238,7 @@
     },
     {
       "id": "or",
-      "command": "or",
-      "name": "or",
+      "label": "or",
       "description": "Executa o próximo comando apenas se o anterior falhar.",
       "color": "#b1745b",
       "slots": [
@@ -258,8 +260,8 @@
   "controls": [
     {
       "id": "if_statement",
-      "command": "if",
-      "name": "if_statement",
+      "shellCommand": "if",
+      "label": "if", 
       "description": "Executa comandos condicionalmente baseado no sucesso de um comando teste.",
       "color": "#dbaa25",
       "syntaxEnd": "fi",
@@ -292,8 +294,8 @@
     },
     {
       "id": "while_loop",
-      "command": "while",
-      "name": "while_loop",
+      "shellCommand": "while", 
+      "label": "while",
       "description": "Repete comandos enquanto a condição for verdadeira.",
       "color": "#dbaa25",
       "syntaxEnd": "done",

@@ -43,7 +43,7 @@ export function buildCommandHelpHTML(
     commandDefinition: CLI.CliDefinitions["commands"][number],
 ): string {
     let html = `
-        <h3>${commandDefinition.presentationName}</h3>
+        <h3>${commandDefinition.label}</h3>
         <p>${commandDefinition.description}</p>
         <strong>Opções disponíveis:</strong>
         <ul style="margin-left:20px; list-style-type:disc;">

@@ -117,7 +117,7 @@ public class ScriptGenerator {
 
         StringBuilder sb = new StringBuilder();
         
-        sb.append(def.command());
+        sb.append(def.shellCommand());
 
         if (def.slots() != null) {
             for (SlotDef slot : def.slots()) {

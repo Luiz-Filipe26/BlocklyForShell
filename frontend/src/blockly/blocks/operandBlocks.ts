@@ -19,12 +19,12 @@ function createSingleOperandBlock(
     operandDefinition: CLI.CLIOperand,
 ): void {
     Blockly.Blocks[
-        `${commandDefinition.id}_${operandDefinition.name}_operand`
+        `${commandDefinition.id}_${operandDefinition.id}_operand`
     ] = {
         init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "operand",
-                operandName: operandDefinition.name,
+                operandName: operandDefinition.id,
                 operandType: operandDefinition.type,
                 relatedCommand: commandDefinition.shellCommand,
             });
@@ -52,7 +52,7 @@ function appendOperandInputs(
             `(operando de: ${commandDefinition.shellCommand})`,
             "PARENT_INDICATOR",
         )
-        .appendField(`${operandDefinition.name}:`)
+        .appendField(`${operandDefinition.label}:`)
         .appendField(field, "VALUE");
 
     block.setPreviousStatement(true, `${commandDefinition.id}_Operand`);

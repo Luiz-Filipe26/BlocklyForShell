@@ -71,7 +71,7 @@ function transformCommandToCategory(
             { kind: "block", type: `${definition.id}_option` },
             ...definition.operands.map((operation) => ({
                 kind: "block" as const,
-                type: `${definition.id}_${operation.name}_operand`,
+                type: `${definition.id}_${operation.id}_operand`,
             })),
         ],
     };
@@ -82,6 +82,6 @@ function transformSimpleToBlock(
 ): ToolboxBlock {
     return {
         kind: "block",
-        type: definition.name,
+        type: definition.id,
     };
 }

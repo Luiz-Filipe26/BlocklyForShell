@@ -4,7 +4,7 @@ import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
 
 export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
-    Blockly.Blocks[operatorDefinition.name] = {
+    Blockly.Blocks[operatorDefinition.id] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "operator",
@@ -17,14 +17,14 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
             const helpIcon = BlockUtils.createGenericHelpIcon(() => {
                 return `
                     <div class="help-content">
-                        <h3>Operador: ${operatorDefinition.command}</h3>
+                        <h3>Operador: ${operatorDefinition.label}</h3>
                         <p>${operatorDefinition.description}</p>
                     </div>
                 `;
             });
 
             this.appendDummyInput()
-                .appendField(operatorDefinition.name)
+                .appendField(operatorDefinition.label)
                 .appendField(" ")
                 .appendField(helpIcon);
 

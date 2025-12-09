@@ -6,7 +6,7 @@ import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
 import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
 
 export function createControlBlock(controlDefinition: CLI.CLIControl): void {
-    Blockly.Blocks[controlDefinition.name] = {
+    Blockly.Blocks[controlDefinition.id] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "control",
@@ -16,15 +16,15 @@ export function createControlBlock(controlDefinition: CLI.CLIControl): void {
             const helpIcon = BlockUtils.createGenericHelpIcon(() => {
                 return `
                     <div class="help-content">
-                        <h3>Controle: ${controlDefinition.command}</h3>
+                        <h3>Controle: ${controlDefinition.label}</h3>
                         <p>${controlDefinition.description}</p>
-                        <small>Sintaxe: ${controlDefinition.command} ... ${controlDefinition.syntaxEnd}</small>
+                        <small>Sintaxe: ${controlDefinition.label} ... ${controlDefinition.syntaxEnd}</small>
                     </div>
                 `;
             });
 
             this.appendDummyInput()
-                .appendField(controlDefinition.name)
+                .appendField(controlDefinition.label)
                 .appendField(" ")
                 .appendField(helpIcon);
 

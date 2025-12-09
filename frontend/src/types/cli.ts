@@ -9,7 +9,8 @@ export interface CLICardinality {
 }
 
 export interface CLIOperand {
-    name: string;
+    id: string;
+    label: string;
     description: string;
     color: string;
     type: "file" | "folder" | "string";
@@ -28,7 +29,7 @@ export interface CLIOption {
 export interface CLICommand {
     id: string;
     shellCommand: string;
-    presentationName: string;
+    label: string;
     description: string;
     color: string;
     optionColor: string;
@@ -52,8 +53,7 @@ export interface CLIControlSlot {
 
 export interface CLIOperator {
     id: string;
-    command: string;
-    name: string;
+    label: string;
     description: string;
     color: string;
     slots: CLIControlSlot[];
@@ -62,8 +62,8 @@ export interface CLIOperator {
 
 export interface CLIControl {
     id: string;
-    command: string;
-    name: string;
+    shellCommand: string;
+    label: string;
     description: string;
     color: string;
     syntaxEnd: string;

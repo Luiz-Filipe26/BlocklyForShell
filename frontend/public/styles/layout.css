@@ -32,3 +32,77 @@
     position: relative;
     border-right: 2px solid #ccc;
 }
+
+.editor-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    padding: 0 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ccc;
+    border-right: 2px solid #ccc;
+
+    flex-shrink: 0;
+    height: 50px;
+}
+
+.toolbar-group {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-tool {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0 10px;
+
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #495057;
+    cursor: pointer;
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+.btn-tool:hover {
+    background-color: #e2e6ea;
+    border-color: #adb5bd;
+    color: #212529;
+}
+
+.btn-tool:active {
+    background-color: #dae0e5;
+    transform: translateY(1px);
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background-color: #ccc;
+    margin: 0 5px;
+}
+
+.btn-tool-danger {
+    color: #d63031;
+    border-color: #ffcccc;
+    background-color: #fff5f5;
+}
+
+.btn-tool-danger:hover {
+    background-color: #ffe6e6;
+    border-color: #ffaaaa;
+    color: #c0392b;
+}
+
+.spacer {
+    flex: 1;
+}

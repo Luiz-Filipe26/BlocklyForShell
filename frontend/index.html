@@ -15,6 +15,53 @@
 
         <main class="main-layout">
             <div class="editor-column">
+                <div class="editor-toolbar">
+                    <div class="toolbar-group">
+                        <button
+                            id="btn-save-script"
+                            class="btn-tool"
+                            title="Baixar script atual (.json)"
+                        >
+                            💾 Salvar Script
+                        </button>
+                        <button
+                            id="btn-load-script"
+                            class="btn-tool"
+                            title="Carregar script (.json)"
+                        >
+                            📂 Abrir Script
+                        </button>
+                    </div>
+
+                    <span class="divider"></span>
+
+                    <div class="toolbar-group">
+                        <button
+                            id="btn-load-defs"
+                            class="btn-tool"
+                            title="Carregar novas definições (cli_definitions.json)"
+                        >
+                            ⚙️ Carregar Definições
+                        </button>
+                        <button
+                            id="btn-load-game"
+                            class="btn-tool"
+                            title="Carregar novos níveis (game_data.json)"
+                        >
+                            🎮 Níveis
+                        </button>
+                    </div>
+
+                    <span class="spacer"></span>
+
+                    <button
+                        id="btn-reset-defs"
+                        class="btn-tool btn-tool-danger"
+                        title="Voltar para definições padrão"
+                    >
+                        ↺ Resetar Fábrica
+                    </button>
+                </div>
                 <div id="blockly-area" class="blockly-workspace-area"></div>
 
                 <div class="bottom-panel system-log-panel">

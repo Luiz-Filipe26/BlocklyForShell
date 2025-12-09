@@ -1,41 +1,45 @@
 import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
-import * as BlockIDs from "blockly/constants/blockIds";
+import * as BlockIDs from "@/blockly/constants/blockIds";
+import * as Logger from "@/app/systemLogger";
 import { createToolbox } from "./toolboxBuilder";
 import { initSystemBlocks } from "@/blockly/blocks/systemBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
-import * as Logger from "@/app/systemLogger";
 import { createAllBlocksFromDefinition } from "@/blockly/blocks/blocksBuilder";
+import { getDefinitions } from "@/app/dataManager"; // ✅ Usa o DataManager
 import {
     AUTOSAVE_STORAGE_KEY,
     initAutoSaver,
     loadSession,
 } from "@/app/workspaceAutoSaver";
 
+// --- Tipos Auxiliares para Normalização ---
 interface RawCLICommand extends Omit<CLI.CLICommand, "id"> {
     id?: string;
 }
-
 interface RawCliDefinitions extends Omit<CLI.CliDefinitions, "commands"> {
     commands: RawCLICommand[];
 }
 
+/**
+ * Inicializa o Workspace principal.
+ */
 export async function setupWorkspace(
     blocklyArea: HTMLDivElement,
 ): Promise<Blockly.WorkspaceSvg | null> {
     initSystemBlocks();
-    const response = await fetch("http://localhost:7000/api/definitions");
-    if (!response.ok) {
+    const rawDefinitions = await getDefinitions();
+
+    if (!rawDefinitions) {
         Logger.log(
-            `Falha crítica ao iniciar a aplicação. Backend não responde. Código: ${response.status}`,
+            "Falha crítica: Sem definições disponíveis.",
             Logger.LogLevel.ERROR,
             Logger.LogMode.ToastAndConsole,
         );
         return null;
     }
 
-    const rawJson = await response.json();
-    const cliDefinitions = normalizeCliDefinitions(rawJson);
+    const cliDefinitions = normalizeCliDefinitions(rawDefinitions);
     createAllBlocksFromDefinition(cliDefinitions);
 
     const workspace = Blockly.inject(
@@ -44,14 +48,45 @@ export async function setupWorkspace(
     );
 
     disableOrphanBlocks(workspace);
+
     const restored = loadSession(workspace);
+
     if (!restored) {
         createScriptRoot(workspace);
     }
+
     initAutoSaver(workspace);
     initCustomContextMenu();
 
     return workspace;
+}
+
+/**
+ * Responsável por aplicar novas definições e resetar o workspace.
+ */
+export function refreshWorkspaceDefinitions(
+    workspace: Blockly.WorkspaceSvg,
+    definitions: CLI.CliDefinitions,
+): void {
+    const normalizedDefs = normalizeCliDefinitions(definitions);
+    createAllBlocksFromDefinition(normalizedDefs);
+    const newToolbox = createToolbox(normalizedDefs);
+    workspace.updateToolbox(newToolbox);
+    Blockly.Events.disable();
+    workspace.clear();
+    createScriptRoot(workspace);
+    Blockly.Events.enable();
+}
+
+/**
+ * Cria o bloco raiz (script_root) no workspace.
+ * Exportada para ser usada em resets manuais.
+ */
+export function createScriptRoot(workspace: Blockly.WorkspaceSvg): void {
+    const rootBlock = workspace.newBlock(BlockIDs.ROOT_BLOCK_TYPE);
+    rootBlock.initSvg();
+    rootBlock.render();
+    rootBlock.moveBy(50, 50);
 }
 
 function getBlocklyOptions(
@@ -84,23 +119,17 @@ function getBlocklyOptions(
     };
 }
 
-function normalizeCliDefinitions(raw: RawCliDefinitions): CLI.CliDefinitions {
+function normalizeCliDefinitions(
+    raw: RawCliDefinitions | CLI.CliDefinitions,
+): CLI.CliDefinitions {
+    const defs = raw as RawCliDefinitions;
     return {
-        ...raw,
-        commands: raw.commands.map((command) => ({
+        ...defs,
+        commands: defs.commands.map((command) => ({
             ...command,
             id: command.id || command.shellCommand,
         })),
     };
-}
-
-async function createScriptRoot(
-    workspace: Blockly.WorkspaceSvg,
-): Promise<void> {
-    const rootBlock = workspace.newBlock(BlockIDs.ROOT_BLOCK_TYPE);
-    rootBlock.initSvg();
-    rootBlock.render();
-    rootBlock.moveBy(50, 50);
 }
 
 function initCustomContextMenu(): void {
@@ -115,14 +144,15 @@ function initCustomContextMenu(): void {
         id: BlockIDs.CONTEXT_MENU_IDS.CLEAR_OPTION,
         preconditionFn: () => "enabled",
         callback: (scope) => {
-            const workspace = scope.workspace;
+            const workspace = scope.workspace as Blockly.WorkspaceSvg;
             if (!workspace) return;
 
             if (confirm("Tem certeza que deseja apagar todos os blocos?")) {
                 Blockly.Events.disable();
                 workspace.clear();
-                Blockly.Events.enable();
                 localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
+                Blockly.Events.enable();
+
                 createScriptRoot(workspace);
             }
         },

@@ -4,7 +4,9 @@ import { setupWorkspace } from "@/blockly/workspace/workspaceCreator";
 import { getCurrentLevelId, setupLevelSelector } from "@/app/levelLoader";
 import { setupScriptHotReloader } from "@/app/scriptHotReloader";
 import { runScript } from "@/app/scriptRunner";
+import * as Blockly from "blockly";
 import * as Logger from "@/app/systemLogger";
+import * as PersistenceManager from "@/app/persistenceManager";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -26,6 +28,11 @@ const pageElements = {
     ),
     closeModalBtn: queryRequired<HTMLButtonElement>("close-modal-btn"),
     systemLogContainer: queryRequired<HTMLDivElement>("system-log-container"),
+    btnSaveScript: queryRequired<HTMLButtonElement>("btn-save-script"),
+    btnLoadScript: queryRequired<HTMLButtonElement>("btn-load-script"),
+    btnLoadDefs: queryRequired<HTMLButtonElement>("btn-load-defs"),
+    btnLoadGame: queryRequired<HTMLButtonElement>("btn-load-game"),
+    btnResetDefs: queryRequired<HTMLButtonElement>("btn-reset-defs"),
 };
 
 async function start(): Promise<void> {
@@ -48,13 +55,60 @@ async function start(): Promise<void> {
     );
 
     setupScriptHotReloader(workspace, pageElements.codeOutput);
+    registerButtonListeners(workspace);
+}
 
+function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
     pageElements.runBtn.addEventListener("click", async () => {
         runScript(workspace, pageElements, getCurrentLevelId());
     });
 
     pageElements.clearBtn.addEventListener("click", () => {
         pageElements.cliOutput.textContent = "$";
+    });
+
+    pageElements.btnSaveScript.addEventListener("click", () => {
+        PersistenceManager.downloadScript(workspace);
+    });
+
+    pageElements.btnLoadScript.addEventListener("click", () => {
+        PersistenceManager.uploadScript(workspace);
+    });
+
+    pageElements.btnLoadDefs.addEventListener("click", () => {
+        if (
+            confirm(
+                "Carregar novas definições limpará o workspace atual. Continuar?",
+            )
+        ) {
+            PersistenceManager.uploadDefinitions(workspace);
+        }
+    });
+
+    pageElements.btnResetDefs.addEventListener("click", () => {
+        if (
+            confirm(
+                "ATENÇÃO: Isso apagará suas definições e níveis personalizados e voltará ao padrão do servidor. Continuar?",
+            )
+        ) {
+            PersistenceManager.resetToFactorySettings(workspace, async () => {
+                await setupLevelSelector(
+                    pageElements.levelSelect,
+                    pageElements.levelDescription,
+                );
+                pageElements.levelSelect.selectedIndex = 0;
+                pageElements.levelSelect.dispatchEvent(new Event("change"));
+            });
+        }
+    });
+
+    pageElements.btnLoadGame.addEventListener("click", () => {
+        PersistenceManager.uploadGameData(() => {
+            setupLevelSelector(
+                pageElements.levelSelect,
+                pageElements.levelDescription,
+            );
+        });
     });
 }
 

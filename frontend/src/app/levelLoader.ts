@@ -1,5 +1,5 @@
 import * as API from "@/types/api";
-import * as Logger from "@/app/systemLogger";
+import { getGameData } from "./dataManager";
 
 let currentLevelId: string | null = null;
 
@@ -11,7 +11,7 @@ export async function setupLevelSelector(
     levelSelect: HTMLSelectElement,
     levelDescription: HTMLDivElement,
 ): Promise<void> {
-    const data = await fetchGameData();
+    const data = await getGameData();
 
     if (!data) {
         levelSelect.innerHTML = "<option>Erro ao carregar níveis</option>";
@@ -29,30 +29,6 @@ export async function setupLevelSelector(
     registerLevelSelectorEvents(levelSelect, levelDescription);
 
     levelSelect.dispatchEvent(new Event("change"));
-}
-
-async function fetchGameData(): Promise<API.GameData | null> {
-    try {
-        const response = await fetch("http://localhost:7000/api/game-data");
-
-        if (!response.ok) {
-            Logger.log(
-                "Falha ao buscar níveis.",
-                Logger.LogLevel.ERROR,
-                Logger.LogMode.ToastAndConsole,
-            );
-            return null;
-        }
-
-        return response.json();
-    } catch (err) {
-        Logger.log(
-            "Erro de conexão ao buscar níveis.",
-            Logger.LogLevel.ERROR,
-            Logger.LogMode.ToastAndConsole,
-        );
-        return null;
-    }
 }
 
 function getSortedLevels(gameData: API.GameData): API.Level[] {

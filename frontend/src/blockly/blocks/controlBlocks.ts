@@ -3,7 +3,7 @@ import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { validateControlCardinality } from "@/blockly/validation/cardinalityValidator";
 import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
-import * as BlockUtils from "./blockUtils";
+import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
 
 export function createControlBlock(controlDefinition: CLI.CLIControl): void {
     Blockly.Blocks[controlDefinition.name] = {
@@ -13,14 +13,27 @@ export function createControlBlock(controlDefinition: CLI.CLIControl): void {
                 commandName: controlDefinition.id,
             });
 
+            const helpIcon = BlockUtils.createGenericHelpIcon(() => {
+                return `
+                    <div class="help-content">
+                        <h3>Controle: ${controlDefinition.command}</h3>
+                        <p>${controlDefinition.description}</p>
+                        <small>Sintaxe: ${controlDefinition.command} ... ${controlDefinition.syntaxEnd}</small>
+                    </div>
+                `;
+            });
+
+            this.appendDummyInput()
+                .appendField(controlDefinition.name)
+                .appendField(" ")
+                .appendField(helpIcon);
+
             controlDefinition.slots.forEach((slot) => {
                 const input = this.appendStatementInput(slot.name).setCheck(
                     slot.check,
                 );
 
-                if (slot.label) {
-                    input.appendField(slot.label);
-                }
+                if (slot.label) input.appendField(slot.label);
             });
 
             this.setPreviousStatement(true, "command");

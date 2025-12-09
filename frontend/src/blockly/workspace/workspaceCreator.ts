@@ -1,7 +1,7 @@
 import * as Blockly from "blockly";
 
 import { createToolbox } from "./toolboxBuilder";
-import * as CLI from "@/types/cli"
+import * as CLI from "@/types/cli";
 import {
     initSystemBlocks,
     SCRIPT_ROOT_BLOCK_TYPE,
@@ -115,7 +115,9 @@ function initCustomContextMenu(): void {
             if (!workspace) return;
 
             if (confirm("Tem certeza que deseja apagar todos os blocos?")) {
+                Blockly.Events.disable();
                 workspace.clear();
+                Blockly.Events.enable();
                 createScriptRoot(workspace);
             }
         },

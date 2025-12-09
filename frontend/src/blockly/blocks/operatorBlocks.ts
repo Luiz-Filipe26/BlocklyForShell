@@ -1,6 +1,7 @@
 import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
+import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
 
 export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
     Blockly.Blocks[operatorDefinition.name] = {
@@ -13,7 +14,21 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
 
             this.setInputsInline(true);
 
-            for (const slot of operatorDefinition.slots) {
+            const helpIcon = BlockUtils.createGenericHelpIcon(() => {
+                return `
+                    <div class="help-content">
+                        <h3>Operador: ${operatorDefinition.command}</h3>
+                        <p>${operatorDefinition.description}</p>
+                    </div>
+                `;
+            });
+
+            this.appendDummyInput()
+                .appendField(operatorDefinition.name)
+                .appendField(" ")
+                .appendField(helpIcon);
+
+            operatorDefinition.slots.forEach((slot) => {
                 const input = this.appendStatementInput(slot.name).setCheck(
                     slot.check,
                 );
@@ -24,14 +39,11 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
                         if (slot.label) input.appendField(slot.label);
                     } else {
                         if (slot.label) input.appendField(slot.label);
-                        // Nota: No Blockly statement, appendField vai sempre à esquerda visualmente
-                        // Se precisar ser estritamente à direita, seria necessário um DummyInput extra.
-                        // Por enquanto, assumimos que labels/symbols ficam à esquerda do buraco.
                     }
                 } else if (slot.label) {
                     input.appendField(slot.label);
                 }
-            }
+            });
 
             this.setPreviousStatement(true, "command");
             this.setNextStatement(true, "command");

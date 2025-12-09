@@ -3,7 +3,7 @@ import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { validateControlCardinality } from "@/blockly/validation/cardinalityValidator";
 import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
-import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
+import * as BlockUtils from "./blockUtils";
 
 export function createControlBlock(controlDefinition: CLI.CLIControl): void {
     Blockly.Blocks[controlDefinition.id] = {

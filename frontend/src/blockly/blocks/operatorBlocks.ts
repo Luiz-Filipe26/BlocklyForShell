@@ -1,7 +1,9 @@
 import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
-import * as BlockUtils from "./blockUtils"; // ✅ Import necessário
+import * as BlockUtils from "./blockUtils";
+import { validateOperatorIntegrity } from "@/blockly/validation/cardinalityValidator";
+import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
 
 export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
     Blockly.Blocks[operatorDefinition.id] = {
@@ -49,6 +51,11 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
             this.setNextStatement(true, "command");
             this.setColour(operatorDefinition.color);
             this.setTooltip(operatorDefinition.description);
+
+            BlockUtils.addLocalChangeListener(this, () => {
+                validateOperatorIntegrity(this, operatorDefinition);
+                renderBlockWarnings(this);
+            });
         },
     };
 }

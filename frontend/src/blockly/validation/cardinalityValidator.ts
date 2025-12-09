@@ -4,6 +4,37 @@ import { getBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { clearError, setError } from "./validationManager";
 import { getBlocksList, getParentInputName } from "@/blockly/blocks/blockUtils";
 
+export function validateControlCardinality(
+    block: Blockly.Block,
+    controlDefinition: CLI.CLIControl,
+): void {
+    clearAllControlCardinalityErrors(block, controlDefinition);
+
+    for (const slot of controlDefinition.slots) {
+        if (!slot.obligatory) continue;
+
+        const targetBlock = block.getInputTargetBlock(slot.name);
+        const isEmpty = !targetBlock || getBlocksList(targetBlock).length === 0;
+
+        if (isEmpty) {
+            setError(
+                block,
+                `CONTROL_MISSING_SLOT_${slot.name}`,
+                `O campo "${(slot.label || slot.name).replace(":", "")}" é obrigatório.`,
+            );
+        }
+    }
+}
+
+function clearAllControlCardinalityErrors(
+    block: Blockly.Block,
+    controlDefinition: CLI.CLIControl,
+): void {
+    controlDefinition.slots.forEach((slot) =>
+        clearError(block, `CONTROL_MISSING_SLOT_${slot.name}`),
+    );
+}
+
 /**
  * Executa a Validação de Cardinalidade mínima e registra Erros de Falta de Componentes"
  */
@@ -37,35 +68,50 @@ function clearAllOperandCardinalityErrors(
     );
 }
 
-function clearAllControlCardinalityErrors(
+/**
+ * Valida se o operador possui todos os slots preenchidos e sem blocos empilhados.
+ */
+export function validateOperatorIntegrity(
     block: Blockly.Block,
-    controlDefinition: CLI.CLIControl,
+    operatorDefinition: CLI.CLIOperator,
 ): void {
-    controlDefinition.slots.forEach((slot) =>
-        clearError(block, `CONTROL_MISSING_SLOT_${slot.name}`),
-    );
-}
-
-export function validateControlCardinality(
-    block: Blockly.Block,
-    controlDefinition: CLI.CLIControl,
-): void {
-    clearAllControlCardinalityErrors(block, controlDefinition);
-
-    for (const slot of controlDefinition.slots) {
-        if (!slot.obligatory) continue;
-
-        const targetBlock = block.getInputTargetBlock(slot.name);
-        const isEmpty = !targetBlock || getBlocksList(targetBlock).length === 0;
-
-        if (isEmpty) {
+    for (const slot of operatorDefinition.slots || []) {
+        const errorKeyEmpty = `OPERATOR_EMPTY_SLOT_${slot.name}`;
+        const errorKeyStack = `OPERATOR_STACKED_SLOT_${slot.name}`;
+        clearError(block, errorKeyEmpty);
+        clearError(block, errorKeyStack);
+        if (isOperatorSlotEmpty(block, slot)) {
             setError(
                 block,
-                `CONTROL_MISSING_SLOT_${slot.name}`,
-                `O campo "${(slot.label || slot.name).replace(":", "")}" é obrigatório.`,
+                errorKeyEmpty,
+                `O slot "${slot.label || slot.name}" é obrigatório.`,
+            );
+            continue;
+        }
+        if (isOperatorSlotStacked(block, slot)) {
+            setError(
+                block,
+                errorKeyStack,
+                `Operadores aceitam apenas um comando por slot. Use um bloco de agrupamento ou subshell se precisar de sequência.`,
             );
         }
     }
+}
+
+function isOperatorSlotEmpty(
+    block: Blockly.Block,
+    slot: CLI.CLIControlSlot,
+): boolean {
+    const targetBlock = block.getInputTargetBlock(slot.name);
+    return !targetBlock;
+}
+
+function isOperatorSlotStacked(
+    block: Blockly.Block,
+    slot: CLI.CLIControlSlot,
+): boolean {
+    const targetBlock = block.getInputTargetBlock(slot.name);
+    return Boolean(targetBlock?.getNextBlock());
 }
 
 /**

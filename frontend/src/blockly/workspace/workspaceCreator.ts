@@ -1,11 +1,8 @@
 import * as Blockly from "blockly";
-
-import { createToolbox } from "./toolboxBuilder";
 import * as CLI from "@/types/cli";
-import {
-    initSystemBlocks,
-    SCRIPT_ROOT_BLOCK_TYPE,
-} from "@/blockly/blocks/systemBlocks";
+import * as BlockIDs from "blockly/constants/blockIds";
+import { createToolbox } from "./toolboxBuilder";
+import { initSystemBlocks } from "@/blockly/blocks/systemBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
 import * as Logger from "@/app/systemLogger";
 import { createAllBlocksFromDefinition } from "@/blockly/blocks/blocksBuilder";
@@ -17,8 +14,6 @@ interface RawCLICommand extends Omit<CLI.CLICommand, "id"> {
 interface RawCliDefinitions extends Omit<CLI.CliDefinitions, "commands"> {
     commands: RawCLICommand[];
 }
-
-export const CLEAR_OPTION_CONTEXT_MENU_ID = "workspace_clear_all_custom";
 
 export async function setupWorkspace(
     blocklyArea: HTMLDivElement,
@@ -93,7 +88,7 @@ function normalizeCliDefinitions(raw: RawCliDefinitions): CLI.CliDefinitions {
 async function createScriptRoot(
     workspace: Blockly.WorkspaceSvg,
 ): Promise<void> {
-    const rootBlock = workspace.newBlock(SCRIPT_ROOT_BLOCK_TYPE);
+    const rootBlock = workspace.newBlock(BlockIDs.ROOT_BLOCK_TYPE);
     rootBlock.initSvg();
     rootBlock.render();
     rootBlock.moveBy(50, 50);
@@ -102,13 +97,13 @@ async function createScriptRoot(
 function initCustomContextMenu(): void {
     const { registry, ScopeType } = Blockly.ContextMenuRegistry;
 
-    if (registry.getItem(CLEAR_OPTION_CONTEXT_MENU_ID))
-        registry.unregister(CLEAR_OPTION_CONTEXT_MENU_ID);
+    if (registry.getItem(BlockIDs.CONTEXT_MENU_IDS.CLEAR_OPTION))
+        registry.unregister(BlockIDs.CONTEXT_MENU_IDS.CLEAR_OPTION);
 
     registry.register({
         scopeType: ScopeType.WORKSPACE,
         weight: 0,
-        id: CLEAR_OPTION_CONTEXT_MENU_ID,
+        id: BlockIDs.CONTEXT_MENU_IDS.CLEAR_OPTION,
         preconditionFn: () => "enabled",
         callback: (scope) => {
             const workspace = scope.workspace;

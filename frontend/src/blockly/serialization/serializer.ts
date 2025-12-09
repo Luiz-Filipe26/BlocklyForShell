@@ -1,9 +1,13 @@
 import * as Blockly from "blockly";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import type * as AST from "@/types/ast";
 import { getBlockSemanticData } from "./metadataManager";
 import { findScriptRoot } from "@/blockly/blocks/systemBlocks";
 
-const IGNORED_FIELDS = ["CARDINALITY_ICON", "PARENT_INDICATOR"];
+const IGNORED_FIELDS: string[] = [
+    BlockIDs.FIELDS.CARDINALITY_ICON,
+    BlockIDs.FIELDS.PARENT_INDICATOR,
+];
 
 export function serializeWorkspaceToAST(
     workspace: Blockly.WorkspaceSvg,
@@ -11,7 +15,9 @@ export function serializeWorkspaceToAST(
     const rootBlock = findScriptRoot(workspace);
     if (!rootBlock) return null;
 
-    const firstCommandBlock = rootBlock.getInputTargetBlock("STACK");
+    const firstCommandBlock = rootBlock.getInputTargetBlock(
+        BlockIDs.INPUTS.STACK,
+    );
 
     return {
         nodeType: "script",
@@ -107,7 +113,6 @@ function extractBlockFields(block: Blockly.Block): AST.ASTField[] {
         input.fieldRow.forEach((field) => {
             const name = field.name;
             const value = field.getValue();
-
             if (name && value !== null && !IGNORED_FIELDS.includes(name)) {
                 fields.push({
                     name: name,

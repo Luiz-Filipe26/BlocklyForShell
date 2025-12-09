@@ -1,5 +1,6 @@
 import * as Blockly from "blockly";
-import { getBlockSemanticData } from "../serialization/metadataManager";
+import { getBlockSemanticData } from "@/blockly/serialization/metadataManager";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 
 export interface ErrorRecord {
     id: string;
@@ -78,11 +79,11 @@ function resolveBlockDisplayName(block: Blockly.Block): string {
             return `[${data.nodeType}] ${data.commandName}`;
 
         case "option":
-            const flag = block.getFieldValue("FLAG") || "?";
+            const flag = block.getFieldValue(BlockIDs.FIELDS.FLAG) || "?";
             return `[Opção] ${flag}`;
 
         case "operand":
-            const value = block.getFieldValue("VALUE") || "";
+            const value = block.getFieldValue(BlockIDs.FIELDS.VALUE) || "";
             return `[Operando: ${data.operandName}] "${value}"`;
 
         default:

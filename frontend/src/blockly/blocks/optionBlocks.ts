@@ -1,4 +1,5 @@
 import * as Blockly from "blockly";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import { createGenericHelpIcon, setupParentIndicator } from "./blockUtils";
 import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "@/blockly/serialization/metadataManager";
@@ -8,9 +9,7 @@ export function createOptionBlock(commandDefinition: CLI.CLICommand): void {
         return;
     }
 
-    const type = `${commandDefinition.id}_option`;
-
-    Blockly.Blocks[type] = {
+    Blockly.Blocks[BlockIDs.commandOptionBlockType(commandDefinition)] = {
         init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "option",
@@ -33,7 +32,7 @@ function appendOptionInputs(
     const dropdown = buildOptionDropdown(commandDefinition);
 
     const helpIcon = createGenericHelpIcon(() => {
-        const flag = block.getFieldValue("FLAG");
+        const flag = block.getFieldValue(BlockIDs.FIELDS.FLAG);
         const optionDefinition = commandDefinition.options.find(
             (opt) => opt.flag === flag,
         );
@@ -41,17 +40,20 @@ function appendOptionInputs(
     });
 
     block
-        .appendDummyInput("MAIN_INPUT")
+        .appendDummyInput(BlockIDs.FIELDS.MAIN_INPUT)
         .appendField(
             `(opção de: ${commandDefinition.shellCommand})`,
-            "PARENT_INDICATOR",
+            BlockIDs.FIELDS.PARENT_INDICATOR,
         )
         .appendField(" ")
-        .appendField(dropdown, "FLAG")
+        .appendField(dropdown, BlockIDs.FIELDS.FLAG)
         .appendField(helpIcon);
 
-    block.setPreviousStatement(true, `${commandDefinition.id}_Option`);
-    block.setNextStatement(true, `${commandDefinition.id}_Option`);
+    const stmtType = BlockIDs.commandOptionStatementType(commandDefinition);
+
+    block.setPreviousStatement(true, stmtType);
+    block.setNextStatement(true, stmtType);
+
     block.setColour(commandDefinition.optionColor || commandDefinition.color);
 }
 
@@ -66,10 +68,7 @@ function buildOptionDropdown(
     });
 
     const descriptionByFlag = new Map(
-        commandDefinition.options.map((optionDefinition) => [
-            optionDefinition.flag,
-            optionDefinition.description,
-        ]),
+        commandDefinition.options.map((opt) => [opt.flag, opt.description]),
     );
 
     const updateTooltip = function(

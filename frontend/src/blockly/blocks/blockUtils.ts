@@ -1,15 +1,16 @@
 import * as Blockly from "blockly";
+import { PATH_CONSTANTS } from "@/app/constants/pathConstants";
 import { log, LogLevel, LogMode } from "@/app/systemLogger";
 import { showHelpBalloon } from "@/app/uiFeedback";
 import * as CLI from "@/types/cli";
 import { getErrors } from "@/blockly/validation/validationManager";
 
+import * as BlockIDs from "@/blockly/constants/blockIds";
+import * as ValidationErrors from "@/blockly/constants/validationErrors";
+
 interface LocalChangeHandler {
     (block: Blockly.Block): void;
 }
-
-const CARD_ICON_EMPTY = "/transparent.svg";
-const CARD_ICON_ALERT = "/cardinality_icon.svg";
 
 const blockHandlersMap = new WeakMap<Blockly.Block, LocalChangeHandler[]>();
 
@@ -56,9 +57,6 @@ export function removeLocalChangeListener(
     blockHandlersMap.set(block, newHandlers);
 }
 
-/**
- * Lista blocos em linha
- */
 export function getBlocksList(
     firstBlock: Blockly.Block | null,
     filter?: string | ((block: Blockly.Block) => boolean),
@@ -82,27 +80,33 @@ export function getBlocksList(
     return blocks;
 }
 
-/**
- * Cria um FieldImage pronto para ser anexado ao HEADER.
- * size: px
- */
 export function createCardinalityField(size: number = 28): Blockly.FieldImage {
-    return new Blockly.FieldImage(CARD_ICON_EMPTY, size, size, "cardinality");
+    return new Blockly.FieldImage(
+        PATH_CONSTANTS.CARD_ICON_EMPTY,
+        size,
+        size,
+        "cardinality",
+    );
 }
 
-/**
- * Atualiza ícone de alerta de problemas.
- */
 export function updateCardinalityIndicator(commandBlock: Blockly.Block): void {
-    const field = commandBlock.getField("CARDINALITY_ICON");
+    const field = commandBlock.getField(BlockIDs.FIELDS.CARDINALITY_ICON);
+
     if (!(field instanceof Blockly.FieldImage)) return;
 
     const errors = getErrors(commandBlock);
+
     const hasCardinalityProblems = errors.some((error) =>
-        error.id.startsWith("CARDINALITY_"),
+        error.id.startsWith(
+            ValidationErrors.VALIDATION_ERROR_PREFIXES.CARDINALITY,
+        ),
     );
 
-    field.setValue(hasCardinalityProblems ? CARD_ICON_ALERT : CARD_ICON_EMPTY);
+    field.setValue(
+        hasCardinalityProblems
+            ? PATH_CONSTANTS.CARD_ICON_ALERT
+            : PATH_CONSTANTS.CARD_ICON_EMPTY,
+    );
 }
 
 export function createGenericHelpIcon(
@@ -111,7 +115,7 @@ export function createGenericHelpIcon(
     size: number = 30,
 ): Blockly.FieldImage {
     const helpIcon = new Blockly.FieldImage(
-        "/info_icon.svg",
+        PATH_CONSTANTS.INFO_ICON,
         size,
         size,
         altText,
@@ -128,27 +132,23 @@ export function createGenericHelpIcon(
     return helpIcon;
 }
 
-/**
- * Define o comportamento do campo PARENT_INDICATOR (visível quando fora do comando).
- */
 export function setupParentIndicator(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
     textWhenOutside: string,
 ): void {
     addLocalChangeListener(block, () => {
-        const indicatorField = block.getField("PARENT_INDICATOR");
+        const indicatorField = block.getField(BlockIDs.FIELDS.PARENT_INDICATOR);
+
         if (!indicatorField) return;
 
         const insideRoot =
             block.getSurroundParent()?.type === commandDefinition.id;
+
         indicatorField.setValue(insideRoot ? "" : textWhenOutside);
     });
 }
 
-/**
- * Retorna o nome do slot (input) do bloco pai ao qual o bloco atual está conectado.
- */
 export function getParentInputName(block: Blockly.Block): string | null {
     const connection = block.previousConnection;
     if (!connection || !connection.targetConnection) return null;

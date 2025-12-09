@@ -1,5 +1,6 @@
 import * as Blockly from "blockly";
-import * as CLI from "@/types/cli"
+import * as CLI from "@/types/cli";
+import * as ValidationErrors from "@/blockly/constants/validationErrors";
 import { clearError, setError } from "./validationManager";
 
 /**
@@ -11,7 +12,7 @@ export function validateOperandValue(
     block: Blockly.Block,
 ): void {
     rules.forEach((rule, index) => {
-        const ruleErrorId = `OPERAND_REGEX_${index}`;
+        const ruleErrorId = ValidationErrors.operandRegexRuleError(index);
         const regex = new RegExp(rule.regex);
 
         if (!regex.test(text)) {

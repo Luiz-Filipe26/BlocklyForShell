@@ -1,5 +1,6 @@
 import * as Blockly from "blockly";
 import * as Logger from "@/app/systemLogger";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import * as CLI from "@/types/cli";
 import { getBlocksList } from "@/blockly/blocks/blockUtils";
 
@@ -34,13 +35,13 @@ export function unplugExclusiveOptionsFromCommand(
 
     for (const group of exclusiveGroups) {
         const foundBlocks = blocks.filter((block) =>
-            group.includes(block.getFieldValue("FLAG")),
+            group.includes(block.getFieldValue(BlockIDs.FIELDS.FLAG)),
         );
 
         if (foundBlocks.length == 0) continue;
         const blockToRemove = foundBlocks[foundBlocks.length - 1];
-        const flagToRemove = blockToRemove.getFieldValue("FLAG");
-        const conflictWith = foundBlocks[0].getFieldValue("FLAG");
+        const flagToRemove = blockToRemove.getFieldValue(BlockIDs.FIELDS.FLAG);
+        const conflictWith = foundBlocks[0].getFieldValue(BlockIDs.FIELDS.FLAG);
 
         blockToRemove.unplug(true);
         Logger.log(
@@ -60,7 +61,7 @@ export function autoFixExcessOperands(
     commandDefinition: CLI.CLICommand,
 ): void {
     const allBlocks = getBlocksList(
-        commandBlock.getInputTargetBlock("OPERANDS"),
+        commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
     );
 
     if (allBlocks.length === 0) return;
@@ -78,7 +79,10 @@ export function autoFixExcessOperands(
     for (const operandDef of commandDefinition.operands) {
         const max = operandDef.cardinality?.max ?? 0;
         if (max === "unlimited") continue;
-        const operandType = `${commandDefinition.id}_${operandDef.label}_operand`;
+        const operandType = BlockIDs.commandOperandBlockType(
+            commandDefinition,
+            operandDef,
+        );
         const blocksOfType = blocksByType.get(operandType);
         if (!blocksOfType || blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));

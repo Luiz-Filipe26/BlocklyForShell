@@ -1,8 +1,10 @@
 import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import { getBlockSemanticData } from "@/blockly/serialization/metadataManager";
 import { clearError, setError } from "./validationManager";
 import { getBlocksList, getParentInputName } from "@/blockly/blocks/blockUtils";
+import * as ValidationErrors from "@/blockly/constants/validationErrors";
 
 export function validateControlCardinality(
     block: Blockly.Block,
@@ -19,7 +21,7 @@ export function validateControlCardinality(
         if (isEmpty) {
             setError(
                 block,
-                `CONTROL_MISSING_SLOT_${slot.name}`,
+                ValidationErrors.controlMissingSlotError(slot),
                 `O campo "${(slot.label || slot.name).replace(":", "")}" é obrigatório.`,
             );
         }
@@ -31,12 +33,12 @@ function clearAllControlCardinalityErrors(
     controlDefinition: CLI.CLIControl,
 ): void {
     controlDefinition.slots.forEach((slot) =>
-        clearError(block, `CONTROL_MISSING_SLOT_${slot.name}`),
+        clearError(block, ValidationErrors.controlMissingSlotError(slot)),
     );
 }
 
 /**
- * Executa a Validação de Cardinalidade mínima e registra Erros de Falta de Componentes"
+ * Executa a validação de cardinalidade mínima do comando.
  */
 export function validateCardinality(
     commandBlock: Blockly.Block,
@@ -45,9 +47,7 @@ export function validateCardinality(
     clearAllOperandCardinalityErrors(commandBlock, commandDefinition);
     validateOptionsGroupCardinality(commandBlock, commandDefinition);
 
-    if (shouldRelaxOperandChecks(commandBlock)) {
-        return;
-    }
+    if (shouldRelaxOperandChecks(commandBlock)) return;
 
     validateOperandsGroupCardinality(commandBlock, commandDefinition);
     validateSpecificOperandsCardinality(commandBlock, commandDefinition);
@@ -60,11 +60,20 @@ function clearAllOperandCardinalityErrors(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
 ): void {
-    clearError(block, "CARDINALITY_MIN_OPTIONS");
-    clearError(block, "CARDINALITY_MIN_OPERANDS");
+    clearError(
+        block,
+        ValidationErrors.VALIDATION_ERRORS.CARDINALITY_MIN_OPTIONS,
+    );
+    clearError(
+        block,
+        ValidationErrors.VALIDATION_ERRORS.CARDINALITY_MIN_OPERANDS,
+    );
 
     commandDefinition.operands.forEach((operand) =>
-        clearError(block, `CARDINALITY_MISSING_OPERAND_${operand.id}`),
+        clearError(
+            block,
+            ValidationErrors.cardinalityMissingOperandError(operand),
+        ),
     );
 }
 
@@ -76,22 +85,25 @@ export function validateOperatorIntegrity(
     operatorDefinition: CLI.CLIOperator,
 ): void {
     for (const slot of operatorDefinition.slots || []) {
-        const errorKeyEmpty = `OPERATOR_EMPTY_SLOT_${slot.name}`;
-        const errorKeyStack = `OPERATOR_STACKED_SLOT_${slot.name}`;
-        clearError(block, errorKeyEmpty);
-        clearError(block, errorKeyStack);
+        const emptyError = ValidationErrors.operatorEmptySlotError(slot);
+        const stackedError = ValidationErrors.operatorStackedSlotError(slot);
+
+        clearError(block, emptyError);
+        clearError(block, stackedError);
+
         if (isOperatorSlotEmpty(block, slot)) {
             setError(
                 block,
-                errorKeyEmpty,
+                emptyError,
                 `O slot "${slot.label || slot.name}" é obrigatório.`,
             );
             continue;
         }
+
         if (isOperatorSlotStacked(block, slot)) {
             setError(
                 block,
-                errorKeyStack,
+                stackedError,
                 `Operadores aceitam apenas um comando por slot. Use um bloco de agrupamento ou subshell se precisar de sequência.`,
             );
         }
@@ -115,7 +127,7 @@ function isOperatorSlotStacked(
 }
 
 /**
- * Verifica a cardinalidade mínima do grupo de opções.
+ * Valida cardinalidade mínima do grupo de opções.
  */
 function validateOptionsGroupCardinality(
     block: Blockly.Block,
@@ -124,14 +136,16 @@ function validateOptionsGroupCardinality(
     if (!commandDefinition.optionsMin) return;
 
     const currentCount = getBlocksList(
-        block.getInputTargetBlock("OPTIONS"),
+        block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
     ).length;
+
     const missing = Math.max(0, commandDefinition.optionsMin - currentCount);
 
-    if (missing == 0) return;
+    if (missing === 0) return;
+
     setError(
         block,
-        "CARDINALITY_MIN_OPTIONS",
+        ValidationErrors.VALIDATION_ERRORS.CARDINALITY_MIN_OPTIONS,
         `Faltam opções obrigatórias (${missing}).`,
     );
 }
@@ -143,7 +157,9 @@ function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
     const parent = block.getSurroundParent();
     const slotName = getParentInputName(block);
     if (!parent || !slotName) return false;
+
     const parentData = getBlockSemanticData(parent);
+
     return Boolean(
         parentData?.nodeType === "operator" &&
         parentData.slotsWithImplicitData?.includes(slotName),
@@ -151,7 +167,7 @@ function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
 }
 
 /**
- * Verifica a cardinalidade mínima do grupo de operandos.
+ * Verifica cardinalidade mínima do grupo de operandos.
  */
 function validateOperandsGroupCardinality(
     block: Blockly.Block,
@@ -160,20 +176,22 @@ function validateOperandsGroupCardinality(
     if (!commandDefinition.operandsMin) return;
 
     const currentCount = getBlocksList(
-        block.getInputTargetBlock("OPERANDS"),
+        block.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
     ).length;
+
     const missing = Math.max(0, commandDefinition.operandsMin - currentCount);
 
-    if (missing == 0) return;
+    if (missing === 0) return;
+
     setError(
         block,
-        "CARDINALITY_MIN_OPERANDS",
+        ValidationErrors.VALIDATION_ERRORS.CARDINALITY_MIN_OPERANDS,
         `Faltam operandos obrigatórios (${missing} no mínimo).`,
     );
 }
 
 /**
- * Verifica a cardinalidade mínima de cada tipo específico de operando.
+ * Verifica cardinalidade mínima por tipo específico de operando.
  */
 function validateSpecificOperandsCardinality(
     block: Blockly.Block,
@@ -181,7 +199,9 @@ function validateSpecificOperandsCardinality(
 ): void {
     if (commandDefinition.operands.length === 0) return;
 
-    const allBlocks = getBlocksList(block.getInputTargetBlock("OPERANDS"));
+    const allBlocks = getBlocksList(
+        block.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
+    );
 
     const countsByType = new Map<string, number>();
     for (const child of allBlocks) {
@@ -190,15 +210,20 @@ function validateSpecificOperandsCardinality(
     }
 
     for (const operandDef of commandDefinition.operands) {
-        const operandType = `${commandDefinition.id}_${operandDef.id}_operand`;
+        const operandType = BlockIDs.commandOperandBlockType(
+            commandDefinition,
+            operandDef,
+        );
+
         const count = countsByType.get(operandType) || 0;
         const min = operandDef.cardinality?.min ?? 0;
-        const missing = Math.max(0, min - count);
 
-        if (missing == 0) continue;
+        const missing = Math.max(0, min - count);
+        if (missing === 0) continue;
+
         setError(
             block,
-            `CARDINALITY_MISSING_OPERAND_${operandDef.id}`,
+            ValidationErrors.cardinalityMissingOperandError(operandDef),
             `Falta operando: ${operandDef.label} (precisa de ${missing}).`,
         );
     }

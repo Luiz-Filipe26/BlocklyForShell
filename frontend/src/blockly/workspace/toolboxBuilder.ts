@@ -1,4 +1,5 @@
 import * as CLI from "@/types/cli";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 
 interface ToolboxBlock {
     kind: "block";
@@ -20,23 +21,23 @@ interface ToolboxConfig {
 type ToolboxItem = ToolboxCategory | ToolboxBlock;
 
 export function createToolbox(
-    cli_definitions: CLI.CliDefinitions,
+    cliDefinitions: CLI.CliDefinitions,
 ): ToolboxConfig {
     const itemRegistry = new Map<string, ToolboxItem>();
 
-    cli_definitions.commands.forEach((command) => {
+    cliDefinitions.commands.forEach((command) => {
         itemRegistry.set(command.id, transformCommandToCategory(command));
     });
 
-    cli_definitions.controls?.forEach((control) => {
+    cliDefinitions.controls?.forEach((control) => {
         itemRegistry.set(control.id, transformSimpleToBlock(control));
     });
 
-    cli_definitions.operators?.forEach((operation) => {
+    cliDefinitions.operators?.forEach((operation) => {
         itemRegistry.set(operation.id, transformSimpleToBlock(operation));
     });
 
-    const categories: ToolboxCategory[] = cli_definitions.categories.map(
+    const categories: ToolboxCategory[] = cliDefinitions.categories.map(
         (category) => {
             const contents = category.commands
                 .map((id) => itemRegistry.get(id))
@@ -60,18 +61,27 @@ export function createToolbox(
  * Transforma um Comando em uma Categoria (Pasta) contendo o comando e seus filhos.
  */
 function transformCommandToCategory(
-    definition: CLI.CLICommand,
+    commandDefinition: CLI.CLICommand,
 ): ToolboxCategory {
     return {
         kind: "category",
-        name: definition.id,
-        colour: definition.color,
+        name: commandDefinition.id,
+        colour: commandDefinition.color,
         contents: [
-            { kind: "block", type: definition.id },
-            { kind: "block", type: `${definition.id}_option` },
-            ...definition.operands.map((operation) => ({
+            {
+                kind: "block",
+                type: BlockIDs.commandBlockType(commandDefinition),
+            },
+            {
+                kind: "block",
+                type: BlockIDs.commandOptionBlockType(commandDefinition),
+            },
+            ...commandDefinition.operands.map((operand) => ({
                 kind: "block" as const,
-                type: `${definition.id}_${operation.id}_operand`,
+                type: BlockIDs.commandOperandBlockType(
+                    commandDefinition,
+                    operand,
+                ),
             })),
         ],
     };
@@ -80,8 +90,10 @@ function transformCommandToCategory(
 function transformSimpleToBlock(
     definition: CLI.CLIControl | CLI.CLIOperator,
 ): ToolboxBlock {
-    return {
-        kind: "block",
-        type: definition.id,
-    };
+    const type =
+        "slots" in definition
+            ? BlockIDs.operatorBlockType(definition)
+            : BlockIDs.controlBlockType(definition);
+
+    return { kind: "block", type };
 }

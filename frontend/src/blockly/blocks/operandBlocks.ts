@@ -1,4 +1,5 @@
 import * as Blockly from "blockly";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import { validateOperandValue } from "@/blockly/validation/valueValidators";
 import { setupParentIndicator } from "./blockUtils";
 import * as CLI from "@/types/cli";
@@ -19,7 +20,7 @@ function createSingleOperandBlock(
     operandDefinition: CLI.CLIOperand,
 ): void {
     Blockly.Blocks[
-        `${commandDefinition.id}_${operandDefinition.id}_operand`
+        BlockIDs.commandOperandBlockType(commandDefinition, operandDefinition)
     ] = {
         init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
@@ -47,16 +48,22 @@ function appendOperandInputs(
     const field = buildOperandField(operandDefinition, block);
 
     block
-        .appendDummyInput("MAIN_INPUT")
+        .appendDummyInput(BlockIDs.FIELDS.MAIN_INPUT)
         .appendField(
             `(operando de: ${commandDefinition.shellCommand})`,
-            "PARENT_INDICATOR",
+            BlockIDs.FIELDS.PARENT_INDICATOR,
         )
         .appendField(`${operandDefinition.label}:`)
-        .appendField(field, "VALUE");
+        .appendField(field, BlockIDs.FIELDS.VALUE);
 
-    block.setPreviousStatement(true, `${commandDefinition.id}_Operand`);
-    block.setNextStatement(true, `${commandDefinition.id}_Operand`);
+    block.setPreviousStatement(
+        true,
+        BlockIDs.commandOperandStatementType(commandDefinition),
+    );
+    block.setNextStatement(
+        true,
+        BlockIDs.commandOperandStatementType(commandDefinition),
+    );
     block.setColour(operandDefinition.color || commandDefinition.color);
     block.setTooltip(operandDefinition.description);
 }

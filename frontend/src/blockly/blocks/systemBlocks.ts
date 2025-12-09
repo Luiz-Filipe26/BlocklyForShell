@@ -1,16 +1,15 @@
 import * as Blockly from "blockly";
-
-export const SCRIPT_ROOT_BLOCK_TYPE = "script_root";
+import * as BlockIDs from "@/blockly/constants/blockIds";
 
 export function findScriptRoot(
     workspace: Blockly.WorkspaceSvg,
 ): Blockly.Block | null {
-    const roots = workspace.getBlocksByType(SCRIPT_ROOT_BLOCK_TYPE, false);
+    const roots = workspace.getBlocksByType(BlockIDs.ROOT_BLOCK_TYPE, false);
     return roots.length > 0 ? roots[0] : null;
 }
 
 export function initSystemBlocks(): void {
-    Blockly.Blocks[SCRIPT_ROOT_BLOCK_TYPE] = {
+    Blockly.Blocks[BlockIDs.ROOT_BLOCK_TYPE] = {
         init: function(this: Blockly.Block) {
             this.appendDummyInput().appendField("📜 Script Principal");
             this.appendStatementInput("STACK").setCheck("command");

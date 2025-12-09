@@ -1,3 +1,4 @@
+import * as BlockIDs from "@/blockly/constants/blockIds";
 import * as Blockly from "blockly";
 import { buildCommandHelpHTML } from "@/app/uiFeedback";
 import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
@@ -36,11 +37,14 @@ function appendCommandHeader(
     );
 
     block
-        .appendDummyInput("HEADER")
+        .appendDummyInput(BlockIDs.DUMMY_INPUTS.HEADER)
         .appendField(commandDefinition.label)
         .appendField(" ")
         .appendField(helpIcon)
-        .appendField(BlockUtils.createCardinalityField(28), "CARDINALITY_ICON");
+        .appendField(
+            BlockUtils.createCardinalityField(28),
+            BlockIDs.FIELDS.CARDINALITY_ICON,
+        );
 }
 
 function appendCommandInputs(
@@ -49,20 +53,20 @@ function appendCommandInputs(
 ): void {
     if (commandDefinition.options && commandDefinition.options.length > 0) {
         block
-            .appendStatementInput("OPTIONS")
-            .setCheck(`${commandDefinition.id}_Option`)
+            .appendStatementInput(BlockIDs.INPUTS.OPTIONS)
+            .setCheck(BlockIDs.commandOptionStatementType(commandDefinition))
             .appendField("Opções:");
     }
 
     if (commandDefinition.operands && commandDefinition.operands.length > 0) {
         block
-            .appendStatementInput("OPERANDS")
-            .setCheck(`${commandDefinition.id}_Operand`)
+            .appendStatementInput(BlockIDs.INPUTS.OPERANDS)
+            .setCheck(BlockIDs.commandOperandStatementType(commandDefinition))
             .appendField("Operandos:");
     }
 
-    block.setPreviousStatement(true, "command");
-    block.setNextStatement(true, "command");
+    block.setPreviousStatement(true, BlockIDs.commandStatementType());
+    block.setNextStatement(true, BlockIDs.commandStatementType());
     block.setColour(commandDefinition.color);
     block.setTooltip(commandDefinition.description);
 }
@@ -73,12 +77,12 @@ function setupCommandDeduplication(
 ): void {
     BlockUtils.addLocalChangeListener(block, () => {
         const optionBlocks = BlockUtils.getBlocksList(
-            block.getInputTargetBlock("OPTIONS"),
-            `${commandDefinition.id}_option`,
+            block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
+            BlockIDs.commandOptionBlockType(commandDefinition),
         );
 
         unplugDuplicatesFromList(optionBlocks, (child) =>
-            child.getFieldValue("FLAG"),
+            child.getFieldValue(BlockIDs.FIELDS.FLAG),
         );
     });
 }
@@ -107,8 +111,8 @@ function setupExclusiveOptionsValidation(
 
     BlockUtils.addLocalChangeListener(block, () => {
         const optionBlocks = BlockUtils.getBlocksList(
-            block.getInputTargetBlock("OPTIONS"),
-            `${commandDefinition.id}_option`,
+            block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
+            BlockIDs.commandOptionBlockType(commandDefinition),
         );
 
         if (commandDefinition.exclusiveOptions) {

@@ -121,18 +121,18 @@
       "shellCommand": "mkdir",
       "label": "mkdir",
       "description": "Criar pastas",
-      "color": "#8e44ad", 
+      "color": "#8e44ad",
       "optionColor": "#7fbf7f",
       "options": [
         {
-           "flag": "-p",
-           "description": "Cria diretórios pais conforme necessário (parents), sem erro se existir.",
-           "takesArgument": false
+          "flag": "-p",
+          "description": "Cria diretórios pais conforme necessário (parents), sem erro se existir.",
+          "takesArgument": false
         },
         {
-           "flag": "-v",
-           "description": "Mostra uma mensagem para cada diretório criado (verbose).",
-           "takesArgument": false
+          "flag": "-v",
+          "description": "Mostra uma mensagem para cada diretório criado (verbose).",
+          "takesArgument": false
         }
       ],
       "operands": [
@@ -157,21 +157,21 @@
   "operators": [
     {
       "id": "pipe",
-      "label": "pipe", 
+      "label": "pipe",
       "description": "Redireciona a saída do comando anterior para a entrada do próximo (Pipe).",
       "color": "#b1745b",
       "slots": [
-        { 
-            "name": "A", 
-            "type": "statement", 
-            "check": "command" 
+        {
+          "name": "A",
+          "type": "statement",
+          "check": "command"
         },
-        { 
-            "name": "B", 
-            "type": "statement", 
-            "check": "command", 
-            "symbol": "|", 
-            "symbolPlacement": "before" 
+        {
+          "name": "B",
+          "type": "statement",
+          "check": "command",
+          "symbol": "|",
+          "symbolPlacement": "before"
         }
       ],
       "slotsWithImplicitData": ["B"]
@@ -182,17 +182,17 @@
       "description": "Salva a saída do comando em um arquivo (sobrescreve).",
       "color": "#b1745b",
       "slots": [
-        { 
-            "name": "A", 
-            "type": "statement", 
-            "check": "command" 
+        {
+          "name": "A",
+          "type": "statement",
+          "check": "command"
         },
-        { 
-            "name": "B", 
-            "type": "statement", 
-            "check": "command", 
-            "symbol": ">", 
-            "symbolPlacement": "before" 
+        {
+          "name": "B",
+          "type": "statement",
+          "check": "command",
+          "symbol": ">",
+          "symbolPlacement": "before"
         }
       ]
     },
@@ -202,17 +202,17 @@
       "description": "Adiciona a saída do comando ao final de um arquivo (append).",
       "color": "#b1745b",
       "slots": [
-        { 
-            "name": "A", 
-            "type": "statement", 
-            "check": "command" 
+        {
+          "name": "A",
+          "type": "statement",
+          "check": "command"
         },
-        { 
-            "name": "B", 
-            "type": "statement", 
-            "check": "command", 
-            "symbol": ">>", 
-            "symbolPlacement": "before" 
+        {
+          "name": "B",
+          "type": "statement",
+          "check": "command",
+          "symbol": ">>",
+          "symbolPlacement": "before"
         }
       ]
     },
@@ -222,17 +222,17 @@
       "description": "Executa o próximo comando apenas se o anterior tiver sucesso.",
       "color": "#b1745b",
       "slots": [
-        { 
-            "name": "A", 
-            "type": "statement", 
-            "check": "command" 
+        {
+          "name": "A",
+          "type": "statement",
+          "check": "command"
         },
-        { 
-            "name": "B", 
-            "type": "statement", 
-            "check": "command", 
-            "symbol": "&&", 
-            "symbolPlacement": "before" 
+        {
+          "name": "B",
+          "type": "statement",
+          "check": "command",
+          "symbol": "&&",
+          "symbolPlacement": "before"
         }
       ]
     },
@@ -242,17 +242,17 @@
       "description": "Executa o próximo comando apenas se o anterior falhar.",
       "color": "#b1745b",
       "slots": [
-        { 
-            "name": "A", 
-            "type": "statement", 
-            "check": "command" 
+        {
+          "name": "A",
+          "type": "statement",
+          "check": "command"
         },
-        { 
-            "name": "B", 
-            "type": "statement", 
-            "check": "command", 
-            "symbol": "||", 
-            "symbolPlacement": "before" 
+        {
+          "name": "B",
+          "type": "statement",
+          "check": "command",
+          "symbol": "||",
+          "symbolPlacement": "before"
         }
       ]
     }
@@ -261,7 +261,7 @@
     {
       "id": "if_statement",
       "shellCommand": "if",
-      "label": "if", 
+      "label": "if",
       "description": "Executa comandos condicionalmente baseado no sucesso de um comando teste.",
       "color": "#dbaa25",
       "syntaxEnd": "fi",
@@ -279,7 +279,7 @@
           "type": "statement",
           "check": "command",
           "label": "Então faça (then):",
-          "syntaxPrefix": "; then",
+          "syntaxPrefix": "then",
           "obligatory": true
         },
         {
@@ -294,7 +294,7 @@
     },
     {
       "id": "while_loop",
-      "shellCommand": "while", 
+      "shellCommand": "while",
       "label": "while",
       "description": "Repete comandos enquanto a condição for verdadeira.",
       "color": "#dbaa25",
@@ -313,7 +313,7 @@
           "type": "statement",
           "check": "command",
           "label": "Faça (do):",
-          "syntaxPrefix": "; do",
+          "syntaxPrefix": "do",
           "obligatory": true
         }
       ]

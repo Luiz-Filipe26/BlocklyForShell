@@ -6,6 +6,11 @@ import { initSystemBlocks } from "@/blockly/blocks/systemBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
 import * as Logger from "@/app/systemLogger";
 import { createAllBlocksFromDefinition } from "@/blockly/blocks/blocksBuilder";
+import {
+    AUTOSAVE_STORAGE_KEY,
+    initAutoSaver,
+    loadSession,
+} from "@/app/workspaceAutoSaver";
 
 interface RawCLICommand extends Omit<CLI.CLICommand, "id"> {
     id?: string;
@@ -39,7 +44,11 @@ export async function setupWorkspace(
     );
 
     disableOrphanBlocks(workspace);
-    createScriptRoot(workspace);
+    const restored = loadSession(workspace);
+    if (!restored) {
+        createScriptRoot(workspace);
+    }
+    initAutoSaver(workspace);
     initCustomContextMenu();
 
     return workspace;
@@ -113,6 +122,7 @@ function initCustomContextMenu(): void {
                 Blockly.Events.disable();
                 workspace.clear();
                 Blockly.Events.enable();
+                localStorage.removeItem(AUTOSAVE_STORAGE_KEY);
                 createScriptRoot(workspace);
             }
         },

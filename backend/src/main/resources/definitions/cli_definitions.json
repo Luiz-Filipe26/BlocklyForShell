@@ -101,7 +101,6 @@
         {
           "flag": "-l",
           "description": "Manipule o operando .. logicamente."
-          // takesArgument REMOVIDO
         }
       ],
       "operands": [

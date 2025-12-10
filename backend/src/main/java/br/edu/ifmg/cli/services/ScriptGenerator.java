@@ -75,9 +75,14 @@ public class ScriptGenerator {
 
 		for (AstNode opt : node.getChildren("OPTIONS")) {
 			String flag = opt.getField("FLAG").orElse("").trim();
-			if (!flag.isEmpty()) {
-				sb.append(" ").append(flag);
-			}
+			if (flag.isEmpty())
+				continue;
+			sb.append(" ").append(flag);
+			opt.getField("OPTION_ARG_VALUE").ifPresent(argValue -> {
+				if (!argValue.isBlank()) {
+					sb.append(" ").append(quoteArgument(argValue));
+				}
+			});
 		}
 
 		for (AstNode op : node.getChildren("OPERANDS")) {

@@ -33,24 +33,56 @@ export function unplugExclusiveOptionsFromCommand(
 ): void {
     if (!exclusiveGroups || exclusiveGroups.length === 0) return;
 
+    const remainingBlocks = [...blocks];
+
     for (const group of exclusiveGroups) {
-        const foundBlocks = blocks.filter((block) =>
-            group.includes(block.getFieldValue(BlockIDs.FIELDS.FLAG)),
+        resolveGroupConflicts(group, remainingBlocks);
+    }
+}
+
+function resolveGroupConflicts(
+    group: string[],
+    remainingBlocks: Blockly.Block[],
+): void {
+    while (true) {
+        const foundBlocks = findGroupBlocks(remainingBlocks, group);
+        if (foundBlocks.length <= 1) return;
+
+        const keeper = foundBlocks[0];
+        const intruder = foundBlocks[1];
+
+        const keeperFlag = String(keeper.getFieldValue(BlockIDs.FIELDS.FLAG));
+        const intruderFlag = String(
+            intruder.getFieldValue(BlockIDs.FIELDS.FLAG),
         );
 
-        if (foundBlocks.length == 0) continue;
-        const blockToRemove = foundBlocks[foundBlocks.length - 1];
-        const flagToRemove = blockToRemove.getFieldValue(BlockIDs.FIELDS.FLAG);
-        const conflictWith = foundBlocks[0].getFieldValue(BlockIDs.FIELDS.FLAG);
+        unplugAndTrim(intruder, remainingBlocks);
 
-        blockToRemove.unplug(true);
         Logger.log(
-            `Conflito: A opção '${flagToRemove}' não pode ser usada com '${conflictWith}'.`,
+            `Conflito: A opção '${intruderFlag}' não pode ser usada com '${keeperFlag}'.`,
             Logger.LogLevel.WARN,
             Logger.LogMode.ToastAndConsole,
         );
-        return;
     }
+}
+
+function findGroupBlocks(
+    blocks: Blockly.Block[],
+    group: string[],
+): Blockly.Block[] {
+    return blocks.filter((block) =>
+        group.includes(String(block.getFieldValue(BlockIDs.FIELDS.FLAG))),
+    );
+}
+
+function unplugAndTrim(
+    block: Blockly.Block,
+    remainingBlocks: Blockly.Block[],
+): void {
+    block.unplug(true);
+    const idx = remainingBlocks.indexOf(block);
+    if (idx === -1) return;
+    remainingBlocks.splice(idx, remainingBlocks.length - idx);
 }
 
 /**

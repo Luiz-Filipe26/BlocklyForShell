@@ -8,12 +8,19 @@ export interface CLICardinality {
     max: number | "unlimited";
 }
 
+export interface CLIArgument {
+    type: "string" | "file" | "folder" | "number";
+    label: string;
+    defaultValue?: string;
+    validations?: CLIValidation[];
+}
+
 export interface CLIOperand {
     id: string;
     label: string;
     description: string;
     color: string;
-    type: "file" | "folder" | "string";
+    type: CLIArgument["type"];
     defaultValue: string;
     cardinality?: CLICardinality;
     validations: CLIValidation[];
@@ -23,7 +30,7 @@ export interface CLIOption {
     flag: string;
     longFlag?: string;
     description: string;
-    takesArgument: boolean;
+    argument?: CLIArgument;
 }
 
 export interface CLICommand {

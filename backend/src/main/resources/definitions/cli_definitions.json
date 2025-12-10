@@ -10,47 +10,53 @@
       "options": [
         {
           "flag": "-l",
-          "description": "Usa o formato de listagem longa, mostrando detalhes.",
-          "takesArgument": false
+          "description": "Usa o formato de listagem longa, mostrando detalhes."
         },
         {
           "flag": "-a",
           "longFlag": "--all",
-          "description": "Mostra todas as entradas, incluindo as ocultas (que começam com '.').",
-          "takesArgument": false
+          "description": "Mostra todas as entradas, incluindo as ocultas (que começam com '.')."
         },
         {
           "flag": "-h",
           "longFlag": "--human-readable",
-          "description": "Com -h, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G).",
-          "takesArgument": false
+          "description": "Com -h, mostra os tamanhos de forma legível (ex: 1K, 234M, 2G)."
         },
         {
           "flag": "-t",
-          "description": "Ordena pela data de modificação, com os mais recentes primeiro.",
-          "takesArgument": false
+          "description": "Ordena pela data de modificação, com os mais recentes primeiro."
         },
         {
           "flag": "-S",
-          "description": "Ordena por tamanho de arquivo, com os maiores primeiro.",
-          "takesArgument": false
+          "description": "Ordena por tamanho de arquivo, com os maiores primeiro."
         },
         {
           "flag": "-r",
           "longFlag": "--reverse",
-          "description": "Inverte a ordem da ordenação.",
-          "takesArgument": false
+          "description": "Inverte a ordem da ordenação."
         },
         {
           "flag": "-R",
           "longFlag": "--recursive",
-          "description": "Lista os subdiretórios recursivamente.",
-          "takesArgument": false
+          "description": "Lista os subdiretórios recursivamente."
+        },
+        {
+          "flag": "--width",
+          "description": "Controla a largura da saída, em caracteres.",
+          "argument": {
+            "type": "number",
+            "label": "Largura da tela",
+            "defaultValue": "80",
+            "validations": [
+              {
+                "regex": "^[1-9][0-9]*$",
+                "errorMessage": "A largura deve ser um número inteiro positivo."
+              }
+            ]
+          }
         }
       ],
-      "exclusiveOptions": [
-        ["-t", "-S"]
-      ],
+      "exclusiveOptions": [["-t", "-S"]],
       "operands": [
         {
           "id": "file",
@@ -94,8 +100,8 @@
       "options": [
         {
           "flag": "-l",
-          "description": "Manipule o operando .. logicamente.",
-          "takesArgument": false
+          "description": "Manipule o operando .. logicamente."
+          // takesArgument REMOVIDO
         }
       ],
       "operands": [
@@ -126,13 +132,11 @@
       "options": [
         {
           "flag": "-p",
-          "description": "Cria diretórios pais conforme necessário (parents), sem erro se existir.",
-          "takesArgument": false
+          "description": "Cria diretórios pais conforme necessário (parents), sem erro se existir."
         },
         {
           "flag": "-v",
-          "description": "Mostra uma mensagem para cada diretório criado (verbose).",
-          "takesArgument": false
+          "description": "Mostra uma mensagem para cada diretório criado (verbose)."
         }
       ],
       "operands": [

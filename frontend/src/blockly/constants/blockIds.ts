@@ -6,6 +6,7 @@ export const INPUTS = {
     OPTIONS: "OPTIONS",
     OPERANDS: "OPERANDS",
     STACK: "STACK",
+    OPTION_ARG_INPUT: "OPTION_ARG_INPUT",
 } as const;
 
 export const DUMMY_INPUTS = {
@@ -16,6 +17,7 @@ export const FIELDS = {
     FLAG: "FLAG",
     MAIN_INPUT: "MAIN_INPUT",
     VALUE: "VALUE",
+    OPTION_ARG_VALUE: "OPTION_ARG_VALUE",
     CARDINALITY_ICON: "CARDINALITY_ICON",
     PARENT_INDICATOR: "PARENT_INDICATOR",
 } as const;

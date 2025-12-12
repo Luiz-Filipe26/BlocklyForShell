@@ -3,20 +3,127 @@
     {
       "id": "intro_mkdir",
       "title": "Criando Pastas",
-      "description": "Crie um diretório chamado 'projetos' para organizar seu trabalho.",
+      "summary": "Crie um diretório chamado 'projetos'.",
+      "fullGuideHtml": "<h1>Primeiros Passos</h1><p>Bem-vindo ao terminal! Para organizar seus arquivos, precisamos criar pastas (também chamadas de diretórios).</p><h2>O Comando mkdir</h2><p>O comando <code>mkdir</code> (make directory) é usado para criar novas pastas vazias.</p><h3>Sua Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta com o nome <code>projetos</code>.</p>",
       "setupCommands": ["rm -rf projetos"],
-      "verificationScript": "if [ -d 'projetos' ]; then echo '✅ Pasta encontrada!'; exit 0; else echo '❌ A pasta projetos não existe.'; exit 1; fi"
+      "verificationScript": "if [ -d 'projetos' ]; then echo 'OK'; exit 0; else echo 'A pasta projetos não existe.'; exit 1; fi"
+    },
+    {
+      "id": "intro_cd",
+      "title": "Navegando Entre Pastas",
+      "summary": "Entre na pasta 'projetos'.",
+      "fullGuideHtml": "<h1>Movendo-se no Sistema</h1><p>Agora que criamos uma pasta, precisamos entrar nela para trabalhar lá dentro.</p><h2>O Comando cd</h2><p>O comando <code>cd</code> (change directory) altera o seu local atual de trabalho.</p><h3>Sua Missão</h3><p>Use o bloco <strong>cd</strong> para entrar na pasta <code>projetos</code> que acabamos de criar.</p>",
+      "setupCommands": ["rm -rf projetos", "mkdir projetos"],
+      "verificationScript": "if [ \"$PWD\" = */projetos ]; then echo 'OK'; exit 0; else echo 'Você não está dentro da pasta projetos.'; exit 1; fi"
+    },
+    {
+      "id": "mkdir_nested",
+      "title": "Criando Estruturas",
+      "summary": "Crie a árvore de pastas 'src/utils/helpers'.",
+      "fullGuideHtml": "<h1>Estruturas Profundas</h1><p>Às vezes precisamos criar uma pasta dentro de outra, que fica dentro de outra. Isso se chama 'caminho aninhado'.</p><h2>Criação Recursiva</h2><p>Normalmente, o <code>mkdir</code> falha se a pasta pai não existir. Porém, podemos instruí-lo a criar todos os pais necessários.</p><h3>Sua Missão</h3><p>Crie a estrutura completa <code>src/utils/helpers</code> de uma só vez.</p>",
+      "setupCommands": ["rm -rf src"],
+      "verificationScript": "if [ -d 'src/utils/helpers' ]; then echo 'OK'; exit 0; else echo 'A estrutura src/utils/helpers não foi criada.'; exit 1; fi"
     },
     {
       "id": "file_mv",
       "title": "O Arquivo Secreto",
-      "description": "Mova o arquivo 'plano_secreto.txt' para dentro da pasta 'cofre'.",
-      "setupCommands": ["mkdir cofre", "touch plano_secreto.txt"],
-      "verificationScript": "if [ -f 'cofre/plano_secreto.txt' ] && [ ! -f 'plano_secreto.txt' ]; then echo '✅ Arquivo movido com sucesso!'; exit 0; else echo '❌ O arquivo não está no cofre ou ainda existe na origem.'; exit 1; fi"
+      "summary": "Mova 'plano_secreto.txt' para dentro de 'cofre'.",
+      "fullGuideHtml": "<h1>Movendo Arquivos</h1><p>Deixaram um arquivo confidencial solto na raiz! Precisamos guardá-lo.</p><h2>O Comando mv</h2><p>O comando <code>mv</code> (move) serve para mover arquivos de um lugar para outro. Ele recebe dois argumentos:</p><ul><li>1. O arquivo de <strong>origem</strong>.</li><li>2. A pasta de <strong>destino</strong>.</li></ul><h3>Sua Missão</h3><p>Mova o arquivo <code>plano_secreto.txt</code> para dentro da pasta <code>cofre</code>.</p>",
+      "setupCommands": [
+        "rm -rf cofre",
+        "mkdir cofre",
+        "rm -f plano_secreto.txt",
+        "touch plano_secreto.txt"
+      ],
+      "verificationScript": "if [ -f 'cofre/plano_secreto.txt' ] && [ ! -f 'plano_secreto.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo não está no cofre ou ainda existe na origem.'; exit 1; fi"
+    },
+    {
+      "id": "copy_multiple",
+      "title": "Cópia em Série",
+      "summary": "Copie a.txt, b.txt e c.txt para a pasta 'backup'.",
+      "fullGuideHtml": "<h1>Backups são Importantes</h1><p>Antes de modificar arquivos, é sempre bom ter uma cópia de segurança.</p><h2>O Comando cp</h2><p>O comando <code>cp</code> (copy) duplica arquivos. Você pode copiar vários arquivos de uma vez indicando o destino no final.</p><h3>Sua Missão</h3><p>Copie os arquivos <code>a.txt</code>, <code>b.txt</code> e <code>c.txt</code> para dentro do diretório <code>backup</code>.</p>",
+      "setupCommands": [
+        "rm -rf backup",
+        "mkdir backup",
+        "rm -f a.txt b.txt c.txt",
+        "touch a.txt b.txt c.txt"
+      ],
+      "verificationScript": "if [ -f 'backup/a.txt' ] && [ -f 'backup/b.txt' ] && [ -f 'backup/c.txt' ]; then echo 'OK'; exit 0; else echo 'Nem todos os arquivos foram copiados.'; exit 1; fi"
+    },
+    {
+      "id": "remove_safely",
+      "title": "Remoção Cuidadosa",
+      "summary": "Apague apenas o arquivo 'temp.log'.",
+      "fullGuideHtml": "<h1>Limpando a Casa</h1><p>Arquivos temporários ocupam espaço e precisam ser removidos.</p><h2>O Comando rm</h2><p>O comando <code>rm</code> (remove) deleta arquivos permanentemente. <strong>Cuidado!</strong> Não há lixeira no terminal padrão.</p><h3>Sua Missão</h3><p>Existe um arquivo <code>temp.log</code> e um arquivo <code>importante.txt</code>. Apague <strong>apenas</strong> o arquivo de log.</p>",
+      "setupCommands": [
+        "rm -f temp.log",
+        "touch temp.log",
+        "touch importante.txt"
+      ],
+      "verificationScript": "if [ ! -f 'temp.log' ] && [ -f 'importante.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo temp.log ainda existe ou importante.txt foi apagado.'; exit 1; fi"
+    },
+    {
+      "id": "cat_read",
+      "title": "Lendo Arquivos",
+      "summary": "Leia o conteúdo de 'mensagem.txt'.",
+      "fullGuideHtml": "<h1>Visualizando Conteúdo</h1><p>Como saber o que está escrito dentro de um arquivo de texto sem abri-lo em um editor?</p><h2>O Comando cat</h2><p>O comando <code>cat</code> (concatenate) lê o arquivo e joga todo o texto na tela (stdout).</p><h3>Sua Missão</h3><p>Use o bloco <code>cat</code> para ler o arquivo <code>mensagem.txt</code>.</p>",
+      "setupCommands": ["echo 'Olá mundo' > mensagem.txt"],
+      "verificationScript": "if cat mensagem.txt | grep -q 'Olá mundo'; then echo 'OK'; exit 0; else echo 'O conteúdo não foi exibido corretamente.'; exit 1; fi"
+    },
+    {
+      "id": "grep_filter",
+      "title": "Filtrando Logs",
+      "summary": "Filtre as linhas com 'ERRO' no arquivo 'sistema.log'.",
+      "fullGuideHtml": "<h1>Encontrando Agulha no Palheiro</h1><p>Arquivos de log podem ser gigantescos. Ler tudo com o <code>cat</code> é impossível.</p><h2>O Comando grep</h2><p>O <code>grep</code> é um filtro poderoso. Ele busca por um texto específico e imprime <strong>apenas as linhas</strong> onde esse texto aparece.</p><h3>Sua Missão</h3><p>Exiba apenas as linhas que contêm a palavra <code>ERRO</code> dentro do arquivo <code>sistema.log</code>.</p>",
+      "setupCommands": [
+        "rm -f sistema.log",
+        "echo 'INFO: início' >> sistema.log",
+        "echo 'ERRO: falha de conexão' >> sistema.log",
+        "echo 'INFO: processando' >> sistema.log",
+        "echo 'ERRO: disco cheio' >> sistema.log",
+        "echo 'INFO: fim' >> sistema.log"
+      ],
+      "verificationScript": "if grep 'ERRO' sistema.log | grep -q 'falha'; then echo 'OK'; exit 0; else echo 'As linhas com ERRO não foram filtradas.'; exit 1; fi"
+    },
+    {
+      "id": "pipe_chain",
+      "title": "O Poder do Pipe",
+      "summary": "Liste arquivos e filtre apenas os '.txt'.",
+      "fullGuideHtml": "<h1>Conectando Comandos</h1><p>A verdadeira força do Shell está em conectar pequenos comandos para fazer grandes coisas.</p><h2>O Operador Pipe (|)</h2><p>O caractere <code>|</code> (pipe) pega a saída do comando da esquerda e a entrega como entrada para o comando da direita.</p><h3>Sua Missão</h3><p>1. Liste os arquivos da pasta (<code>ls</code>).<br>2. Conecte essa lista a um filtro (<code>grep</code>) para mostrar apenas o que termina em <code>.txt</code>.</p>",
+      "setupCommands": [
+        "rm -f a.txt b.txt c.log",
+        "touch a.txt b.txt c.log"
+      ],
+      "verificationScript": "output=$(ls | grep '\\.txt$'); if echo \"$output\" | grep -q 'a.txt' && echo \"$output\" | grep -q 'b.txt' && ! echo \"$output\" | grep -q 'c.log'; then echo 'OK'; exit 0; else echo 'A filtragem ou o encadeamento falhou.'; exit 1; fi"
+    },
+    {
+      "id": "conditional_logic",
+      "title": "Decisões Lógicas",
+      "summary": "Se 'dados.csv' existir, diga 'OK', senão diga 'Erro'.",
+      "fullGuideHtml": "<h1>Automação Inteligente</h1><p>Scripts nem sempre são lineares. Às vezes precisamos tomar decisões baseadas no estado do sistema.</p><h2>O Bloco If (Se)</h2><p>O bloco <code>if</code> verifica uma condição. Se for verdadeira, executa o primeiro bloco. Se não, executa o bloco <code>else</code>.</p><h3>Sua Missão</h3><p>Verifique se o arquivo <code>dados.csv</code> existe.<br>- Se existir: imprima <code>OK</code>.<br>- Se não existir: imprima <code>Erro</code> ou <code>dados.csv não encontrado</code>.</p>",
+      "setupCommands": ["rm -f dados.csv", "touch dados.csv"],
+      "verificationScript": "if [ -f dados.csv ]; then echo 'OK'; exit 0; else echo 'dados.csv não encontrado.'; exit 1; fi"
+    },
+    {
+      "id": "loop_processing",
+      "title": "Repetição (Loops)",
+      "summary": "Imprima o nome de cada arquivo .txt individualmente.",
+      "fullGuideHtml": "<h1>Trabalho Repetitivo</h1><p>Imagine ter que rodar um comando para 100 arquivos diferentes. É para isso que servem os loops!</p><h2>O Loop For</h2><p>O <code>for</code> percorre uma lista de itens (como arquivos em uma pasta) e executa os blocos internos para cada um deles.</p><h3>Sua Missão</h3><p>Use um loop para pegar todos os arquivos <code>*.txt</code> e, para cada um, use o <code>echo</code> para imprimir seu nome.</p>",
+      "setupCommands": ["rm -f a.txt b.txt", "touch a.txt b.txt"],
+      "verificationScript": "count=$(for f in *.txt; do echo \"$f\"; done | wc -l); if [ \"$count\" -ge 2 ]; then echo 'OK'; exit 0; else echo 'Loop não percorreu todos os arquivos.'; exit 1; fi"
     }
   ],
   "levelOrder": [
     "intro_mkdir",
-    "file_mv"
+    "intro_cd",
+    "mkdir_nested",
+    "file_mv",
+    "copy_multiple",
+    "remove_safely",
+    "cat_read",
+    "grep_filter",
+    "pipe_chain",
+    "conditional_logic",
+    "loop_processing"
   ]
 }

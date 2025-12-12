@@ -3,8 +3,8 @@ import * as API from "@/types/api";
 import * as Logger from "@/app/systemLogger";
 
 const STORAGE_KEYS = {
-    DEFINITIONS: "cli_definitions_v2",
-    LEVELS: "game_levels_v2",
+    DEFINITIONS: "cli_definitions_v1",
+    LEVELS: "game_levels_v1",
 } as const;
 
 const API_URL = "http://localhost:7000/api";

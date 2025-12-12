@@ -37,7 +37,7 @@ public class LauncherWindow extends JFrame {
 	public LauncherWindow(int port) {
 		this.appUrl = "http://localhost:" + port;
 
-		setTitle("Blockly for Shell Launcher");
+		setTitle("ShellBlocks Launcher");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(600, 450);
 		setLocationRelativeTo(null);

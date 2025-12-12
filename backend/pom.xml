@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>br.edu.ifmg.cli</groupId>
-	<artifactId>blockly-for-shell</artifactId>
+	<artifactId>shell-blocks</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>BlocklyForShell</name>
+	<name>ShellBlocks</name>
 
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -35,7 +35,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>blockly-for-shell</finalName>
+		<finalName>shell-blocks</finalName>
 		
 		<plugins>
 			<plugin>

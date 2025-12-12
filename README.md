@@ -1,8 +1,8 @@
-# **Blockly for Shell 🧩💻️**
+# **ShellBlocks 🧩💻️**
 
 Um ambiente interativo de **Programação Visual** para desmistificar a Linha de Comando (CLI) Linux.
 
-O **Blockly for Shell** é uma ferramenta educacional que utiliza a metáfora de blocos de encaixar (semelhante ao Scratch) para ensinar a lógica, sintaxe e composição de comandos de terminal (Shell). O objetivo é reduzir a carga cognitiva de iniciantes, permitindo que foquem na _lógica_ da operação antes de memorizar a _sintaxe_ textual.
+O **ShellBlocks** é uma ferramenta educacional que utiliza a metáfora de blocos de encaixar (semelhante ao Scratch) para ensinar a lógica, sintaxe e composição de comandos de terminal (Shell). O objetivo é reduzir a carga cognitiva de iniciantes, permitindo que foquem na _lógica_ da operação antes de memorizar a _sintaxe_ textual.
 
 ## **🚀 Como Rodar**
 
@@ -15,8 +15,8 @@ Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores
 
 ### **Instalação (Linux e Windows/macOS)**
 
-1. Vá para a página de [**Última Versão (Release)**](https://github.com/Luiz-Filipe26/BlocklyForShell/releases/tag/LATEST_BUILD).
-2. Baixe o arquivo blockly-for-shell.jar anexado à Release.
+1. Vá para a página de [**Última Versão (Release)**](https://github.com/Luiz-Filipe26/ShellBlocks/releases/tag/LATEST_BUILD).
+2. Baixe o arquivo shell-blocks.jar anexado à Release.
 
 ### **Configuração de Permissões (APENAS USUÁRIOS LINUX)**
 
@@ -123,7 +123,7 @@ chmod \+x build\_project.sh
 ./build\_project.sh
 ```
 
-Ao final, o executável blockly-for-shell.jar será gerado na **raiz do projeto**.
+Ao final, o executável shell-blocks.jar será gerado na **raiz do projeto**.
 
 ## **🧩 Como Adicionar Novos Comandos**
 

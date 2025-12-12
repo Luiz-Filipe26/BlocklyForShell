@@ -13,6 +13,18 @@ import {
     loadSession,
 } from "@/app/workspaceAutoSaver";
 
+const FALLBACK_DEFINITIONS: CLI.CliDefinitions = {
+    commands: [],
+    categories: [
+        {
+            name: "Sistema Offline",
+            commands: [],
+        },
+    ],
+    operators: [],
+    controls: [],
+};
+
 // --- Tipos Auxiliares para Normalização ---
 interface RawCLICommand extends Omit<CLI.CLICommand, "id"> {
     id?: string;
@@ -28,15 +40,15 @@ export async function setupWorkspace(
     blocklyArea: HTMLDivElement,
 ): Promise<Blockly.WorkspaceSvg | null> {
     initSystemBlocks();
-    const rawDefinitions = await getDefinitions();
+    let rawDefinitions = await getDefinitions();
 
     if (!rawDefinitions) {
         Logger.log(
-            "Falha crítica: Sem definições disponíveis.",
-            Logger.LogLevel.ERROR,
-            Logger.LogMode.ToastAndConsole,
+            "Backend indisponível. Iniciando em Modo de Segurança.",
+            Logger.LogLevel.WARN,
+            Logger.LogMode.Console,
         );
-        return null;
+        rawDefinitions = FALLBACK_DEFINITIONS;
     }
 
     const cliDefinitions = normalizeCliDefinitions(rawDefinitions);

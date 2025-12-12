@@ -72,10 +72,16 @@ function transformCommandToCategory(
                 kind: "block",
                 type: BlockIDs.commandBlockType(commandDefinition),
             },
-            {
-                kind: "block",
-                type: BlockIDs.commandOptionBlockType(commandDefinition),
-            },
+            ...(commandDefinition.options?.length
+                ? [
+                    {
+                        kind: "block" as const,
+                        type: BlockIDs.commandOptionBlockType(
+                            commandDefinition,
+                        ),
+                    },
+                ]
+                : []),
             ...commandDefinition.operands.map((operand) => ({
                 kind: "block" as const,
                 type: BlockIDs.commandOperandBlockType(

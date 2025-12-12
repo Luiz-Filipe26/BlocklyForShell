@@ -1,4 +1,13 @@
 {
-    "printWidth": 80,
-    "semi": true
+  "printWidth": 80,
+  "semi": true,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 140,
+        "bracketSameLine": true
+      }
+    }
+  ]
 }

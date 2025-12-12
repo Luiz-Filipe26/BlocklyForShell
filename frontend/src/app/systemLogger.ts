@@ -17,7 +17,7 @@ let activeWorkspace: Blockly.WorkspaceSvg | null = null;
 
 export function initSystemLogger(
     container: HTMLDivElement,
-    workspace: Blockly.WorkspaceSvg,
+    workspace: Blockly.WorkspaceSvg | null,
 ): void {
     logContainer = container;
     activeWorkspace = workspace;

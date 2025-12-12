@@ -7,6 +7,7 @@ import { runScript } from "@/app/scriptRunner";
 import * as Blockly from "blockly";
 import * as Logger from "@/app/systemLogger";
 import * as PersistenceManager from "@/app/persistenceManager";
+import { setupHeaderBehavior } from "@/app/ui/headerController";
 
 function queryRequired<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -20,8 +21,12 @@ const pageElements = {
     cliOutput: queryRequired<HTMLPreElement>("cli-output"),
     runBtn: queryRequired<HTMLButtonElement>("run-btn"),
     clearBtn: queryRequired<HTMLButtonElement>("clear-btn"),
+    headerRoot: queryRequired<HTMLElement>("app-header"),
+    headerToggleBtn: queryRequired<HTMLButtonElement>("header-toggle-btn"),
     levelSelect: queryRequired<HTMLSelectElement>("level-select"),
-    levelDescription: queryRequired<HTMLDivElement>("level-description"),
+    levelSummaryText: queryRequired<HTMLElement>("level-summary-text"),
+    levelFullDetails: queryRequired<HTMLElement>("level-full-details"),
+    levelDescription: queryRequired<HTMLDivElement>("level-full-details"),
     validationModal: queryRequired<HTMLDialogElement>("validation-modal"),
     validationErrorList: queryRequired<HTMLUListElement>(
         "validation-error-list",
@@ -37,6 +42,7 @@ const pageElements = {
 
 async function start(): Promise<void> {
     const workspace = await setupWorkspace(pageElements.blocklyArea);
+    Logger.initSystemLogger(pageElements.systemLogContainer, workspace);
 
     if (workspace == null) {
         Logger.log(
@@ -47,11 +53,12 @@ async function start(): Promise<void> {
         return;
     }
 
-    Logger.initSystemLogger(pageElements.systemLogContainer, workspace);
+    setupHeaderBehavior(pageElements.headerRoot, pageElements.headerToggleBtn);
 
     await setupLevelSelector(
         pageElements.levelSelect,
-        pageElements.levelDescription,
+        pageElements.levelSummaryText,
+        pageElements.levelFullDetails,
     );
 
     setupScriptHotReloader(workspace, pageElements.codeOutput);
@@ -94,7 +101,8 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
             PersistenceManager.resetToFactorySettings(workspace, async () => {
                 await setupLevelSelector(
                     pageElements.levelSelect,
-                    pageElements.levelDescription,
+                    pageElements.levelSummaryText,
+                    pageElements.levelFullDetails,
                 );
                 pageElements.levelSelect.selectedIndex = 0;
                 pageElements.levelSelect.dispatchEvent(new Event("change"));
@@ -106,7 +114,8 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
         PersistenceManager.uploadGameData(() => {
             setupLevelSelector(
                 pageElements.levelSelect,
-                pageElements.levelDescription,
+                pageElements.levelSummaryText,
+                pageElements.levelFullDetails,
             );
         });
     });

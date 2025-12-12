@@ -1,5 +1,5 @@
 .sidebar {
-    width: 450px;
+    width: 400px;
     background-color: #e9ecef;
     padding: 10px;
 
@@ -9,6 +9,7 @@
 
     overflow-y: auto;
     flex-shrink: 0;
+    border-left: 1px solid #ccc;
 }
 
 .sidebar .panel {
@@ -19,7 +20,6 @@
 
     display: flex;
     flex-direction: column;
-
     flex: 0 0 auto;
 }
 
@@ -29,17 +29,14 @@
 }
 
 .sidebar .panel h2 {
-    font-size: 1.1em;
+    font-size: 0.95em;
+    font-weight: 600;
     margin-bottom: 10px;
-    color: #333;
+    color: #555;
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
     flex-shrink: 0;
-}
-
-.sidebar .level-panel {
-    max-height: 40vh;
-    overflow-y: auto;
+    text-transform: uppercase;
 }
 
 .sidebar .action-buttons-panel {
@@ -64,6 +61,7 @@
     background-color: #28a745;
     color: white;
 }
+
 .sidebar .btn-run:hover {
     background-color: #218838;
 }
@@ -72,6 +70,7 @@
     background-color: #dc3545;
     color: white;
 }
+
 .sidebar .btn-clear:hover {
     background-color: #c82333;
 }

@@ -1,18 +1,22 @@
+:root {
+    --header-collapsed-height: 100px;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html,
-body {
-    height: 100%;
+html, body {
+    min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f0f2f5;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 body {
     display: flex;
     flex-direction: column;
-    overflow: clip;
 }

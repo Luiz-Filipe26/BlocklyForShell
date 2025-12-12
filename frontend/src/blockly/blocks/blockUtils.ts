@@ -1,7 +1,7 @@
 import * as Blockly from "blockly";
 import { PATH_CONSTANTS } from "@/app/constants/pathConstants";
 import { log, LogLevel, LogMode } from "@/app/systemLogger";
-import { showHelpBalloon } from "@/app/uiFeedback";
+import { showHelpBalloon } from "@/app/ui/uiFeedback";
 import * as CLI from "@/types/cli";
 import { getErrors } from "@/blockly/validation/validationManager";
 

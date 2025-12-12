@@ -9,59 +9,65 @@
         <script type="module" src="/src/main.ts"></script>
     </head>
     <body>
-        <header class="main-header">
-            <h1>Ambiente Interativo para Aprendizado de CLI</h1>
+        <header id="app-header" class="app-header">
+            <div class="header-brand">
+                <div class="logo-area">
+                    <h1>Blocks to Shell</h1>
+                </div>
+            </div>
+
+            <div class="header-context">
+                <div class="context-controls">
+                    <div class="context-summary">
+                        <span class="info-icon">ℹ️</span>
+                        <p id="level-summary-text" class="summary-text"></p>
+                    </div>
+
+                    <label for="level-select" class="input-label">Missão:</label>
+                    <select id="level-select" class="level-select">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+
+                <button id="header-toggle-btn" class="btn-details-toggle" title="Ler guia completo">
+                    <span class="btn-label">Guia Completo</span>
+                    <span class="btn-icon">▼</span>
+                </button>
+            </div>
+
+            <div class="header-details-panel">
+                <div class="details-content-wrapper">
+                    <article id="level-full-details" class="level-full-details"></article>
+                </div>
+            </div>
         </header>
 
-        <main class="main-layout">
+        <main class="main-layout" id="workspace-area">
             <div class="editor-column">
                 <div class="editor-toolbar">
                     <div class="toolbar-group">
-                        <button
-                            id="btn-save-script"
-                            class="btn-tool"
-                            title="Baixar script atual (.json)"
-                        >
-                            💾 Salvar Script
-                        </button>
-                        <button
-                            id="btn-load-script"
-                            class="btn-tool"
-                            title="Carregar script (.json)"
-                        >
-                            📂 Abrir Script
-                        </button>
+                        <button id="btn-save-script" class="btn-tool" title="Baixar script atual (.json)">💾 Salvar Script</button>
+                        <button id="btn-load-script" class="btn-tool" title="Carregar script (.json)">📂 Carregar Script</button>
                     </div>
 
                     <span class="divider"></span>
 
                     <div class="toolbar-group">
-                        <button
-                            id="btn-load-defs"
-                            class="btn-tool"
-                            title="Carregar novas definições (cli_definitions.json)"
-                        >
+                        <button id="btn-load-defs" class="btn-tool" title="Carregar novas definições (cli_definitions.json)">
                             ⚙️ Carregar Definições
                         </button>
-                        <button
-                            id="btn-load-game"
-                            class="btn-tool"
-                            title="Carregar novos níveis (game_data.json)"
-                        >
+                        <button id="btn-load-game" class="btn-tool" title="Carregar novos níveis (game_data.json)">
                             🎮 Carregar Níveis
                         </button>
                     </div>
 
                     <span class="spacer"></span>
 
-                    <button
-                        id="btn-reset-defs"
-                        class="btn-tool btn-tool-danger"
-                        title="Voltar para definições padrão"
-                    >
+                    <button id="btn-reset-defs" class="btn-tool btn-tool-danger" title="Voltar para as configurações padrão de fábrica">
                         ↺ Resetar Fábrica
                     </button>
                 </div>
+
                 <div id="blockly-area" class="blockly-workspace-area"></div>
 
                 <div class="bottom-panel system-log-panel">
@@ -73,16 +79,6 @@
             </div>
 
             <aside class="sidebar">
-                <div class="panel level-panel">
-                    <h2>Missão Atual</h2>
-                    <select id="level-select" class="level-select-input">
-                        <option value="">Carregando níveis...</option>
-                    </select>
-                    <div id="level-description" class="mission-box">
-                        Selecione um nível para ver a missão.
-                    </div>
-                </div>
-
                 <div class="panel panel-expand">
                     <h2>Código Gerado</h2>
                     <pre id="code-output" class="terminal-display"></pre>
@@ -95,9 +91,7 @@
 
                 <div id="action-buttons" class="panel action-buttons-panel">
                     <button id="run-btn" class="btn btn-run">Executar</button>
-                    <button id="clear-btn" class="btn btn-clear">
-                        Limpar Terminal
-                    </button>
+                    <button id="clear-btn" class="btn btn-clear">Limpar</button>
                 </div>
             </aside>
         </main>
@@ -108,16 +102,10 @@
                     <h2>⚠️ Correções Necessárias</h2>
                 </div>
                 <div class="modal-body">
-                    <p>
-                        O script não pode ser executado pois contém blocos
-                        inválidos:
-                    </p>
                     <ul id="validation-error-list" class="validation-list"></ul>
                 </div>
                 <div class="modal-footer">
-                    <button id="close-modal-btn" class="btn btn-close-modal">
-                        Entendi, vou corrigir
-                    </button>
+                    <button id="close-modal-btn" class="btn btn-close-modal">Entendi</button>
                 </div>
             </div>
         </dialog>

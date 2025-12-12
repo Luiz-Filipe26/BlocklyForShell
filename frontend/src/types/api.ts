@@ -13,7 +13,8 @@ export interface ExecutionResult {
 export interface Level {
     id: string;
     title: string;
-    description: string;
+    summary?: string;
+    fullGuideHtml?: string;
 }
 
 export interface GameData {

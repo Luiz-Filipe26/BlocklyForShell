@@ -1,6 +1,6 @@
 import * as BlockIDs from "@/blockly/constants/blockIds";
 import * as Blockly from "blockly";
-import { buildCommandHelpHTML } from "@/app/uiFeedback";
+import { buildCommandHelpHTML } from "@/app/ui/uiFeedback";
 import { renderBlockWarnings } from "@/blockly/validation/validationWarnings";
 import * as BlockUtils from "./blockUtils";
 import * as CLI from "@/types/cli";

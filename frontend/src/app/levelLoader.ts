@@ -7,26 +7,33 @@ export function getCurrentLevelId(): string | null {
     return currentLevelId;
 }
 
+/**
+ * Configura o seletor de níveis e os painéis de descrição.
+ * Recebe os elementos do DOM diretamente.
+ */
 export async function setupLevelSelector(
     levelSelect: HTMLSelectElement,
-    levelDescription: HTMLDivElement,
+    summaryElement: HTMLElement,
+    detailsElement: HTMLElement,
 ): Promise<void> {
     const data = await getGameData();
 
     if (!data) {
         levelSelect.innerHTML = "<option>Erro ao carregar níveis</option>";
-        levelDescription.textContent =
-            "Não foi possível conectar ao servidor para buscar os níveis.";
+        summaryElement.textContent = "Erro de conexão com o servidor.";
+        detailsElement.innerHTML = "";
         return;
     }
 
     const levels = getSortedLevels(data);
 
     levelSelect.innerHTML = "";
+
     const options = [buildSandboxOption(), ...buildLevelOptions(levels)];
+
     options.forEach((option) => levelSelect.appendChild(option));
 
-    registerLevelSelectorEvents(levelSelect, levelDescription);
+    registerLevelSelectorEvents(levelSelect, summaryElement, detailsElement);
 
     levelSelect.dispatchEvent(new Event("change"));
 }
@@ -42,8 +49,10 @@ function buildSandboxOption(): HTMLOptionElement {
     const option = document.createElement("option");
     option.value = "";
     option.text = "🛠️ Modo Livre (Sandbox)";
-    option.dataset.description =
-        "Ambiente livre. Crie scripts à vontade sem objetivos específicos.";
+
+    option.dataset.summary = "Ambiente livre sem objetivos.";
+    option.dataset.details = "<h1>Modo Livre</h1><p>Use este espaço para testar comandos e blocos livremente.</p>";
+
     return option;
 }
 
@@ -52,32 +61,29 @@ function buildLevelOptions(levels: API.Level[]): HTMLOptionElement[] {
         const option = document.createElement("option");
         option.value = level.id;
         option.text = `Nível ${index + 1}: ${level.title}`;
-        option.dataset.description = level.description ?? "";
+
+        option.dataset.summary = level.summary || "";
+        option.dataset.details = level.fullGuideHtml || `<p>${level.summary || ""}</p>`;
+
         return option;
     });
 }
 
 function registerLevelSelectorEvents(
     selectElement: HTMLSelectElement,
-    descriptionElement: HTMLDivElement,
+    summaryElement: HTMLElement,
+    detailsElement: HTMLElement
 ) {
     selectElement.addEventListener("change", () => {
         currentLevelId = selectElement.value || null;
-        updateLevelDescription(
-            selectElement.selectedOptions[0],
-            descriptionElement,
-        );
+
+        const selectedOption = selectElement.selectedOptions[0];
+        if (!selectedOption) return;
+
+        // Atualiza a UI lendo do dataset da opção selecionada
+        // .textContent para texto puro (segurança)
+        summaryElement.textContent = selectedOption.dataset.summary || "";
+        // .innerHTML para o guia rico (renderiza o HTML string)
+        detailsElement.innerHTML = selectedOption.dataset.details || "";
     });
-}
-
-function updateLevelDescription(
-    selectedOption: HTMLOptionElement | undefined,
-    descriptionElement: HTMLDivElement,
-) {
-    if (!selectedOption) {
-        descriptionElement.textContent = "";
-        return;
-    }
-
-    descriptionElement.textContent = selectedOption.dataset.description || "";
 }

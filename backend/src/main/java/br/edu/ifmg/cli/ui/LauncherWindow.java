@@ -29,14 +29,12 @@ import javax.swing.text.StyledDocument;
 public class LauncherWindow extends JFrame {
 
 	private static final String LAUNCHER_ICON_PATH = "/launcher_icon.png";
-	
-	private final JTextPane logPane; 
-	private final String appUrl;
+
+	private final JTextPane logPane;
 	private JButton openBrowserButton;
+	private String webAppUrl = "http://localhost:0";
 
-	public LauncherWindow(int port) {
-		this.appUrl = "http://localhost:" + port;
-
+	public LauncherWindow() {
 		setTitle("ShellBlocks Launcher");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(600, 450);
@@ -49,27 +47,37 @@ public class LauncherWindow extends JFrame {
 		logPane = new JTextPane();
 		logPane.setEditable(false);
 		logPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		
+
 		setupStyles();
 		setupAutoScrollerDocumentListener(logPane);
 
 		add(new JScrollPane(logPane), BorderLayout.CENTER);
 	}
-	
+
+	public void setWebAppUrl(String url) {
+		this.webAppUrl = url;
+	}
+
 	public void enableBrowserButton() {
-        SwingUtilities.invokeLater(() -> openBrowserButton.setEnabled(true));
-    }
-	
+		SwingUtilities.invokeLater(() -> openBrowserButton.setEnabled(true));
+	}
+
 	private void setupAutoScrollerDocumentListener(JTextPane logPane) {
 		logPane.getDocument().addDocumentListener(new DocumentListener() {
-			public void insertUpdate(javax.swing.event.DocumentEvent e) { scrollToBottom(); }
-			public void removeUpdate(javax.swing.event.DocumentEvent e) { scrollToBottom(); }
-			public void changedUpdate(javax.swing.event.DocumentEvent e) { scrollToBottom(); }
-			
+			public void insertUpdate(javax.swing.event.DocumentEvent e) {
+				scrollToBottom();
+			}
+
+			public void removeUpdate(javax.swing.event.DocumentEvent e) {
+				scrollToBottom();
+			}
+
+			public void changedUpdate(javax.swing.event.DocumentEvent e) {
+				scrollToBottom();
+			}
+
 			private void scrollToBottom() {
-				SwingUtilities.invokeLater(() -> 
-					logPane.setCaretPosition(logPane.getDocument().getLength())
-				);
+				SwingUtilities.invokeLater(() -> logPane.setCaretPosition(logPane.getDocument().getLength()));
 			}
 		});
 	}
@@ -77,7 +85,7 @@ public class LauncherWindow extends JFrame {
 	private void setupStyles() {
 		StyledDocument doc = logPane.getStyledDocument();
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-		
+
 		Style regular = doc.addStyle("regular", def);
 		StyleConstants.setForeground(regular, Color.BLACK);
 
@@ -103,7 +111,7 @@ public class LauncherWindow extends JFrame {
 
 		openBrowserButton.addActionListener(e -> {
 			try {
-				Desktop.getDesktop().browse(new URI(appUrl));
+				Desktop.getDesktop().browse(new URI(webAppUrl));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

@@ -31,6 +31,8 @@ cd ..
 cp "backend/$JAR_PATH" .
 chmod +x "$JAR_FILE"
 
+echo "GENERATED_JAR_NAME=$JAR_FILE" >> $GITHUB_ENV
+
 echo ""
 echo "✅ SUCESSO!"
 echo "------------------------------------------------------"

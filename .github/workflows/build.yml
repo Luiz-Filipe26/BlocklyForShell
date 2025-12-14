@@ -44,8 +44,8 @@ jobs:
     - name: Upload do JAR (Artifact)
       uses: actions/upload-artifact@v4
       with:
-        name: blockly-for-shell-jar
-        path: blockly-for-shell.jar
+        name: ${{ env.GENERATED_JAR_NAME }}
+        path: ${{ env.GENERATED_JAR_NAME }}
         retention-days: 5 
 
     - name: Forçar Movimento da Tag
@@ -68,9 +68,9 @@ jobs:
         tag_name: LATEST_BUILD
         target_commitish: ${{ github.sha }}
         name: 🚀 Versão Mais Recente (LATEST_BUILD)
-        files: blockly-for-shell.jar
+        files: ${{ env.GENERATED_JAR_NAME }}
         body: |
           Build disparado pelo commit: ${{ github.sha }}
-          Data: ${{ github.event.head_commit.timestamp }}
+          Timestamp: ${{ github.event.head_commit.timestamp }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

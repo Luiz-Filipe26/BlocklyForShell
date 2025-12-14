@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "vite",
         "type-check": "tsc --noEmit",
-        "build": "npm run type-check && vite build --emptyOutDir",
+        "build": "npm run type-check && vite build",
         "preview": "vite preview"
     },
     "devDependencies": {

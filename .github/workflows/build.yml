@@ -41,6 +41,25 @@ jobs:
     - name: Rodar Script de Build Completo
       run: ./build_project.sh
 
+    - name: Verificar Existência e Variável do JAR
+      run: |
+        JAR_NAME="${{ env.GENERATED_JAR_NAME }}"
+        
+        if [ -z "$JAR_NAME" ]; then
+          echo "❌ ERRO FATAL: A variável de ambiente GENERATED_JAR_NAME não foi definida ou está vazia." >&2
+          echo "O script build_project.sh falhou ao exportar o nome do JAR via \$GITHUB_ENV." >&2
+          exit 1
+        fi
+        
+        if [ ! -f "$JAR_NAME" ]; then
+          echo "❌ ERRO FATAL: O arquivo JAR ('$JAR_NAME') não foi encontrado na raiz do projeto." >&2
+          echo "Isso indica que o script de build falhou ao copiar o artefato ou o nome está incorreto." >&2
+          exit 1
+        fi
+        echo "✅ JAR '$JAR_NAME' encontrado com sucesso. Continuando para o upload."
+      
+      if: success()
+
     - name: Upload do JAR (Artifact)
       uses: actions/upload-artifact@v4
       with:

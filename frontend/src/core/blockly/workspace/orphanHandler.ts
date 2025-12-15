@@ -5,7 +5,7 @@ const ORPHAN_DISABLED_REASON = "orphan_block";
 
 /**
  * Verifica todos os blocos no workspace.
- * Se um bloco não estiver conectado (direta ou indiretamente) ao 'script_root',
+ * Se um bloco não estiver conectado (direta ou indiretamente) ao "script_root",
  * ele é desabilitado (fica cinza e não gera código).
  */
 export function disableOrphanBlocks(workspace: Blockly.WorkspaceSvg): void {

@@ -51,7 +51,7 @@ async function sendAstToBackend(
 
     if (!ast) {
         codeOutput.textContent =
-            "// Monte seu script dentro do bloco 'Script Principal'";
+            "// Monte seu script dentro do bloco \"Script Principal\"";
         return;
     }
 

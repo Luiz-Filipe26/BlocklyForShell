@@ -64,6 +64,6 @@ public class ServerInitializer {
 		app.start(config.port());
 
 		logger.info("Servidor Backend iniciado na porta {}", config.port());
-		logger.info("Acesse o Frontend ou clique em 'Abrir Navegador' para começar.");
+		logger.info("Clique em \"Abrir Navegador\" para começar.");
 	}
 }

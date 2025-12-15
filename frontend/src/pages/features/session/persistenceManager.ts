@@ -63,7 +63,7 @@ export function uploadDefinitions(workspace: Blockly.WorkspaceSvg): void {
             const definitions: CLI.CliDefinitions = JSON.parse(jsonContent);
 
             if (!definitions.commands || !Array.isArray(definitions.commands)) {
-                throw new Error("JSON inválido: falta array de 'commands'.");
+                throw new Error("JSON inválido: falta array de \"commands\".");
             }
 
             DataManager.saveCustomDefinitions(definitions);
@@ -123,7 +123,7 @@ export function uploadGameData(
             const gameData: API.GameData = JSON.parse(jsonContent);
 
             if (!gameData.levels || !Array.isArray(gameData.levels)) {
-                throw new Error("JSON inválido: falta array de 'levels'.");
+                throw new Error("JSON inválido: falta array de \"levels\".");
             }
 
             DataManager.saveCustomGameData(gameData);

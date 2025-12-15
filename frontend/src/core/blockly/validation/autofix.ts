@@ -64,7 +64,7 @@ function resolveGroupConflicts(
 
         unplugAndTrim(intruder, remainingBlocks);
 
-        const message = `Conflito: A opção '${intruderFlag}' não pode ser usada com '${keeperFlag}'.`;
+        const message = `Conflito: A opção \"${intruderFlag}\" não pode ser usada com \"${keeperFlag}\".`;
         if (workspace) {
             showToast(workspace, message);
             coreLog(workspace, message, LogLevel.WARN);
@@ -127,7 +127,7 @@ export function autoFixExcessOperands(
         if (!blocksOfType || blocksOfType.length <= max) continue;
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
 
-        const message = `Limite de ${max} excedido para '${operandDef.label}'.`;
+        const message = `Limite de ${max} excedido para \"${operandDef.label}\".`;
         if (workspace) {
             showToast(workspace, message);
             coreLog(workspace, message, LogLevel.WARN);

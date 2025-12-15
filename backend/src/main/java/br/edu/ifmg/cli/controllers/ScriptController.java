@@ -3,8 +3,8 @@ package br.edu.ifmg.cli.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.edu.ifmg.cli.models.AstNode;
 import br.edu.ifmg.cli.models.GeneratedScript;
+import br.edu.ifmg.cli.models.ast.AstNode;
 import br.edu.ifmg.cli.services.ScriptGenerator;
 import io.javalin.Javalin;
 import io.javalin.http.Context;

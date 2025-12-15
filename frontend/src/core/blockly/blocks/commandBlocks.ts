@@ -3,7 +3,7 @@ import * as Blockly from "blockly";
 import { buildCommandHelpHTML } from "../ui/helpBalloon";
 import { renderBlockWarnings } from "../validation/validationWarnings";
 import * as BlockComponents from "../ui/blockComponents";
-import * as BlockTraversal from "../helpers/blockTraversal"
+import * as BlockTraversal from "../helpers/blockTraversal";
 import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "../serialization/metadataManager";
 import {
@@ -19,7 +19,19 @@ export function createCommandBlock(commandDefinition: CLI.CLICommand): void {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "command",
-                commandName: commandDefinition.shellCommand,
+                name: commandDefinition.shellCommand,
+                bindings: [
+                    {
+                        key: "options",
+                        source: "input",
+                        name: BlockIDs.INPUTS.OPTIONS,
+                    },
+                    {
+                        key: "operands",
+                        source: "input",
+                        name: BlockIDs.INPUTS.OPERANDS,
+                    },
+                ],
             });
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);

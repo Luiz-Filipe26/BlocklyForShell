@@ -5,6 +5,7 @@ import { getBlockSemanticData } from "../serialization/metadataManager";
 import { clearError, setError } from "../validation/validationManager";
 import * as BlockTraversal from "../helpers/blockTraversal";
 import * as ValidationErrors from "../constants/validationErrors";
+import { getOperatorDefinition } from "../blocks/operatorBlocks";
 
 export function validateControlCardinality(
     block: Blockly.Block,
@@ -157,14 +158,16 @@ function validateOptionsGroupCardinality(
  */
 function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
     const parent = block.getSurroundParent();
+    if (!parent) return false;
+
+    const operatorDefinition = getOperatorDefinition(parent.type);
+    if (!operatorDefinition) return false;
+
     const slotName = BlockTraversal.getParentInputName(block);
-    if (!parent || !slotName) return false;
+    if (!slotName) return false;
 
-    const parentData = getBlockSemanticData(parent);
-
-    return Boolean(
-        parentData?.nodeType === "operator" &&
-        parentData.slotsWithImplicitData?.includes(slotName),
+    return (
+        operatorDefinition.slotsWithImplicitData?.includes(slotName) ?? false
     );
 }
 

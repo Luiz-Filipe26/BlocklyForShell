@@ -2,7 +2,7 @@ import * as Blockly from "blockly";
 import * as CLI from "@/types/cli";
 import { setBlockSemanticData } from "../serialization/metadataManager";
 import * as BlockIDs from "../constants/blockIds";
-import * as BlockComponents from "../ui/blockComponents"
+import * as BlockComponents from "../ui/blockComponents";
 import { validateControlCardinality } from "../validation/cardinalityValidator";
 import { renderBlockWarnings } from "../validation/validationWarnings";
 import { addLocalChangeListener } from "../events/blockEventListeners";
@@ -12,7 +12,12 @@ export function createControlBlock(controlDefinition: CLI.CLIControl): void {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "control",
-                commandName: controlDefinition.id,
+                name: controlDefinition.id,
+                bindings: controlDefinition.slots.map((slot) => ({
+                    key: slot.name,
+                    source: "input",
+                    name: slot.name,
+                })),
             });
 
             appendControlHeader(controlDefinition, this);

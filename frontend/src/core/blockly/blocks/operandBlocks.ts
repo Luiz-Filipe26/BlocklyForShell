@@ -25,9 +25,14 @@ function createSingleOperandBlock(
         init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "operand",
-                operandName: operandDefinition.id,
-                operandType: operandDefinition.type,
-                relatedCommand: commandDefinition.shellCommand,
+                name: operandDefinition.id,
+                bindings: [
+                    {
+                        key: "value",
+                        source: "field",
+                        name: BlockIDs.FIELDS.VALUE,
+                    },
+                ],
             });
             appendOperandInputs(commandDefinition, operandDefinition, this);
 

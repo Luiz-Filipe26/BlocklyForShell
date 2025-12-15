@@ -1,17 +1,17 @@
 import * as Blockly from "blockly";
-import type { BlockSemanticData } from "@/types/ast";
+import type { SemanticData } from "@/types/ast";
 
-const semanticDataMap = new WeakMap<Blockly.Block, BlockSemanticData>();
+const semanticDataMap = new WeakMap<Blockly.Block, SemanticData>();
 
 export function setBlockSemanticData(
     block: Blockly.Block,
-    data: BlockSemanticData,
+    data: SemanticData,
 ): void {
     semanticDataMap.set(block, data);
 }
 
 export function getBlockSemanticData(
     block: Blockly.Block,
-): BlockSemanticData | undefined {
+): SemanticData | undefined {
     return semanticDataMap.get(block);
 }

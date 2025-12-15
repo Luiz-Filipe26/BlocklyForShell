@@ -1,6 +1,7 @@
 import * as Blockly from "blockly";
 import * as BlockIDs from "../constants/blockIds";
 import { PATH_CONSTANTS } from "../constants/pathConstants";
+import { setBlockSemanticData } from "../serialization/metadataManager";
 
 export function findScriptRoot(
     workspace: Blockly.WorkspaceSvg,
@@ -12,6 +13,17 @@ export function findScriptRoot(
 export function initSystemBlocks(): void {
     Blockly.Blocks[BlockIDs.ROOT_BLOCK_TYPE] = {
         init: function(this: Blockly.Block) {
+            setBlockSemanticData(this, {
+                nodeType: "script",
+                name: "script",
+                bindings: [
+                    {
+                        key: "commands",
+                        source: "input",
+                        name: BlockIDs.INPUTS.STACK,
+                    },
+                ],
+            });
             this.appendDummyInput()
                 .appendField(
                     new Blockly.FieldImage(

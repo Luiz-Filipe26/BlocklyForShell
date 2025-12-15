@@ -13,7 +13,19 @@ export function createOptionBlock(commandDefinition: CLI.CLICommand): void {
         init: function(this: Blockly.Block) {
             setBlockSemanticData(this, {
                 nodeType: "option",
-                relatedCommand: commandDefinition.shellCommand,
+                name: commandDefinition.shellCommand,
+                bindings: [
+                    {
+                        key: "flag",
+                        source: "field",
+                        name: BlockIDs.FIELDS.FLAG,
+                    },
+                    {
+                        key: "value",
+                        source: "field",
+                        name: BlockIDs.FIELDS.OPTION_ARG_VALUE,
+                    },
+                ],
             });
 
             appendOptionInputs(commandDefinition, this);

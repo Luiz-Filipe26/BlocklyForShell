@@ -76,7 +76,7 @@ function resolveBlockDisplayName(block: Blockly.Block): string {
         case "command":
         case "control":
         case "operator":
-            return `[${data.nodeType}] ${data.commandName}`;
+            return `[${data.nodeType}] ${data.name}`;
 
         case "option":
             const flag = block.getFieldValue(BlockIDs.FIELDS.FLAG) || "?";
@@ -84,7 +84,7 @@ function resolveBlockDisplayName(block: Blockly.Block): string {
 
         case "operand":
             const value = block.getFieldValue(BlockIDs.FIELDS.VALUE) || "";
-            return `[Operando: ${data.operandName}] "${value}"`;
+            return `[Operando: ${data.name}] "${value}"`;
 
         default:
             return block.type;

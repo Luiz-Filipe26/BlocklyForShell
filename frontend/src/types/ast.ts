@@ -1,3 +1,27 @@
+export type SemanticNodeKind =
+    | "script"
+    | "command"
+    | "option"
+    | "operand"
+    | "operator"
+    | "control";
+
+export interface SemanticBinding {
+    key: string;
+    source: "field" | "input";
+    name: string;
+}
+
+export interface SemanticData {
+    nodeType: SemanticNodeKind;
+    name: string;
+    bindings: SemanticBinding[];
+}
+
+export interface ScriptSemanticData extends SemanticData {
+    nodeType: "script";
+}
+
 export interface ASTField {
     name: string;
     value: string;
@@ -9,49 +33,12 @@ export interface ASTInput {
 }
 
 export interface ASTNode {
-    nodeType: string;
+    name: string;
     fields: ASTField[];
     inputs: ASTInput[];
-    semanticData?: Omit<BlockSemanticData, "nodeType">;
+    semanticData?: SemanticData;
 }
 
-export interface ScriptNode extends ASTNode {
-    nodeType: "script";
+export interface AST extends ASTNode {
+    semanticData: ScriptSemanticData
 }
-
-export type AST = ScriptNode;
-
-export interface BlockSemanticDataCommand {
-    nodeType: "command";
-    commandName: string;
-}
-
-export interface BlockSemanticDataOperand {
-    nodeType: "operand";
-    operandName: string;
-    operandType: string;
-    relatedCommand: string;
-}
-
-export interface BlockSemanticDataOption {
-    nodeType: "option";
-    relatedCommand: string;
-}
-
-export interface BlockSemanticDataControl {
-    nodeType: "control";
-    commandName: string;
-}
-
-export interface BlockSemanticDataOperator {
-    nodeType: "operator";
-    commandName: string;
-    slotsWithImplicitData?: string[];
-}
-
-export type BlockSemanticData =
-    | BlockSemanticDataCommand
-    | BlockSemanticDataOperand
-    | BlockSemanticDataOption
-    | BlockSemanticDataControl
-    | BlockSemanticDataOperator;

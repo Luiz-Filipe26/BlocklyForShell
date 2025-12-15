@@ -7,13 +7,24 @@ import { validateOperatorIntegrity } from "../validation/cardinalityValidator";
 import { renderBlockWarnings } from "../validation/validationWarnings";
 import { addLocalChangeListener } from "../events/blockEventListeners";
 
+const operatorDefinitionByBlockType = new Map<string, CLI.CLIOperator>();
+
 export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
+    operatorDefinitionByBlockType.set(
+        BlockIDs.operatorBlockType(operatorDefinition),
+        operatorDefinition,
+    );
+
     Blockly.Blocks[BlockIDs.operatorBlockType(operatorDefinition)] = {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "operator",
-                commandName: operatorDefinition.id,
-                slotsWithImplicitData: operatorDefinition.slotsWithImplicitData,
+                name: operatorDefinition.id,
+                bindings: operatorDefinition.slots.map((slot) => ({
+                    key: slot.name,
+                    source: "input",
+                    name: slot.name,
+                })),
             });
 
             this.setInputsInline(true);
@@ -24,6 +35,12 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
             setupOperatorValidation(operatorDefinition, this);
         },
     };
+}
+
+export function getOperatorDefinition(
+    blockType: string,
+): CLI.CLIOperator | undefined {
+    return operatorDefinitionByBlockType.get(blockType);
 }
 
 function appendOperatorHeader(

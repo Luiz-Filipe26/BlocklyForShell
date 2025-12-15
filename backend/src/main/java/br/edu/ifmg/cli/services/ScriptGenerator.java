@@ -1,230 +1,197 @@
 package br.edu.ifmg.cli.services;
 
-import br.edu.ifmg.cli.models.AstNode;
-import br.edu.ifmg.cli.models.CliDefinitions;
-import br.edu.ifmg.cli.models.CliDefinitions.ControlDef;
-import br.edu.ifmg.cli.models.CliDefinitions.OperatorDef;
-import br.edu.ifmg.cli.models.CliDefinitions.SlotDef;
-import com.google.gson.Gson;
+import br.edu.ifmg.cli.models.ast.AstNode;
+import br.edu.ifmg.cli.models.ast.SemanticBinding;
+import org.springframework.stereotype.Service;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 public class ScriptGenerator {
 
-	private final Map<String, OperatorDef> operatorsMap;
-	private final Map<String, ControlDef> controlsMap;
-
-	public ScriptGenerator() {
-		try (var stream = getClass().getResourceAsStream("/definitions/cli_definitions.json")) {
-			if (stream == null)
-				throw new RuntimeException("cli_definitions.json não encontrado!");
-
-			var reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-			CliDefinitions defs = new Gson().fromJson(reader, CliDefinitions.class);
-
-			this.operatorsMap = defs.getOperatorsMap() != null ? Map.copyOf(defs.getOperatorsMap()) : Map.of();
-			this.controlsMap = defs.getControlsMap() != null ? Map.copyOf(defs.getControlsMap()) : Map.of();
-
-		} catch (Exception e) {
-			throw new RuntimeException("Falha ao inicializar ScriptGenerator com definições", e);
-		}
-	}
-
 	public String generate(AstNode rootNode) {
-		if (rootNode == null) {
-			throw new IllegalArgumentException("AST nula passada ao ScriptGenerator.");
-		}
+		if (rootNode == null)
+			throw new IllegalArgumentException("AST não pode ser nula");
 
-		StringBuilder sb = new StringBuilder();
-		List<AstNode> commands = rootNode.getChildren("commands");
+		// A raiz é um script_node, buscamos seus filhos lógicos "commands"
+		// Note que "commands" é a KEY do binding no ast.ts, não o nome do input
+		List<AstNode> commandNodes = extractChildren(rootNode, "commands");
 
-		for (AstNode node : commands) {
-			String code = dispatch(node);
-			if (code != null && !code.isBlank()) {
-				sb.append(code.trim()).append("\n");
-			}
-		}
-
-		return sb.toString().trim();
+		return commandNodes.stream().map(this::dispatch).filter(s -> !s.isBlank()).collect(Collectors.joining("\n"));
 	}
 
 	private String dispatch(AstNode node) {
-		if (node == null)
+		if (node == null || node.semanticData() == null)
 			return "";
 
-		return switch (node.getType()) {
-		case "command" -> generateSimpleCommand(node);
+		String kind = node.semanticData().kind();
+
+		return switch (kind) {
+		case "command" -> generateCommand(node);
 		case "control" -> generateControl(node);
 		case "operator" -> generateOperator(node);
-		default -> throw new IllegalArgumentException("Tipo desconhecido na AST: " + node.getType());
+		// Options e Operands são consumidos pelos pais, não geram código sozinhos aqui
+		default -> "";
 		};
 	}
 
-	private String generateSimpleCommand(AstNode node) {
-		var sem = node.semanticData();
-		if (sem == null || sem.commandName() == null || sem.commandName().isBlank()) {
-			throw new IllegalArgumentException("Comando sem semanticData válido.");
-		}
-
+	// --- 1. COMANDOS (100% Dinâmico via AST) ---
+	private String generateCommand(AstNode node) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(sem.commandName());
 
-		for (AstNode opt : node.getChildren("OPTIONS")) {
-			String flag = opt.getField("FLAG").orElse("").trim();
-			if (flag.isEmpty())
-				continue;
-			sb.append(" ").append(flag);
-			opt.getField("OPTION_ARG_VALUE").ifPresent(argValue -> {
-				if (!argValue.isBlank()) {
-					sb.append(" ").append(quoteArgument(argValue));
+		// Nome do comando vem do semantic data (ex: "ls", "grep")
+		sb.append(node.semanticData().name());
+
+		// Processa Opções
+		List<AstNode> options = extractChildren(node, "options");
+		for (AstNode opt : options) {
+			String flag = extractValue(opt, "flag");
+			String arg = extractValue(opt, "argument"); // Chave 'argument' conforme seu último ast.ts
+
+			if (flag != null && !flag.isBlank()) {
+				sb.append(" ").append(flag);
+				if (arg != null && !arg.isBlank()) {
+					sb.append(" ").append(quoteArgument(arg));
 				}
-			});
+			}
 		}
 
-		for (AstNode op : node.getChildren("OPERANDS")) {
-			String value = op.getField("VALUE").orElse("");
-			if (!value.isEmpty()) {
-				sb.append(" ").append(quoteArgument(value));
+		// Processa Operandos
+		List<AstNode> operands = extractChildren(node, "operands");
+		for (AstNode op : operands) {
+			String val = extractValue(op, "value");
+			if (val != null && !val.isBlank()) {
+				sb.append(" ").append(quoteArgument(val));
 			}
 		}
 
 		return sb.toString();
 	}
 
+	// --- 2. OPERADORES (Estático - Sintaxe Bash) ---
 	private String generateOperator(AstNode node) {
-		var sem = node.semanticData();
-		if (sem == null || sem.commandName() == null || sem.commandName().isBlank()) {
-			throw new IllegalArgumentException("Operador sem semanticData válido.");
-		}
+		String opName = node.semanticData().name();
+		String symbol = getBashOperatorSymbol(opName);
 
-		String opId = sem.commandName();
-		OperatorDef def = operatorsMap.get(opId);
-		if (def == null)
-			throw new IllegalStateException("Operador não encontrado: " + opId);
+		// Assume que operadores binários têm slots A e B (ou genéricos)
+		// Itera sobre os bindings na ordem que vieram do front
+		List<String> parts = new ArrayList<>();
 
-		var slotContents = def.slots() == null ? List.<SlotPair>of()
-				: def.slots().stream().map(slot -> new SlotPair(slot, resolveSlotContent(node, slot.name())))
-						.collect(Collectors.toList());
+		for (SemanticBinding binding : node.semanticData().bindings()) {
+			List<AstNode> children = extractChildren(node, binding.key());
 
-		StringBuilder sb = new StringBuilder();
-		boolean first = true;
+			String slotCode = children.stream().map(this::dispatch).collect(Collectors.joining("\n"));
 
-		for (SlotPair sp : slotContents) {
-			String child = sp.content().trim();
-			if (child.isEmpty())
-				continue;
-
-			if (child.contains("\n")) {
-				child = "(" + indentMultiline(child) + ")";
-			}
-
-			SlotDef slot = sp.slot();
-
-			if (first) {
-				sb.append(child);
-				first = false;
-				if (slot.symbol() != null && "after".equals(slot.symbolPlacement())) {
-					sb.append(" ").append(slot.symbol()).append(" ");
-				}
-				continue;
-			}
-
-			if (slot.symbol() != null && "before".equals(slot.symbolPlacement())) {
-				sb.append(" ").append(slot.symbol()).append(" ").append(child);
-			} else if (slot.symbol() != null && "after".equals(slot.symbolPlacement())) {
-				sb.append(" ").append(child).append(" ").append(slot.symbol());
-			} else {
-				sb.append(" ").append(child);
+			if (!slotCode.isBlank()) {
+				// Se for multiline, coloca parênteses (subshell visual) para não quebrar
+				// sintaxe
+				if (slotCode.contains("\n"))
+					slotCode = "(" + indent(slotCode) + ")";
+				parts.add(slotCode);
 			}
 		}
 
-		return sb.toString().trim();
+		// Monta: Parte1 [SYMBOL] Parte2 [SYMBOL] Parte3...
+		return String.join(" " + symbol + " ", parts);
 	}
 
+	// --- 3. CONTROLES (Estático - Sintaxe Bash) ---
 	private String generateControl(AstNode node) {
-		var sem = node.semanticData();
-		if (sem == null || sem.commandName() == null || sem.commandName().isBlank()) {
-			throw new IllegalArgumentException("Control sem semanticData válido.");
-		}
+		String controlName = node.semanticData().name();
 
-		String controlId = sem.commandName();
-		ControlDef def = controlsMap.get(controlId);
-		if (def == null)
-			throw new IllegalStateException("Controle não encontrado: " + controlId);
+		// Aqui reside o conhecimento da sintaxe do Bash
+		if ("if".equals(controlName)) {
+			String cond = extractSlotCode(node, "CONDITION");
+			String body = extractSlotCode(node, "DO");
+			String elseBody = extractSlotCode(node, "ELSE");
 
-		StringBuilder sb = new StringBuilder();
-		sb.append(def.shellCommand());
-
-		List<SlotDef> slots = def.slots() == null ? List.of() : def.slots();
-
-		boolean firstSlot = true;
-
-		for (SlotDef slot : slots) {
-			String slotContent = resolveSlotContent(node, slot.name()).trim();
-			if (slotContent.isEmpty())
-				continue;
-
-			// Primeiro slot: testa condição
-			if (firstSlot) {
-				sb.append(" ");
-
-				if (slotContent.contains("\n")) {
-					slotContent = "(" + indentMultiline(slotContent) + ")";
-				}
-
-				sb.append(slotContent);
-
-				if (slot.syntaxPrefix() != null && !slot.syntaxPrefix().isBlank()) {
-					sb.append(" ; ").append(slot.syntaxPrefix().trim());
-				}
-
-				sb.append("\n");
-				firstSlot = false;
-				continue;
+			StringBuilder sb = new StringBuilder();
+			sb.append("if ").append(cond).append("; then\n");
+			sb.append(indent(body)).append("\n");
+			if (!elseBody.isBlank()) {
+				sb.append("else\n").append(indent(elseBody)).append("\n");
 			}
-
-			// Demais blocos (then, else, do, etc.)
-			if (slot.syntaxPrefix() != null && !slot.syntaxPrefix().isBlank()) {
-				sb.append(slot.syntaxPrefix().trim()).append("\n");
-			}
-
-			sb.append(indentMultiline(slotContent));
-			sb.append("\n");
+			sb.append("fi");
+			return sb.toString();
 		}
 
-		if (def.syntaxEnd() != null && !def.syntaxEnd().isBlank()) {
-			sb.append(def.syntaxEnd());
+		if ("while".equals(controlName)) {
+			String cond = extractSlotCode(node, "CONDITION");
+			String body = extractSlotCode(node, "DO");
+			return "while " + cond + "; do\n" + indent(body) + "\ndone";
 		}
 
-		return sb.toString().trim();
+		if ("for_files".equals(controlName)) { // Exemplo: for x in *.txt
+			String variable = extractValue(node, "VAR_NAME"); // Se você tiver campos no controle
+			String pattern = extractValue(node, "PATTERN");
+			String body = extractSlotCode(node, "DO");
+			// Fallbacks seguros se não vier do front
+			variable = variable != null ? variable : "i";
+			pattern = pattern != null ? pattern : "*";
+
+			return "for " + variable + " in " + pattern + "; do\n" + indent(body) + "\ndone";
+		}
+
+		return "";
 	}
 
-	private record SlotPair(SlotDef slot, String content) {
+	// --- AUXILIARES E "Dicionário Bash" ---
+
+	private String getBashOperatorSymbol(String opSemanticName) {
+		return switch (opSemanticName) {
+		case "pipe" -> "|";
+		case "redirect_stdout" -> ">";
+		case "redirect_append" -> ">>";
+		case "redirect_stdin" -> "<";
+		case "and" -> "&&";
+		case "or" -> "||";
+		case "semicolon" -> ";";
+		default -> " ";
+		};
 	}
 
-	private String resolveSlotContent(AstNode parent, String slotName) {
-		StringBuilder sb = new StringBuilder();
-		List<AstNode> children = parent.getChildren(slotName);
-		for (AstNode child : children) {
-			String code = dispatch(child);
-			if (code != null && !code.isBlank()) {
-				sb.append(code.trim()).append("\n");
+	// --- ENGINE DE EXTRAÇÃO (AST DRIVEN) ---
+
+	private String extractValue(AstNode node, String roleKey) {
+		if (node.semanticData() == null)
+			return null;
+
+		return node.semanticData().bindings().stream().filter(b -> b.key().equals(roleKey)).findFirst()
+				.flatMap(binding -> {
+					if ("field".equals(binding.source())) {
+						return node.getRawFieldValue(binding.name());
+					}
+					return java.util.Optional.empty();
+				}).orElse(null);
+	}
+
+	private List<AstNode> extractChildren(AstNode node, String roleKey) {
+		if (node.semanticData() == null)
+			return Collections.emptyList();
+
+		return node.semanticData().bindings().stream().filter(b -> b.key().equals(roleKey)).findFirst().map(binding -> {
+			if ("input".equals(binding.source())) {
+				return node.getRawInputChildren(binding.name());
 			}
-		}
-		return sb.toString().trim();
+			return Collections.<AstNode>emptyList();
+		}).orElse(Collections.emptyList());
 	}
 
-	private static String quoteArgument(String rawInput) {
-		if (rawInput == null || rawInput.isEmpty())
+	private String extractSlotCode(AstNode node, String roleKey) {
+		List<AstNode> children = extractChildren(node, roleKey);
+		return children.stream().map(this::dispatch).collect(Collectors.joining("\n"));
+	}
+
+	private String quoteArgument(String raw) {
+		if (raw == null || raw.isEmpty())
 			return "''";
-		return "'" + rawInput.replace("'", "'\\''") + "'";
+		// Aspas simples são as mais seguras no Bash, escapando a própria aspa simples
+		return "'" + raw.replace("'", "'\\''") + "'";
 	}
 
-	private static String indentMultiline(String s) {
-		return List.of(s.split("\n")).stream().map(line -> "  " + line).collect(Collectors.joining("\n"));
+	private String indent(String code) {
+		return code.lines().map(l -> "  " + l).collect(Collectors.joining("\n"));
 	}
 }

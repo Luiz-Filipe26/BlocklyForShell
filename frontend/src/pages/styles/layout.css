@@ -51,10 +51,12 @@
 }
 
 .btn-tool {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
     height: 32px;
+
+    align-items: center;
+    gap: 8px;
 
     background-color: #fff;
     border: 1px solid #ced4da;
@@ -68,6 +70,14 @@
     white-space: nowrap;
 
     transition: all 0.2s ease;
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
 }
 
 .btn-tool:hover {

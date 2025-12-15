@@ -48,7 +48,7 @@ export function uploadScript(workspace: Blockly.WorkspaceSvg): void {
             showToast(workspace, "Script carregado com sucesso!");
         } catch (error) {
             const message = "Arquivo de script inválido.";
-            showToast(workspace, "❌ " + message);
+            showToast(workspace, message, LogLevel.ERROR);
             Logger.log(message, LogLevel.ERROR);
         }
     });
@@ -106,7 +106,7 @@ export async function resetToFactorySettings(
         );
     } catch (error) {
         const message = `Erro ao resetar fábrica: ${error}`;
-        showToast(workspace, "❌ " + message);
+        showToast(workspace, message, LogLevel.ERROR);
         Logger.log(message, LogLevel.ERROR);
     }
 }

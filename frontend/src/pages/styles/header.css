@@ -17,14 +17,33 @@
     height: var(--header-brand-height);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+}
+
+.header-brand .logo-area {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.brand-divider {
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 300;
+}
+
+.brand-tagline {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.3px;
 }
 
 .header-brand h1 {
-    font-size: 1rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin: 0;
+    line-height: 1;
 }
 
 .header-context {
@@ -89,7 +108,7 @@
 }
 
 .btn-details-toggle {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -132,4 +151,21 @@
 .app-header.is-expanded .btn-details-toggle {
     background-color: var(--color-accent);
     color: white;
+}
+
+.app-header.is-expanded .btn-details-toggle .btn-icon {
+    transform: rotate(180deg);
+}
+
+.btn-details-toggle .btn-icon {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 600px) {
+    .brand-divider,
+    .brand-tagline {
+        display: none;
+    }
 }

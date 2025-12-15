@@ -30,6 +30,20 @@
     font-size: 1.2rem;
 }
 
+.modal-title {
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header .icon-inline {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
 .modal-body {
     padding: 20px;
     background-color: #fff;

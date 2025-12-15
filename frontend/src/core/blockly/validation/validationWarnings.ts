@@ -34,15 +34,15 @@ export function renderBlockWarnings(block: Blockly.Block): void {
     );
 
     if (cardSpecificOperands.length > 0) {
-        lines.push("🔴 Faltam operandos específicos:");
+        lines.push("- Faltam operandos específicos:");
         cardSpecificOperands.forEach((error) => {
             const cleanMsg = error.message.replace("Falta operando: ", "");
             lines.push(`    • ${cleanMsg}`);
         });
     }
 
-    if (cardMinOperands) lines.push(`🔴 ${cardMinOperands.message}`);
-    if (cardMinOptions) lines.push(`🔴 ${cardMinOptions.message}`);
+    if (cardMinOperands) lines.push(`- ${cardMinOperands.message}`);
+    if (cardMinOptions) lines.push(`- ${cardMinOptions.message}`);
 
     const otherErrors = errors.filter(
         (error) =>
@@ -55,7 +55,7 @@ export function renderBlockWarnings(block: Blockly.Block): void {
         if (lines.length > 0) lines.push("────────────────");
 
         otherErrors.forEach((error) => {
-            lines.push(`⚠️ ${error.message}`);
+            lines.push(`[ERRO] ${error.message}`);
         });
     }
 

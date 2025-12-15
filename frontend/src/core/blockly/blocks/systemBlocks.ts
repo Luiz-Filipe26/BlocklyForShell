@@ -1,5 +1,6 @@
 import * as Blockly from "blockly";
 import * as BlockIDs from "../constants/blockIds";
+import { PATH_CONSTANTS } from "../constants/pathConstants";
 
 export function findScriptRoot(
     workspace: Blockly.WorkspaceSvg,
@@ -11,7 +12,16 @@ export function findScriptRoot(
 export function initSystemBlocks(): void {
     Blockly.Blocks[BlockIDs.ROOT_BLOCK_TYPE] = {
         init: function(this: Blockly.Block) {
-            this.appendDummyInput().appendField("📜 Script Principal");
+            this.appendDummyInput()
+                .appendField(
+                    new Blockly.FieldImage(
+                        PATH_CONSTANTS.FILE_TEXT_WHITE_ICON,
+                        24,
+                        24,
+                        "",
+                    ),
+                )
+                .appendField("Script Principal");
             this.appendStatementInput(BlockIDs.INPUTS.STACK).setCheck(
                 BlockIDs.commandStatementType(),
             );

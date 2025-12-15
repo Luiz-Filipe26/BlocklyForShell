@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>ShellBlocks</title>
+        <title>ShellBlocks - Ambiente Interativo de Aprendizado CLI</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link href="./index.css" rel="stylesheet" />
         <script type="module" src="./index.ts"></script>
@@ -13,13 +13,15 @@
             <div class="header-brand">
                 <div class="logo-area">
                     <h1>ShellBlocks</h1>
+                    <span class="brand-divider">|</span>
+                    <span class="brand-tagline">Ambiente Interativo para Aprendizado de CLI</span>
                 </div>
             </div>
 
             <div class="header-context">
                 <div class="context-controls">
                     <div class="context-summary">
-                        <span class="info-icon">ℹ️</span>
+                        <img src="/icons/lucid/info.svg" class="icon-inline" alt="" />
                         <p id="level-summary-text" class="summary-text"></p>
                     </div>
 
@@ -31,7 +33,7 @@
 
                 <button id="header-toggle-btn" class="btn-details-toggle" title="Ler guia completo">
                     <span class="btn-label">Guia Completo</span>
-                    <span class="btn-icon">▼</span>
+                    <img src="/icons/lucid/chevron-down.svg" class="btn-icon" alt="" />
                 </button>
             </div>
 
@@ -46,25 +48,34 @@
             <div class="editor-column">
                 <div class="editor-toolbar">
                     <div class="toolbar-group">
-                        <button id="btn-save-script" class="btn-tool" title="Baixar script atual (.json)">💾 Salvar Script</button>
-                        <button id="btn-load-script" class="btn-tool" title="Carregar script (.json)">📂 Carregar Script</button>
+                        <button id="btn-save-script" class="btn-tool" title="Baixar script atual (.json)">
+                            <img src="/icons/lucid/save.svg" class="btn-icon" alt="" />
+                            Salvar Script
+                        </button>
+                        <button id="btn-load-script" class="btn-tool" title="Carregar script (.json)">
+                            <img src="/icons/lucid/folder-open.svg" class="btn-icon" alt="" />
+                            Carregar Script
+                        </button>
                     </div>
 
                     <span class="divider"></span>
 
                     <div class="toolbar-group">
                         <button id="btn-load-defs" class="btn-tool" title="Carregar novas definições (cli_definitions.json)">
-                            ⚙️ Carregar Definições
+                            <img src="/icons/lucid/settings.svg" class="btn-icon" alt="" />
+                            Carregar Definições
                         </button>
                         <button id="btn-load-game" class="btn-tool" title="Carregar novos níveis (game_data.json)">
-                            🎮 Carregar Níveis
+                            <img src="/icons/lucid/gamepad-2.svg" class="btn-icon" alt="" />
+                            Carregar Níveis
                         </button>
                     </div>
 
                     <span class="spacer"></span>
 
                     <button id="btn-reset-defs" class="btn-tool btn-tool-danger" title="Voltar para as configurações padrão de fábrica">
-                        ↺ Resetar Fábrica
+                        <img src="/icons/lucid/rotate-ccw.svg" class="btn-icon" alt="" />
+                        Resetar Fábrica
                     </button>
                 </div>
 
@@ -99,7 +110,14 @@
         <dialog id="validation-modal" class="validation-dialog">
             <div class="modal-content error-theme">
                 <div class="modal-header">
-                    <h2>⚠️ Correções Necessárias</h2>
+                    <h2 class="modal-title">
+                        <img
+                            src="/icons/lucid/triangle-alert.svg"
+                            class="icon-inline"
+                            style="vertical-align: middle; margin-right: 8px"
+                            alt="" />
+                        Correções Necessárias
+                    </h2>
                 </div>
                 <div class="modal-body">
                     <ul id="validation-error-list" class="validation-list"></ul>

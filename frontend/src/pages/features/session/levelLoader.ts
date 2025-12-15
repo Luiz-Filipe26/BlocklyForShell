@@ -48,7 +48,7 @@ function getSortedLevels(gameData: API.GameData): API.Level[] {
 function buildSandboxOption(): HTMLOptionElement {
     const option = document.createElement("option");
     option.value = "";
-    option.text = "🛠️ Modo Livre (Sandbox)";
+    option.text = "Modo Livre (Sandbox)";
 
     option.dataset.summary = "Ambiente livre sem objetivos.";
     option.dataset.details = "<h1>Modo Livre</h1><p>Use este espaço para testar comandos e blocos livremente.</p>";

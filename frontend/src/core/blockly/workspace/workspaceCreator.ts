@@ -169,6 +169,6 @@ function initCustomContextMenu(workspaceId: string): void {
                 createScriptRoot(workspace);
             }
         },
-        displayText: "🗑️ Limpar e Resetar",
+        displayText: "Limpar e Resetar",
     });
 }

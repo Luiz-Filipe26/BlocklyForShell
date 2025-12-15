@@ -136,9 +136,9 @@ function renderExecutionOutput(
 
     if (currentLevelId) {
         if (result.exitCode === 0) {
-            cliOutput.textContent += "✨ SUCESSO! Objetivo concluído. ✨\n";
+            cliOutput.textContent += "[SUCESSO] Objetivo concluído.\n";
         } else {
-            cliOutput.textContent += "⚠️ O objetivo não foi atingido.\n";
+            cliOutput.textContent += "[FALHA] O objetivo não foi atingido.\n";
         }
     } else if (result.exitCode !== 0) {
         cliOutput.textContent += `(Exit Code: ${result.exitCode})\n`;

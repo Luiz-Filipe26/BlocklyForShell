@@ -22,7 +22,7 @@ export function unplugDuplicatesFromList(
             block.unplug(true);
             const message = `Opção "${value}" removida por duplicata`;
             if (workspace) {
-                showToast(workspace, "⚠️ " + message);
+                showToast(workspace, message, LogLevel.WARN);
                 coreLog(workspace, message, LogLevel.WARN);
             }
             return;

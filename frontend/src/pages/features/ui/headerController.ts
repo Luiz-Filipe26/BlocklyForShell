@@ -1,17 +1,22 @@
+import { LogLevel } from "@/types/logger";
+import * as Logger from "./systemLogger";
+
 export function setupHeaderBehavior(
     headerRoot: HTMLElement,
     toggleBtn: HTMLButtonElement,
 ): void {
+    const labelElement = toggleBtn.querySelector(".btn-label");
+
+    if (!labelElement) {
+        Logger.log(
+            "Erro: .btn-label não encontrado dentro do botão toggle.",
+            LogLevel.ERROR,
+        );
+        return;
+    }
+
     toggleBtn.addEventListener("click", () => {
         const isExpanded = headerRoot.classList.toggle("is-expanded");
-        if (isExpanded) {
-            toggleBtn.innerHTML = `<span class="btn-label">Fechar Guia</span> <span class="btn-icon">▲</span>`;
-            toggleBtn.style.backgroundColor = "#0066cc";
-            toggleBtn.style.color = "white";
-        } else {
-            toggleBtn.innerHTML = `<span class="btn-label">Guia Completo</span> <span class="btn-icon">▼</span>`;
-            toggleBtn.style.backgroundColor = "transparent";
-            toggleBtn.style.color = "#0066cc";
-        }
+        labelElement.textContent = isExpanded ? "Fechar Guia" : "Guia Completo";
     });
 }

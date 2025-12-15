@@ -14,37 +14,10 @@ import { setupHeaderBehavior } from "./features/ui/headerController";
 import { getDefinitions } from "./features/session/dataManager";
 import { LogLevel } from "@/types/logger";
 import { MAIN_WORKSPACE_ID } from "./features/constants/constants";
+import { getPageElements } from "./features/ui/DOMProvider";
 
-function queryRequired<T extends HTMLElement>(id: string): T {
-    const element = document.getElementById(id);
-    if (!element) throw new Error(`Elemento ausente no HTML: ${id}`);
-    return element as T;
-}
-
-const pageElements = {
-    blocklyArea: queryRequired<HTMLDivElement>("blockly-area"),
-    codeOutput: queryRequired<HTMLPreElement>("code-output"),
-    cliOutput: queryRequired<HTMLPreElement>("cli-output"),
-    runBtn: queryRequired<HTMLButtonElement>("run-btn"),
-    clearBtn: queryRequired<HTMLButtonElement>("clear-btn"),
-    headerRoot: queryRequired<HTMLElement>("app-header"),
-    headerToggleBtn: queryRequired<HTMLButtonElement>("header-toggle-btn"),
-    levelSelect: queryRequired<HTMLSelectElement>("level-select"),
-    levelSummaryText: queryRequired<HTMLElement>("level-summary-text"),
-    levelFullDetails: queryRequired<HTMLElement>("level-full-details"),
-    levelDescription: queryRequired<HTMLDivElement>("level-full-details"),
-    validationModal: queryRequired<HTMLDialogElement>("validation-modal"),
-    validationErrorList: queryRequired<HTMLUListElement>(
-        "validation-error-list",
-    ),
-    closeModalBtn: queryRequired<HTMLButtonElement>("close-modal-btn"),
-    systemLogContainer: queryRequired<HTMLDivElement>("system-log-container"),
-    btnSaveScript: queryRequired<HTMLButtonElement>("btn-save-script"),
-    btnLoadScript: queryRequired<HTMLButtonElement>("btn-load-script"),
-    btnLoadDefs: queryRequired<HTMLButtonElement>("btn-load-defs"),
-    btnLoadGame: queryRequired<HTMLButtonElement>("btn-load-game"),
-    btnResetDefs: queryRequired<HTMLButtonElement>("btn-reset-defs"),
-};
+const pageElements = getPageElements();
+start();
 
 async function start(): Promise<void> {
     const definitions = await getDefinitions();
@@ -64,7 +37,7 @@ async function start(): Promise<void> {
         return;
     }
 
-    setupHeaderBehavior(pageElements.headerRoot, pageElements.headerToggleBtn);
+    setupHeaderBehavior(pageElements.appHeader, pageElements.headerToggleBtn);
 
     await setupLevelSelector(
         pageElements.levelSelect,
@@ -131,5 +104,3 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
         });
     });
 }
-
-start();

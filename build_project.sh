@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Aborta o script se algum comando falhar
 set -e
 
 echo "--- [1/3] Construindo o Frontend ---"
@@ -10,34 +9,32 @@ npm run build --silent
 cd ..
 
 echo "--- [2/3] Integrando Frontend ao Backend ---"
-# Limpa e recria a pasta de estáticos no Java
 rm -rf backend/src/main/resources/public
 mkdir -p backend/src/main/resources/public
-# Copia o build do Vite para lá
 cp -r frontend/dist/* backend/src/main/resources/public/
 
 echo "--- [3/3] Compilando e Gerando JAR ---"
 cd backend
 mvn -B clean package
 
-# 1. Identifica o arquivo gerado DENTRO da pasta target antes de copiar
-# O 'grep -v' ignora o arquivo 'original-*.jar' (que não tem as dependências)
 JAR_PATH=$(ls target/*.jar | grep -v "original-" | head -n 1)
 JAR_FILE=$(basename "$JAR_PATH")
 
 cd ..
 
-# 2. Copia o arquivo identificado para a raiz
 cp "backend/$JAR_PATH" .
 chmod +x "$JAR_FILE"
 
-echo "GENERATED_JAR_NAME=$JAR_FILE" >> $GITHUB_ENV
+if [ -n "$GITHUB_ENV" ]; then
+    echo "GENERATED_JAR_NAME=$JAR_FILE" >> "$GITHUB_ENV"
+    echo "⚙️ Enviando nome do JAR para o ambiente do GitHub Actions."
+fi
 
 echo ""
 echo "✅ SUCESSO!"
 echo "------------------------------------------------------"
 echo "O executável foi gerado na raiz do projeto:"
-echo "👉 ./$JAR_FILE"
+echo "> ./$JAR_FILE"
 echo "------------------------------------------------------"
 echo "Para rodar, apenas digite:"
 echo "java -jar $JAR_FILE"

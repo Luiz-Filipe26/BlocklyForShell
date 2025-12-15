@@ -18,7 +18,7 @@ public class DockerService {
 	private static final Logger logger = LoggerFactory.getLogger(DockerService.class);
 
 	public void ensureImageExists() {
-        logger.info("🐳 [DockerService] Verificando ambiente...");
+        logger.info("[DockerService] Verificando ambiente...");
 
         try {
             if (!checkDockerBinary()) return;
@@ -27,7 +27,7 @@ public class DockerService {
             buildImage();
 
         } catch (Exception e) {
-            logger.error("❌ [DockerService] Erro crítico não tratado: ", e);
+            logger.error("[DockerService] Erro crítico não tratado: ", e);
         }
     }
 
@@ -35,12 +35,12 @@ public class DockerService {
         try {
             int exitCode = new ProcessBuilder("docker", "--version").start().waitFor();
             if (exitCode != 0) {
-                logger.error("❌ [DockerService] 'docker --version' retornou erro. O Docker está instalado?");
+                logger.error("[DockerService] 'docker --version' retornou erro. O Docker está instalado?");
                 return false;
             }
             return true;
         } catch (Exception e) {
-            logger.error("❌ [DockerService] Não foi possível encontrar o binário 'docker' no PATH.");
+            logger.error("[DockerService] Não foi possível encontrar o binário 'docker' no PATH.");
             return false;
         }
     }
@@ -49,14 +49,14 @@ public class DockerService {
         try {
             int exitCode = new ProcessBuilder("docker", "ps").start().waitFor();
             if (exitCode != 0) {
-                logger.error("❌ [DockerService] Permissão negada ao acessar o Docker Daemon.");
+                logger.error("[DockerService] Permissão negada ao acessar o Docker Daemon.");
                 logger.error("   -> Execute: sudo usermod -aG docker $USER");
                 logger.error("   -> Depois faça Logout/Login.");
                 return false;
             }
             return true;
         } catch (Exception e) {
-            logger.error("❌ [DockerService] Erro ao verificar permissões: ", e);
+            logger.error("[DockerService] Erro ao verificar permissões: ", e);
             return false;
         }
     }
@@ -64,7 +64,7 @@ public class DockerService {
     private void buildImage() throws Exception {
         Path tempDir = Files.createTempDirectory("blockly_docker_build");
         try {
-            logger.info("🔨 [DockerService] Iniciando build da imagem '{}'...", IMAGE_NAME);
+            logger.info("[DockerService] Iniciando build da imagem '{}'...", IMAGE_NAME);
 
             extractResource(DOCKERFILE_RESOURCE, tempDir.resolve("Dockerfile"));
 
@@ -79,9 +79,9 @@ public class DockerService {
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
-                logger.info("✅ [DockerService] Imagem pronta com sucesso!");
+                logger.info("[DockerService] Imagem pronta com sucesso!");
             } else {
-                logger.error("❌ [DockerService] Falha no 'docker build'. Código de saída: {}", exitCode);
+                logger.error("[DockerService] Falha no 'docker build'. Código de saída: {}", exitCode);
             }
 
         } finally {

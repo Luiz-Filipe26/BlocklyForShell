@@ -30,15 +30,15 @@ public class App {
 		Optional<ServerConfig> optionalConfig = loadConfiguration();
 
 		if (optionalConfig.isEmpty()) {
-			logger.error("❌ ERRO FATAL: Inicialização abortada devido a falha na configuração.");
-			logger.error("👉 Verifique se o arquivo 'application.properties' existe e está correto.");
+			logger.error("[FATAL] Inicialização abortada devido a falha na configuração.");
+			logger.error("[AÇÃO] Verifique se o arquivo 'application.properties' existe e está correto.");
 			return;
 		}
 
 		ServerConfig config = optionalConfig.get();
 
 		try {
-			logger.info("✅ Configuração carregada.");
+			logger.info("Configuração carregada com sucesso.");
 			logger.info("   Porta: {}", config.port());
 			logger.info("   Ambiente DEV (CORS): {}", config.devFrontendUrl());
 			window.setWebAppUrl("http://localhost:" + config.port());
@@ -48,7 +48,7 @@ public class App {
 			window.enableBrowserButton();
 
 		} catch (Exception e) {
-			logger.error("❌ ERRO FATAL NA INICIALIZAÇÃO");
+			logger.error("[FATAL] Erro na inicialização.");
 			logger.error("Motivo: {}", e.getMessage());
 
 			if (e.getCause() != null) {
@@ -61,7 +61,7 @@ public class App {
 		try (InputStream input = App.class.getClassLoader().getResourceAsStream("application.properties")) {
 
 			if (input == null) {
-				logger.error("❌ Arquivo 'application.properties' não encontrado no classpath.");
+				logger.error("Arquivo 'application.properties' não encontrado no classpath.");
 				return Optional.empty();
 			}
 
@@ -72,11 +72,11 @@ public class App {
 			String devFrontEndUrl = properties.getProperty("server.dev.frontend-url");
 
 			if (portString == null || portString.isBlank()) {
-				logger.error("❌ Chave 'server.port' ausente em application.properties.");
+				logger.error("Chave 'server.port' ausente em application.properties.");
 				return Optional.empty();
 			}
 			if (devFrontEndUrl == null || devFrontEndUrl.isBlank()) {
-				logger.error("❌ Chave 'server.dev.frontend-url' ausente em application.properties.");
+				logger.error("Chave 'server.dev.frontend-url' ausente em application.properties.");
 				return Optional.empty();
 			}
 
@@ -84,10 +84,10 @@ public class App {
 			return Optional.of(new ServerConfig(port, devFrontEndUrl));
 
 		} catch (NumberFormatException e) {
-			logger.error("❌ 'server.port' não é um número válido.");
+			logger.error("'server.port' não é um número válido.");
 			return Optional.empty();
 		} catch (Exception e) {
-			logger.error("❌ Falha de I/O ao ler application.properties: {}", e.getMessage());
+			logger.error("Falha de I/O ao ler application.properties: {}", e.getMessage());
 			return Optional.empty();
 		}
 	}

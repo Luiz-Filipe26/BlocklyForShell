@@ -19,7 +19,7 @@ export function showToast(
         logLevel === LogLevel.WARN
             ? PATH_CONSTANTS.TRIANGLE_ALERT_YELLOW
             : logLevel === LogLevel.ERROR
-                ? PATH_CONSTANTS.OCTAGON_X_ICON
+                ? PATH_CONSTANTS.OCTAGON_X_RED
                 : "";
     if (iconPath)
         iconHtml = `<img src="${iconPath}" class="toast-icon" alt="${logLevel} icon" />`;

@@ -16,10 +16,10 @@ export function showToast(
 
     let iconHtml = "";
     const iconPath =
-        logLevel === LogLevel.ERROR
+        logLevel === LogLevel.WARN
             ? PATH_CONSTANTS.TRIANGLE_ALERT_YELLOW
-            : logLevel === LogLevel.WARN
-                ? PATH_CONSTANTS.OCTAGON_X_RED
+            : logLevel === LogLevel.ERROR
+                ? PATH_CONSTANTS.OCTAGON_X_ICON
                 : "";
     if (iconPath)
         iconHtml = `<img src="${iconPath}" class="toast-icon" alt="${logLevel} icon" />`;

@@ -1,4 +1,6 @@
 {
+  "$schema": "./cli_schema.json",
+  
   "commands": [
     {
       "id": "ls",

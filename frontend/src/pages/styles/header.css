@@ -1,29 +1,20 @@
-:root {
-    --header-brand-bg: #004c99;
-    --header-bg: #ffffff;
-    --header-border: #cccccc;
-    --accent-color: #0066cc;
-    --text-color: #333;
-    --header-collapsed-height: 100px;
-}
-
 .app-header {
     display: flex;
     flex-direction: column;
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--header-border);
+    background: white;
+    border-bottom: 1px solid var(--color-border-default);
     height: auto;
-    min-height: var(--header-collapsed-height);
+    min-height: var(--header-height-collapsed);
     flex-shrink: 0;
     z-index: 20;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .header-brand {
-    background-color: var(--header-brand-bg);
+    background-color: var(--color-brand-primary);
     color: white;
     padding: 0 20px;
-    height: 40px;
+    height: var(--header-brand-height);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,10 +33,10 @@
     justify-content: flex-end;
 
     padding: 15px 20px;
-    height: 60px;
+    height: var(--header-context-height);
     gap: 20px;
 
-    border: 2px solid var(--header-border);
+    border: 2px solid var(--color-border-default);
     background-color: #e9ecef;
 }
 
@@ -65,7 +56,7 @@
 
 .level-select {
     padding: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-default);
     border-radius: 4px;
     min-width: 200px;
     background-color: #fff;
@@ -85,7 +76,7 @@
 }
 
 .context-summary .info-icon {
-    color: var(--accent-color);
+    color: var(--color-accent);
     font-size: 1.2rem;
     flex-shrink: 0;
 }
@@ -104,8 +95,8 @@
     gap: 8px;
     padding: 8px 16px;
     background: transparent;
-    border: 1px solid var(--accent-color);
-    color: var(--accent-color);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
     border-radius: 4px;
     cursor: pointer;
     font-weight: 600;
@@ -122,44 +113,16 @@
 
 .header-details-panel {
     display: none;
-    background-color: #f8f9fa;
+    background-color: var(--color-background-panel);
     padding: 20px;
 }
 
 .details-content-wrapper {
-    max-width: 900px;
+    max-width: var(--level-details-max-width);
     margin: 0 auto;
     font-size: 1rem;
     line-height: 1.6;
     color: #212529;
-}
-
-.level-full-details h1 {
-    font-size: 1.6em;
-    margin: 0.67em 0;
-}
-
-.level-full-details h2 {
-    font-size: 1.4em;
-    margin: 0.75em 0;
-}
-
-.level-full-details h3 {
-    font-size: 1.2em;
-    margin: 0.83em 0;
-}
-
-.level-full-details h4 {
-    font-size: 1.1em;
-    margin: 1em 0;
-}
-
-.level-full-details>*:first-child {
-    margin-top: 0 !important;
-}
-
-.level-full-details>*:last-child {
-    margin-bottom: 0 !important;
 }
 
 .app-header.is-expanded .header-details-panel {
@@ -167,6 +130,6 @@
 }
 
 .app-header.is-expanded .btn-details-toggle {
-    background-color: var(--accent-color);
+    background-color: var(--color-accent);
     color: white;
 }

@@ -1,0 +1,18 @@
+.toast-message {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    padding: 8px 12px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    font-family: monospace;
+
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+}
+

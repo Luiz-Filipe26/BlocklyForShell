@@ -1,3 +1,4 @@
+import "./helpBalloon.css";
 import * as CLI from "@/types/cli";
 
 let currentHelpBalloon: HTMLDivElement | null = null;

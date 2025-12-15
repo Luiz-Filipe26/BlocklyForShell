@@ -1,0 +1,27 @@
+:root {
+    --header-brand-height: 40px;
+    --header-context-height: 60px;
+    --header-height-collapsed: calc(
+        var(--header-brand-height) + var(--header-context-height)
+    );
+
+    --sidebar-width: 400px;
+    --bottom-panel-height: 150px;
+
+    --level-details-max-width: 900px;
+
+    --color-background-app: #f0f2f5;
+    --color-background-panel: #f8f9fa;
+
+    --color-accent: #0066cc;
+    --color-brand-primary: #004c99;
+
+    --color-border-default: #ccc;
+    --color-border-soft: #eee;
+
+    --color-danger: #dc3545;
+    --color-danger-hover: #c82333;
+
+    --font-sans: Arial, Helvetica, sans-serif;
+    --font-mono: "SF Mono", "Consolas", "Liberation Mono", Menlo, monospace;
+}

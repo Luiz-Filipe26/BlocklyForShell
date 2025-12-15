@@ -1,0 +1,27 @@
+.level-full-details h1 {
+    font-size: 1.6em;
+    margin: 0.67em 0;
+}
+
+.level-full-details h2 {
+    font-size: 1.4em;
+    margin: 0.75em 0;
+}
+
+.level-full-details h3 {
+    font-size: 1.2em;
+    margin: 0.83em 0;
+}
+
+.level-full-details h4 {
+    font-size: 1.1em;
+    margin: 1em 0;
+}
+
+.level-full-details > *:first-child {
+    margin-top: 0;
+}
+
+.level-full-details > *:last-child {
+    margin-bottom: 0;
+}

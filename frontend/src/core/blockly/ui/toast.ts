@@ -1,3 +1,4 @@
+import "./toast.css"
 import * as Blockly from "blockly";
 
 export function showToast(

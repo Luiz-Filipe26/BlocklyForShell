@@ -6,7 +6,7 @@
 .main-layout {
     display: flex;
     flex-direction: row;
-    height: calc(100vh - var(--header-collapsed-height));
+    height: calc(100vh - var(--header-height-collapsed));
     flex-shrink: 0;
     overflow: hidden;
     position: relative;
@@ -23,7 +23,7 @@
 .blockly-workspace-area {
     flex: 1;
     position: relative;
-    border-right: 2px solid #ccc;
+    border-right: 2px solid var(--color-border-default);
 }
 
 .editor-toolbar {
@@ -33,9 +33,9 @@
     gap: 10px;
 
     padding: 0 15px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ccc;
-    border-right: 2px solid #ccc;
+    background-color: var(--color-background-panel);
+    border-bottom: 1px solid var(--color-border-default);
+    border-right: 2px solid var(--color-border-default);
 
     flex-shrink: 0;
     height: 50px;
@@ -84,7 +84,7 @@
 .divider {
     width: 1px;
     height: 24px;
-    background-color: #ccc;
+    background-color: var(--color-border-default);
     margin: 0 5px;
 }
 

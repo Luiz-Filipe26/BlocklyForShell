@@ -5,7 +5,7 @@ import br.edu.ifmg.cli.models.ast.SemanticBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.List; 
 import java.util.stream.Collectors;
 import java.util.Optional;
 

@@ -1,16 +1,10 @@
 import * as API from "@/types/api";
-import { serializeWorkspaceToAST } from "@/core/blockly/serialization/serializer";
-import {
-    BlockErrorReport,
-    getWorkspaceErrors,
-} from "@/core/blockly/validation/validationManager";
-import * as Logger from "../ui/systemLogger";
-import * as Blockly from "blockly";
-import { showToast } from "@/core/blockly/ui/toast";
-import { LogLevel } from "@/types/logger";
+import * as ShellBlocks from "shellblocks"
+import { executeWithTimeout } from "@/core/utils/async";
 import { AppConfig } from "@/config/appConfig";
 import { ApiRoutes } from "@/config/apiRoutes";
-import { executeWithTimeout } from "@/core/utils/async";
+import * as Logger from "../ui/systemLogger";
+import * as Blockly from "blockly";
 
 interface RunDependencies {
     cliOutput: HTMLPreElement;
@@ -28,13 +22,13 @@ export async function runScript(
 ): Promise<void> {
     const { cliOutput, runBtn } = deps;
 
-    const clientErrors = getWorkspaceErrors(workspace);
+    const clientErrors = ShellBlocks.getWorkspaceErrors(workspace);
     if (clientErrors.length > 0) {
         showValidationModal(clientErrors, deps, workspace);
         return;
     }
 
-    const ast = serializeWorkspaceToAST(workspace);
+    const ast = ShellBlocks.serializeWorkspaceToAST(workspace);
     if (!ast) {
         cliOutput.textContent += " \n$";
         cliOutput.scrollTop = cliOutput.scrollHeight;
@@ -53,8 +47,8 @@ export async function runScript(
         renderExecutionOutput(result, cliOutput, currentLevelId);
     } catch (error) {
         const message = `Erro de Conexão: ${error}`;
-        showToast(workspace, message);
-        Logger.log(message, LogLevel.ERROR);
+        ShellBlocks.showToast(workspace, message);
+        Logger.log(message, ShellBlocks.LogLevel.ERROR);
         cliOutput.textContent += `[ERRO DE CONEXÃO]: ${error}\n$`;
     } finally {
         runBtn.disabled = false;
@@ -64,7 +58,7 @@ export async function runScript(
 }
 
 function showValidationModal(
-    errors: BlockErrorReport[],
+    errors: ShellBlocks.BlockErrorReport[],
     deps: RunDependencies,
     workspace: Blockly.WorkspaceSvg,
 ): void {

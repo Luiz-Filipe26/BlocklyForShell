@@ -1,5 +1,5 @@
 import * as Blockly from "blockly";
-import { LogLevel } from "@/types/logger";
+import * as ShellBlocks from "shellblocks"
 
 let logContainer: HTMLDivElement | null = null;
 let activeWorkspace: Blockly.WorkspaceSvg | null = null;
@@ -10,17 +10,17 @@ export function initSystemLogger(
 ): void {
     logContainer = container;
     activeWorkspace = workspace;
-    log("Logger do Sistema inicializado.", LogLevel.INFO);
+    log("Logger do Sistema inicializado.", ShellBlocks.LogLevel.INFO);
 }
 
 export function log(
     message: string,
-    level: LogLevel = LogLevel.INFO,
+    level: ShellBlocks.LogLevel = ShellBlocks.LogLevel.INFO,
 ): void {
     writeToPanel(message, level);
 }
 
-function writeToPanel(message: string, level: LogLevel): void {
+function writeToPanel(message: string, level: ShellBlocks.LogLevel): void {
     if (!logContainer) return;
 
     const entry = document.createElement("div");

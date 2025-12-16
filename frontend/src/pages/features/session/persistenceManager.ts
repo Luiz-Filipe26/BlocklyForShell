@@ -1,11 +1,8 @@
 import * as Blockly from "blockly";
+import * as ShellBlocks from "shellblocks"
 import * as Logger from "../ui/systemLogger";
-import * as CLI from "@/types/cli";
 import * as API from "@/types/api";
 import * as DataManager from "../session/dataManager";
-import { refreshWorkspaceDefinitions } from "@/core/blockly/workspace/workspaceCreator";
-import { showToast } from "@/core/blockly/ui/toast";
-import { LogLevel } from "@/types/logger";
 
 /**
  * Baixa o workspace atual como arquivo JSON.
@@ -26,9 +23,9 @@ export function downloadScript(workspace: Blockly.WorkspaceSvg): void {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        showToast(workspace, "Script baixado com sucesso.");
+        ShellBlocks.showToast(workspace, "Script baixado com sucesso.");
     } catch (error) {
-        Logger.log(`Erro ao salvar script: ${error}`, LogLevel.ERROR);
+        Logger.log(`Erro ao salvar script: ${error}`, ShellBlocks.LogLevel.ERROR);
     }
 }
 
@@ -45,11 +42,11 @@ export function uploadScript(workspace: Blockly.WorkspaceSvg): void {
             Blockly.serialization.workspaces.load(state, workspace);
             Blockly.Events.enable();
 
-            showToast(workspace, "Script carregado com sucesso!");
+            ShellBlocks.showToast(workspace, "Script carregado com sucesso!");
         } catch (error) {
             const message = "Arquivo de script inválido.";
-            showToast(workspace, message, LogLevel.ERROR);
-            Logger.log(message, LogLevel.ERROR);
+            ShellBlocks.showToast(workspace, message, ShellBlocks.LogLevel.ERROR);
+            Logger.log(message, ShellBlocks.LogLevel.ERROR);
         }
     });
 }
@@ -60,22 +57,22 @@ export function uploadScript(workspace: Blockly.WorkspaceSvg): void {
 export function uploadDefinitions(workspace: Blockly.WorkspaceSvg): void {
     triggerFileUpload((jsonContent) => {
         try {
-            const definitions: CLI.CliDefinitions = JSON.parse(jsonContent);
+            const definitions: ShellBlocks.CLI.CliDefinitions = JSON.parse(jsonContent);
 
             if (!definitions.commands || !Array.isArray(definitions.commands)) {
                 throw new Error("JSON inválido: falta array de \"commands\".");
             }
 
             DataManager.saveCustomDefinitions(definitions);
-            refreshWorkspaceDefinitions(workspace, definitions);
+            ShellBlocks.refreshWorkspaceDefinitions(workspace, definitions);
 
             const message = "Definições atualizadas com sucesso!";
-            showToast(workspace, message);
-            Logger.log(message, LogLevel.INFO);
+            ShellBlocks.showToast(workspace, message);
+            Logger.log(message, ShellBlocks.LogLevel.INFO);
         } catch (error) {
             const message = `Erro ao carregar definições: ${error}`;
-            showToast(workspace, message);
-            Logger.log(message, LogLevel.ERROR);
+            ShellBlocks.showToast(workspace, message);
+            Logger.log(message, ShellBlocks.LogLevel.ERROR);
         }
     });
 }
@@ -88,11 +85,11 @@ export async function resetToFactorySettings(
     onLevelsReset: () => Promise<void>,
 ): Promise<void> {
     try {
-        Logger.log("Iniciando reset de fábrica...", LogLevel.INFO);
+        Logger.log("Iniciando reset de fábrica...", ShellBlocks.LogLevel.INFO);
 
         const defaultDefs = await DataManager.resetDefinitions();
         if (defaultDefs) {
-            refreshWorkspaceDefinitions(workspace, defaultDefs);
+            ShellBlocks.refreshWorkspaceDefinitions(workspace, defaultDefs);
         } else {
             throw new Error("Falha ao baixar definições padrão.");
         }
@@ -100,14 +97,14 @@ export async function resetToFactorySettings(
         await DataManager.resetGameData();
         await onLevelsReset();
 
-        showToast(
+        ShellBlocks.showToast(
             workspace,
             "Ambiente completo restaurado para padrões de fábrica.",
         );
     } catch (error) {
         const message = `Erro ao resetar fábrica: ${error}`;
-        showToast(workspace, message, LogLevel.ERROR);
-        Logger.log(message, LogLevel.ERROR);
+        ShellBlocks.showToast(workspace, message, ShellBlocks.LogLevel.ERROR);
+        Logger.log(message, ShellBlocks.LogLevel.ERROR);
     }
 }
 
@@ -129,11 +126,11 @@ export function uploadGameData(
             DataManager.saveCustomGameData(gameData);
             onSuccess(gameData);
 
-            showToast(workspace, "Níveis atualizados manualmente.");
+            ShellBlocks.showToast(workspace, "Níveis atualizados manualmente.");
         } catch (error) {
             const message = `Erro ao carregar níveis: ${error}`;
-            showToast(workspace, message);
-            Logger.log(message, LogLevel.ERROR);
+            ShellBlocks.showToast(workspace, message);
+            Logger.log(message, ShellBlocks.LogLevel.ERROR);
         }
     });
 }

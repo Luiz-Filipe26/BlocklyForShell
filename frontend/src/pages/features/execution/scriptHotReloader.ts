@@ -1,8 +1,7 @@
-import { serializeWorkspaceToAST } from "@/core/blockly/serialization/serializer";
+import * as ShellBlocks from "shellblocks";
 import * as Blockly from "blockly";
 import * as API from "@/types/api";
 import * as Logger from "../ui/systemLogger";
-import { LogLevel } from "@/types/logger";
 import { AppConfig } from "@/config/appConfig";
 import { ApiRoutes } from "@/config/apiRoutes";
 import { executeWithTimeout } from "@/core/utils/async";
@@ -47,11 +46,11 @@ async function sendAstToBackend(
 ): Promise<void> {
     lastStartTime = Date.now();
 
-    const ast = serializeWorkspaceToAST(workspace);
+    const ast = ShellBlocks.serializeWorkspaceToAST(workspace);
 
     if (!ast) {
         codeOutput.textContent =
-            "// Monte seu script dentro do bloco \"Script Principal\"";
+            '// Monte seu script dentro do bloco "Script Principal"';
         return;
     }
 
@@ -72,7 +71,7 @@ async function sendAstToBackend(
 
         if (!response.ok) {
             codeOutput.textContent = "// Erro ao gerar script no backend";
-            Logger.log("Erro ao gerar script no backend", LogLevel.ERROR);
+            Logger.log("Erro ao gerar script no backend", ShellBlocks.LogLevel.ERROR);
             return;
         }
 
@@ -80,6 +79,6 @@ async function sendAstToBackend(
         codeOutput.textContent = data.script;
     } catch {
         codeOutput.textContent = "// Falha ao conectar ao backend";
-        Logger.log("Falha ao conectar no backend", LogLevel.ERROR);
+        Logger.log("Falha ao conectar no backend", ShellBlocks.LogLevel.ERROR);
     }
 }

@@ -1,7 +1,7 @@
-import { LogLevel } from "@/types/logger";
+import * as ShellBlocks from "shellblocks"
 import { executeWithTimeout, TimeoutError } from "../utils/async";
 
-export type StrategyLogger = (message: string, level: LogLevel) => void;
+export type StrategyLogger = (message: string, level: ShellBlocks.LogLevel) => void;
 
 interface StoredResource<T> {
     origin: "user" | "backend";
@@ -61,7 +61,7 @@ export class ResourceResolver {
         this.saveToStorage(config.storageKey, resource);
         this.logger(
             `${config.label} personalizadas salvas com sucesso.`,
-            LogLevel.INFO,
+            ShellBlocks.LogLevel.INFO,
         );
     }
 
@@ -71,13 +71,13 @@ export class ResourceResolver {
         } catch (e) {
             this.logger(
                 `Erro ao limpar o recurso local (${config.label}).`,
-                LogLevel.ERROR,
+                ShellBlocks.LogLevel.ERROR,
             );
             return;
         }
         this.logger(
             `${config.label} locais excluídos com sucesso.`,
-            LogLevel.WARN,
+            ShellBlocks.LogLevel.WARN,
         );
     }
 
@@ -88,7 +88,7 @@ export class ResourceResolver {
         if (stored?.origin === "user") {
             this.logger(
                 `Usando ${label} personalizadas (Salvas pelo usuário).`,
-                LogLevel.INFO,
+                ShellBlocks.LogLevel.INFO,
             );
             return stored.data;
         }
@@ -120,11 +120,11 @@ export class ResourceResolver {
             return data;
         } catch (error) {
             if (error instanceof TimeoutError) {
-                this.logger(`Timeout: ${error.message}`, LogLevel.WARN);
+                this.logger(`Timeout: ${error.message}`, ShellBlocks.LogLevel.WARN);
             } else if (error instanceof Error) {
                 this.logger(
                     `Falha na requisição a ${endpoint}: ${error.message}`,
-                    LogLevel.WARN,
+                    ShellBlocks.LogLevel.WARN,
                 );
             }
 
@@ -139,14 +139,14 @@ export class ResourceResolver {
         if (stored) {
             this.logger(
                 `Backend indisponível. Usando cópia local de ${label}.`,
-                LogLevel.WARN,
+                ShellBlocks.LogLevel.WARN,
             );
             return stored.data;
         }
 
         this.logger(
             `Falha crítica ao carregar ${label}: Backend offline e sem dados locais.`,
-            LogLevel.ERROR,
+            ShellBlocks.LogLevel.ERROR,
         );
         return null;
     }
@@ -159,7 +159,7 @@ export class ResourceResolver {
         } catch (error) {
             this.logger(
                 `Dados corrompidos em ${key}. Limpando armazenamento.`,
-                LogLevel.WARN,
+                ShellBlocks.LogLevel.WARN,
             );
             window.localStorage.removeItem(key);
             return null;
@@ -172,7 +172,7 @@ export class ResourceResolver {
         } catch (e) {
             this.logger(
                 "Erro ao gravar no armazenamento local (localStorage cheio?).",
-                LogLevel.ERROR,
+                ShellBlocks.LogLevel.ERROR,
             );
         }
     }

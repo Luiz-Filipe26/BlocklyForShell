@@ -1,6 +1,5 @@
 import "blockly/blocks";
 import "blockly/msg/pt";
-import { setupWorkspace } from "@/core/blockly/workspace/workspaceCreator";
 import {
     getCurrentLevelId,
     setupLevelSelector,
@@ -12,7 +11,7 @@ import * as Logger from "./features/ui/systemLogger";
 import * as PersistenceManager from "./features/session/persistenceManager";
 import { setupHeaderBehavior } from "./features/ui/headerController";
 import { getDefinitions } from "./features/session/dataManager";
-import { LogLevel } from "@/types/logger";
+import * as ShellBlocks from "shellblocks";
 import { MAIN_WORKSPACE_ID } from "./features/constants/constants";
 import { getPageElements } from "./features/ui/DOMProvider";
 
@@ -21,18 +20,21 @@ start();
 
 async function start(): Promise<void> {
     const definitions = await getDefinitions();
-    const workspace = await setupWorkspace(
+    const workspace = await ShellBlocks.setupWorkspace(
         pageElements.blocklyArea,
         definitions,
-        Logger.log,
-        MAIN_WORKSPACE_ID,
+        {
+            externalLogger: Logger.log,
+            workspaceId: MAIN_WORKSPACE_ID,
+            shouldSetupAutosave: true,
+        },
     );
     Logger.initSystemLogger(pageElements.systemLogContainer, workspace);
 
     if (workspace == null) {
         Logger.log(
             "Não foi possível criar o workspace! Aplicação abortada.",
-            LogLevel.ERROR,
+            ShellBlocks.LogLevel.ERROR,
         );
         return;
     }

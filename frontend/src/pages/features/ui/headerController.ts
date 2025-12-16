@@ -1,4 +1,4 @@
-import { LogLevel } from "@/types/logger";
+import * as ShellBlocks from "shellblocks";
 import * as Logger from "./systemLogger";
 
 export function setupHeaderBehavior(
@@ -10,7 +10,7 @@ export function setupHeaderBehavior(
     if (!labelElement) {
         Logger.log(
             "Erro: .btn-label não encontrado dentro do botão toggle.",
-            LogLevel.ERROR,
+            ShellBlocks.LogLevel.ERROR,
         );
         return;
     }

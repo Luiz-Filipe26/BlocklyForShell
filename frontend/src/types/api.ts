@@ -1,4 +1,4 @@
-import type { AST } from "./ast";
+import * as ShellBlocks from "shellblocks";
 
 export interface GeneratedScript {
     script: string;
@@ -23,6 +23,6 @@ export interface GameData {
 }
 
 export interface RunRequest {
-    ast: AST | null;
+    ast: ShellBlocks.AST.AST | null;
     levelId: string | null;
 }

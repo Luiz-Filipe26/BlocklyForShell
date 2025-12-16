@@ -1,12 +1,17 @@
-export type SemanticNodeKind =
-    | "script"
-    | "command"
-    | "option"
-    | "operand"
-    | "operator"
-    | "control";
+export type StructuralKey =
+    | "commands"
+    | "options"
+    | "operands"
+    | "flag"
+    | "value";
 
-export interface SemanticBinding {
+export interface StructuralBinding {
+    key: StructuralKey;
+    source: "field" | "input";
+    name: string;
+}
+
+export interface DynamicBinding {
     key: string;
     source: "field" | "input";
     name: string;
@@ -33,16 +38,57 @@ export interface SemanticOperatorDefinition {
     slots: SemanticOperatorSlot[];
 }
 
-export interface SemanticData {
-    nodeType: SemanticNodeKind;
+export interface ScriptSemanticData {
+    nodeType: "script";
     name: string;
-    bindings: SemanticBinding[];
+    bindings: StructuralBinding[];
+}
 
-    definition?: {
-        control?: SemanticControlDefinition;
-        operator?: SemanticOperatorDefinition;
+export interface CommandSemanticData {
+    nodeType: "command";
+    name: string;
+    bindings: StructuralBinding[];
+}
+
+export interface OptionSemanticData {
+    nodeType: "option";
+    name: string;
+    bindings: StructuralBinding[];
+}
+
+export interface OperandSemanticData {
+    nodeType: "operand";
+    name: string;
+    bindings: StructuralBinding[];
+}
+
+export interface ControlSemanticData {
+    nodeType: "control";
+    name: string;
+    bindings: DynamicBinding[];
+    definition: {
+        control: SemanticControlDefinition;
     };
 }
+
+export interface OperatorSemanticData {
+    nodeType: "operator";
+    name: string;
+    bindings: DynamicBinding[];
+    definition: {
+        operator: SemanticOperatorDefinition;
+    };
+}
+
+export type SemanticData =
+    | ScriptSemanticData
+    | CommandSemanticData
+    | OptionSemanticData
+    | OperandSemanticData
+    | ControlSemanticData
+    | OperatorSemanticData;
+
+export type SemanticNodeKind = SemanticData["nodeType"];
 
 export interface ASTField {
     name: string;
@@ -62,5 +108,5 @@ export interface ASTNode {
 }
 
 export interface AST extends ASTNode {
-    semanticData: SemanticData & { nodeType: "script" };
+    semanticData: ScriptSemanticData;
 }

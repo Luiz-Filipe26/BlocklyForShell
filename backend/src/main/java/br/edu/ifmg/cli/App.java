@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import br.edu.ifmg.cli.config.ServerConfig;
+import br.edu.ifmg.cli.models.ast.DockerService;
 import br.edu.ifmg.cli.server.ServerInitializer;
-import br.edu.ifmg.cli.services.DockerService;
 import br.edu.ifmg.cli.ui.LauncherWindow;
 
 public class App {

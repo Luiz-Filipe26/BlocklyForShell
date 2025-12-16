@@ -1,19 +1,31 @@
 package br.edu.ifmg.cli.services;
 
-import br.edu.ifmg.cli.models.ast.*;
-
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import br.edu.ifmg.cli.models.ast.AstNode;
+import br.edu.ifmg.cli.models.ast.AstVocabulary.Keys;
+import br.edu.ifmg.cli.models.ast.AstVocabulary.Nodes;
+import br.edu.ifmg.cli.models.ast.AstVocabulary.Sources;
+import br.edu.ifmg.cli.models.ast.AstVocabulary.Values;
+import br.edu.ifmg.cli.models.ast.SemanticBinding;
+import br.edu.ifmg.cli.models.ast.SemanticControlDefinition;
+import br.edu.ifmg.cli.models.ast.SemanticControlSlot;
+import br.edu.ifmg.cli.models.ast.SemanticOperatorDefinition;
+import br.edu.ifmg.cli.models.ast.SemanticOperatorSlot;
+
 public class ScriptGenerator {
+
+	private final AstNavigator navigator = new AstNavigator();
+	private static final Pattern SAFE_ARGUMENT_PATTERN = java.util.regex.Pattern.compile("^[a-zA-Z0-9._/-]+$");
 
 	public String generate(AstNode rootNode) {
 		if (rootNode == null)
 			throw new IllegalArgumentException("AST não pode ser nula");
-		List<AstNode> commandNodes = extractChildren(rootNode, "commands");
-		return processChildList(commandNodes, "\n");
+		return dispatch(rootNode);
 	}
 
 	private String dispatch(AstNode node) {
@@ -22,166 +34,162 @@ public class ScriptGenerator {
 
 		String kind = node.semanticData().nodeType();
 
-		if ("command".equals(kind)) {
-			return generatePosixCommand(node);
-		} else {
-			// Unifica a lógica de Controles e Operadores
-			return generateGenericStructure(node);
-		}
+		return switch (kind) {
+		case Nodes.SCRIPT -> generateScript(node);
+		case Nodes.COMMAND -> generateCommand(node);
+		case Nodes.CONTROL -> generateControl(node);
+		case Nodes.OPERATOR -> generateOperator(node);
+		case Nodes.OPTION -> generateOption(node);
+		case Nodes.OPERAND -> generateOperand(node);
+		default -> "";
+		};
 	}
 
-	// --- LÓGICA 1: ESTRUTURAS GENÉRICAS (Defined by Syntax) ---
-	private String generateGenericStructure(AstNode node) {
-		StringBuilder sb = new StringBuilder();
+	private String generateScript(AstNode node) {
+		var parts = new ArrayList<String>();
 		var data = node.semanticData();
-		var def = data.definition();
 
-		// 1. Identidade
-		// Controles escrevem seu nome ("if"). Operadores são simbólicos ("pipe" não se
-		// escreve).
-		if ("control".equals(data.nodeType())) {
-			sb.append(data.name());
-		}
-
-		// 2. Bindings (Filhos + Sintaxe)
-		for (SemanticBinding binding : data.bindings()) {
-
-			String prefix = getPrefixForSlot(def, binding.key());
-			String symbol = getSymbolForSlot(def, binding.key());
-			boolean isSymbolBefore = isSymbolBefore(def, binding.key());
-
-			// Prefixo ou Símbolo Before
-			if (prefix != null)
-				sb.append(prefix);
-			if (symbol != null && isSymbolBefore)
-				sb.append(" ").append(symbol);
-
-			// Código do Filho
-			String childCode = processChildList(extractChildrenNodes(node, binding), " ");
-
-			if (!childCode.isBlank()) {
-				// Indenta se for controle (multiline)
-				if (childCode.contains("\n") && "control".equals(data.nodeType())) {
-					sb.append("\n").append(indent(childCode));
-				} else {
-					sb.append(" ").append(childCode);
-				}
+		for (var binding : data.bindings()) {
+			String content = resolveBindingContent(node, binding, "\n");
+			if (!content.isBlank()) {
+				parts.add(content);
 			}
-
-			// Símbolo After
-			if (symbol != null && !isSymbolBefore)
-				sb.append(" ").append(symbol);
 		}
-
-		// 3. Fechamento (fi, done)
-		String globalSuffix = getSyntaxEnd(def);
-		if (globalSuffix != null && !globalSuffix.isBlank()) {
-			sb.append("\n").append(globalSuffix);
-		}
-
-		return sb.toString().trim();
+		return String.join("\n", parts);
 	}
 
-	// --- LÓGICA 2: COMANDOS POSIX (Standard) ---
-	private String generatePosixCommand(AstNode node) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(node.semanticData().name()); // "ls"
+	private String generateCommand(AstNode node) {
+		var sb = new StringBuilder();
+		sb.append(node.semanticData().name());
 
-		appendOptions(sb, node);
-		appendOperands(sb, node);
+		var optionNodes = navigator.extractChildren(node, Keys.OPTIONS);
+		String optionsStr = renderNodeList(optionNodes, " ");
+		if (!optionsStr.isBlank()) {
+			sb.append(" ").append(optionsStr);
+		}
+
+		var operandNodes = navigator.extractChildren(node, Keys.OPERANDS);
+		String operandsStr = renderNodeList(operandNodes, " ");
+		if (!operandsStr.isBlank()) {
+			sb.append(" ").append(operandsStr);
+		}
 
 		return sb.toString();
 	}
 
-	// --- EXTRAÇÃO E HELPERS ---
+	private String generateOption(AstNode node) {
+		String flag = navigator.extractValue(node, Keys.FLAG).orElse("");
+		String value = navigator.extractValue(node, Keys.VALUE).orElse("");
 
-	private String processChildList(List<AstNode> nodes, String separator) {
-		return nodes.stream().map(this::dispatch).filter(s -> !s.isBlank()).collect(Collectors.joining(separator));
-	}
-
-	private List<AstNode> extractChildren(AstNode node, String key) {
-		if (node.semanticData() == null)
-			return Collections.emptyList();
-		return node.semanticData().bindings().stream().filter(b -> b.key().equals(key)).findFirst()
-				.map(b -> extractChildrenNodes(node, b)).orElse(Collections.emptyList());
-	}
-
-	private List<AstNode> extractChildrenNodes(AstNode node, SemanticBinding binding) {
-		if ("input".equals(binding.source())) {
-			return node.getRawInputChildren(binding.name());
-		}
-		return Collections.emptyList();
-	}
-
-	private String extractValue(AstNode node, String key) {
-		if (node.semanticData() == null)
-			return null;
-		return node.semanticData().bindings().stream().filter(b -> b.key().equals(key)).findFirst().flatMap(binding -> {
-			if ("field".equals(binding.source())) {
-				return node.getRawFieldValue(binding.name());
+		StringBuilder sb = new StringBuilder();
+		if (!flag.isBlank()) {
+			sb.append(flag);
+			if (!value.isBlank()) {
+				sb.append(" ").append(quoteArgumentIfUnsafe(value));
 			}
+		}
+		return sb.toString();
+	}
+
+	private String generateOperand(AstNode node) {
+		String value = navigator.extractValue(node, Keys.VALUE).orElse("");
+		if (!value.isBlank()) {
+			return quoteArgumentIfUnsafe(value);
+		}
+		return "";
+	}
+
+	private String generateControl(AstNode node) {
+		var sb = new StringBuilder();
+		var data = node.semanticData();
+		var controlDef = data.definition().control();
+
+		sb.append(data.name());
+
+		for (var binding : data.bindings()) {
+			String content = resolveBindingContent(node, binding, "\n");
+
+			if (content.isBlank())
+				continue;
+
+			findControlSlot(controlDef, binding.key()).map(SemanticControlSlot::syntaxPrefix).ifPresent(sb::append);
+
+			if (content.contains("\n")) {
+				sb.append("\n").append(indent(content));
+			} else {
+				sb.append(" ").append(content);
+			}
+		}
+
+		if (controlDef.syntaxEnd() != null) {
+			sb.append("\n").append(controlDef.syntaxEnd());
+		}
+		return sb.toString().trim();
+	}
+
+	private String generateOperator(AstNode node) {
+		var sb = new StringBuilder();
+		var data = node.semanticData();
+		var operatorDef = data.definition().operator();
+
+		for (var binding : data.bindings()) {
+			String content = resolveBindingContent(node, binding, " ");
+
+			if (content.isBlank())
+				continue;
+
+			String finalContent = findOperatorSlot(operatorDef, binding.key()).map(slot -> {
+				String symbol = slot.symbol();
+				if (symbol == null)
+					return content;
+
+				boolean isBefore = Values.PLACEMENT_BEFORE.equals(slot.symbolPlacement());
+				return isBefore ? " " + symbol + " " + content : content + " " + symbol + " ";
+			}).orElse(content);
+
+			sb.append(finalContent);
+		}
+		return sb.toString().trim();
+	}
+
+	private String resolveBindingContent(AstNode node, SemanticBinding binding, String separator) {
+		if (Sources.INPUT.equals(binding.source())) {
+			var children = navigator.getNodesFromBinding(node, binding);
+			return renderNodeList(children, separator);
+		} else if (Sources.FIELD.equals(binding.source())) {
+			return navigator.getValueFromBinding(node, binding).orElse("");
+		}
+		return "";
+	}
+
+	private String renderNodeList(List<AstNode> nodes, String separator) {
+		return nodes.stream().map(this::dispatch).filter(result -> !result.isBlank())
+				.collect(Collectors.joining(separator));
+	}
+
+	private Optional<SemanticControlSlot> findControlSlot(SemanticControlDefinition controlDef, String key) {
+		if (controlDef == null)
 			return Optional.empty();
-		}).orElse(null);
+		return controlDef.slots().stream().filter(slot -> slot.name().equals(key)).findFirst();
 	}
 
-	private void appendOptions(StringBuilder sb, AstNode node) {
-		List<AstNode> options = extractChildren(node, "options");
-		for (AstNode opt : options) {
-			String flag = extractValue(opt, "flag");
-			String arg = extractValue(opt, "value");
-			if (flag != null && !flag.isBlank()) {
-				sb.append(" ").append(flag);
-				if (arg != null && !arg.isBlank())
-					sb.append(" ").append(quoteArgument(arg));
-			}
-		}
+	private Optional<SemanticOperatorSlot> findOperatorSlot(SemanticOperatorDefinition operatorDef, String key) {
+		if (operatorDef == null)
+			return Optional.empty();
+		return operatorDef.slots().stream().filter(slot -> slot.name().equals(key)).findFirst();
 	}
 
-	private void appendOperands(StringBuilder sb, AstNode node) {
-		List<AstNode> operands = extractChildren(node, "operands");
-		for (AstNode op : operands) {
-			String val = extractValue(op, "value");
-			if (val != null && !val.isBlank())
-				sb.append(" ").append(quoteArgument(val));
-		}
-	}
-
-	// --- LEITURA DE DEFINIÇÕES ---
-
-	private String getPrefixForSlot(SemanticDefinition def, String slotName) {
-		if (def == null || def.control() == null)
-			return null;
-		return def.control().slots().stream().filter(s -> s.name().equals(slotName)).findFirst()
-				.map(SemanticControlSlot::syntaxPrefix).orElse(null);
-	}
-
-	private String getSymbolForSlot(SemanticDefinition def, String slotName) {
-		if (def == null || def.operator() == null)
-			return null;
-		return def.operator().slots().stream().filter(s -> s.name().equals(slotName)).findFirst()
-				.map(SemanticOperatorSlot::symbol).orElse(null);
-	}
-
-	private boolean isSymbolBefore(SemanticDefinition def, String slotName) {
-		if (def == null || def.operator() == null)
-			return false;
-		return def.operator().slots().stream().filter(s -> s.name().equals(slotName)).findFirst()
-				.map(s -> "before".equals(s.symbolPlacement())).orElse(false);
-	}
-
-	private String getSyntaxEnd(SemanticDefinition def) {
-		if (def == null || def.control() == null)
-			return null;
-		return def.control().syntaxEnd();
-	}
-
-	private String quoteArgument(String raw) {
-		if (raw == null || raw.isEmpty())
+	private String quoteArgumentIfUnsafe(String rawArgument) {
+		if (rawArgument == null || rawArgument.isEmpty())
 			return "''";
-		return "'" + raw.replace("'", "'\\''") + "'";
+		if (SAFE_ARGUMENT_PATTERN.matcher(rawArgument).matches()) {
+	        return rawArgument;
+	    }
+		
+		return "'" + rawArgument.replace("'", "'\\''") + "'";
 	}
 
 	private String indent(String code) {
-		return code.lines().map(l -> "  " + l).collect(Collectors.joining("\n"));
+		return code.lines().map(line -> "  " + line).collect(Collectors.joining("\n"));
 	}
 }

@@ -1,4 +1,4 @@
-package br.edu.ifmg.cli.models.ast;
+package br.edu.ifmg.cli.services;
 
 import java.io.IOException;
 import java.net.URL;

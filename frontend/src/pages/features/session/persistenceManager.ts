@@ -4,6 +4,22 @@ import * as Logger from "../ui/systemLogger";
 import * as API from "@/types/api";
 import * as DataManager from "../session/dataManager";
 
+const EXPERIMENT_PROGRESS_KEY = "experiment_progress_v1";
+
+export function getExperimentProgress(): number {
+    const raw = localStorage.getItem(EXPERIMENT_PROGRESS_KEY);
+    if (!raw) return 0;
+    return parseInt(raw, 10) || 0;
+}
+
+export function unlockNextLevel(): void {
+    const current = getExperimentProgress();
+    localStorage.setItem(
+        EXPERIMENT_PROGRESS_KEY,
+        String(current + 1),
+    );
+}
+
 /**
  * Baixa o workspace atual como arquivo JSON.
  */

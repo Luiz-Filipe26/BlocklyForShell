@@ -1,5 +1,5 @@
 import * as API from "@/types/api";
-import * as ShellBlocks from "shellblocks"
+import * as ShellBlocks from "shellblocks";
 import { executeWithTimeout } from "@/core/utils/async";
 import { AppConfig } from "@/config/appConfig";
 import { ApiRoutes } from "@/config/apiRoutes";
@@ -19,6 +19,7 @@ export async function runScript(
     workspace: Blockly.WorkspaceSvg,
     deps: RunDependencies,
     currentLevelId: string | null,
+    onLevelSuccess?: () => void,
 ): Promise<void> {
     const { cliOutput, runBtn } = deps;
 
@@ -44,7 +45,12 @@ export async function runScript(
     try {
         const payload: API.RunRequest = { ast, levelId: currentLevelId };
         const result = await requestExecution(payload);
-        renderExecutionOutput(result, cliOutput, currentLevelId);
+        renderExecutionOutput(
+            result,
+            cliOutput,
+            currentLevelId,
+            onLevelSuccess,
+        );
     } catch (error) {
         const message = `Erro de Conexão: ${error}`;
         ShellBlocks.showToast(workspace, message);
@@ -114,6 +120,7 @@ function renderExecutionOutput(
     result: API.ExecutionResult,
     cliOutput: HTMLPreElement,
     currentLevelId: string | null,
+    onLevelSuccess?: () => void,
 ): void {
     let output = "";
 
@@ -131,6 +138,7 @@ function renderExecutionOutput(
     if (currentLevelId) {
         if (result.exitCode === 0) {
             cliOutput.textContent += "[SUCESSO] Objetivo concluído.\n";
+            onLevelSuccess?.();
         } else {
             cliOutput.textContent += "[FALHA] O objetivo não foi atingido.\n";
         }

@@ -2,6 +2,7 @@ import "blockly/blocks";
 import "blockly/msg/pt";
 import {
     getCurrentLevelId,
+    notifyLevelCompleted,
     setupLevelSelector,
 } from "./features/session/levelLoader";
 import { setupScriptHotReloader } from "./features/execution/scriptHotReloader";
@@ -16,6 +17,7 @@ import { MAIN_WORKSPACE_ID } from "./features/constants/constants";
 import { getPageElements } from "./features/ui/DOMProvider";
 
 const pageElements = getPageElements();
+const IS_EXPERIMENT_MODE = import.meta.env.VITE_EXPERIMENT_MODE === "true";
 start();
 
 async function start(): Promise<void> {
@@ -39,6 +41,10 @@ async function start(): Promise<void> {
         return;
     }
 
+    if (IS_EXPERIMENT_MODE) {
+        enforceExperimentRestrictions();
+    }
+
     setupHeaderBehavior(pageElements.appHeader, pageElements.headerToggleBtn);
 
     await setupLevelSelector(
@@ -51,9 +57,31 @@ async function start(): Promise<void> {
     registerButtonListeners(workspace);
 }
 
+function enforceExperimentRestrictions() {
+    Logger.log("Modo Experimento Ativo: Botões de personalização desativados.");
+
+    const buttonsToDisable = [
+        pageElements.btnLoadDefs,
+        pageElements.btnLoadGame,
+        pageElements.btnResetDefs,
+    ];
+
+    buttonsToDisable.forEach((button) => (button.disabled = true));
+}
+
 function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
     pageElements.runBtn.addEventListener("click", async () => {
-        runScript(workspace, pageElements, getCurrentLevelId());
+        runScript(workspace, pageElements, getCurrentLevelId(), () => {
+            notifyLevelCompleted(getCurrentLevelId());
+            if (IS_EXPERIMENT_MODE) {
+                PersistenceManager.unlockNextLevel();
+                setupLevelSelector(
+                    pageElements.levelSelect,
+                    pageElements.levelSummaryText,
+                    pageElements.levelFullDetails,
+                );
+            }
+        });
     });
 
     pageElements.clearBtn.addEventListener("click", () => {
@@ -67,6 +95,8 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
     pageElements.btnLoadScript.addEventListener("click", () => {
         PersistenceManager.uploadScript(workspace);
     });
+
+    if (IS_EXPERIMENT_MODE) return;
 
     pageElements.btnLoadDefs.addEventListener("click", () => {
         if (

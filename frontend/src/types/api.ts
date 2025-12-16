@@ -10,11 +10,14 @@ export interface ExecutionResult {
     exitCode: number;
 }
 
+export type LevelDifficulty = 'tutorial' | 'training' | 'challenge';
+
 export interface Level {
     id: string;
     title: string;
     summary?: string;
     fullGuideHtml?: string;
+    difficulty?: LevelDifficulty;
 }
 
 export interface GameData {

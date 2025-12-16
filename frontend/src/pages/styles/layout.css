@@ -72,6 +72,16 @@
     transition: all 0.2s ease;
 }
 
+.btn-tool[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f1f3f5;
+    border-color: #dee2e6;
+    color: #6c757d;
+    transform: none;
+    pointer-events: none;
+}
+
 .btn-icon {
     width: 16px;
     height: 16px;

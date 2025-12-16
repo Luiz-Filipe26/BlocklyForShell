@@ -1,129 +1,139 @@
 {
   "levels": [
     {
-      "id": "intro_mkdir",
-      "title": "Criando Pastas",
-      "summary": "Crie um diretório chamado 'projetos'.",
-      "fullGuideHtml": "<h1>Primeiros Passos</h1><p>Bem-vindo ao terminal! Para organizar seus arquivos, precisamos criar pastas (também chamadas de diretórios).</p><h2>O Comando mkdir</h2><p>O comando <code>mkdir</code> (make directory) é usado para criar novas pastas vazias.</p><h3>Sua Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta com o nome <code>projetos</code>.</p>",
-      "setupCommands": ["rm -rf projetos"],
-      "verificationScript": "if [ -d 'projetos' ]; then echo 'OK'; exit 0; else echo 'A pasta projetos não existe.'; exit 1; fi"
+      "id": "01_recon",
+      "title": "1. Reconhecimento",
+      "summary": "Liste os arquivos para saber onde você está.",
+      "fullGuideHtml": "<h1>Onde estou?</h1><p>Você acessou o servidor. O terminal não mostra nada até você pedir.</p><h3>Missão</h3><p>Use o bloco <strong>ls</strong> para listar o conteúdo da pasta atual.</p>",
+      "setupCommands": ["rm -rf *", "touch notas.txt", "mkdir -p sistema/logs"],
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'notas.txt' .last_cmd_out; then echo 'OK'; exit 0; else echo 'Você não listou os arquivos ou a saída não foi mostrada.'; exit 1; fi",
+      "difficulty": "tutorial"
     },
     {
-      "id": "intro_cd",
-      "title": "Navegando Entre Pastas",
-      "summary": "Entre na pasta 'projetos'.",
-      "fullGuideHtml": "<h1>Movendo-se no Sistema</h1><p>Agora que criamos uma pasta, precisamos entrar nela para trabalhar lá dentro.</p><h2>O Comando cd</h2><p>O comando <code>cd</code> (change directory) altera o seu local atual de trabalho.</p><h3>Sua Missão</h3><p>Use o bloco <strong>cd</strong> para entrar na pasta <code>projetos</code> que acabamos de criar.</p>",
-      "setupCommands": ["rm -rf projetos", "mkdir projetos"],
-      "verificationScript": "if [ \"$PWD\" = */projetos ]; then echo 'OK'; exit 0; else echo 'Você não está dentro da pasta projetos.'; exit 1; fi"
+      "id": "02_navigation",
+      "title": "2. Infiltração",
+      "summary": "Entre na pasta 'sistema'.",
+      "fullGuideHtml": "<h1>Entrando em Pastas</h1><p>Vimos uma pasta chamada <code>sistema</code>. Precisamos investigar o que há dentro dela.</p><h3>Missão</h3><p>Use o bloco <strong>cd</strong> para entrar no diretório <code>sistema</code>.</p>",
+      "setupCommands": ["mkdir -p sistema"],
+      "verificationScript": "if [[ \"$PWD\" == */sistema ]]; then echo 'OK'; exit 0; else echo 'Você ainda não está dentro da pasta sistema.'; exit 1; fi",
+      "difficulty": "tutorial"
     },
     {
-      "id": "mkdir_nested",
-      "title": "Criando Estruturas",
-      "summary": "Crie a árvore de pastas 'src/utils/helpers'.",
-      "fullGuideHtml": "<h1>Estruturas Profundas</h1><p>Às vezes precisamos criar uma pasta dentro de outra, que fica dentro de outra. Isso se chama 'caminho aninhado'.</p><h2>Criação Recursiva</h2><p>Normalmente, o <code>mkdir</code> falha se a pasta pai não existir. Porém, podemos instruí-lo a criar todos os pais necessários.</p><h3>Sua Missão</h3><p>Crie a estrutura completa <code>src/utils/helpers</code> de uma só vez.</p>",
-      "setupCommands": ["rm -rf src"],
-      "verificationScript": "if [ -d 'src/utils/helpers' ]; then echo 'OK'; exit 0; else echo 'A estrutura src/utils/helpers não foi criada.'; exit 1; fi"
+      "id": "03_workspace",
+      "title": "3. Base de Operações",
+      "summary": "Crie uma pasta chamada 'investigacao'.",
+      "fullGuideHtml": "<h1>Criando Espaço</h1><p>Precisamos de um lugar limpo para guardar evidências.</p><h3>Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta chamada <code>investigacao</code>.</p>",
+      "setupCommands": ["rm -rf investigacao"],
+      "verificationScript": "if [ -d 'investigacao' ]; then echo 'OK'; exit 0; else echo 'A pasta investigacao não foi encontrada.'; exit 1; fi",
+      "difficulty": "tutorial"
     },
     {
-      "id": "file_mv",
-      "title": "O Arquivo Secreto",
-      "summary": "Mova 'plano_secreto.txt' para dentro de 'cofre'.",
-      "fullGuideHtml": "<h1>Movendo Arquivos</h1><p>Deixaram um arquivo confidencial solto na raiz! Precisamos guardá-lo.</p><h2>O Comando mv</h2><p>O comando <code>mv</code> (move) serve para mover arquivos de um lugar para outro. Ele recebe dois argumentos:</p><ul><li>1. O arquivo de <strong>origem</strong>.</li><li>2. A pasta de <strong>destino</strong>.</li></ul><h3>Sua Missão</h3><p>Mova o arquivo <code>plano_secreto.txt</code> para dentro da pasta <code>cofre</code>.</p>",
+      "id": "04_evidence",
+      "title": "4. Preservação",
+      "summary": "Copie o arquivo 'suspeito.dat' para 'investigacao'.",
+      "fullGuideHtml": "<h1>Cópia de Segurança</h1><p>Achamos um arquivo <code>suspeito.dat</code>. Antes de analisá-lo, faça uma cópia.</p><h3>Missão</h3><p>Use o bloco <strong>cp</strong> (copy) para copiar o arquivo <code>suspeito.dat</code> para dentro da pasta <code>investigacao</code>.</p>",
+      "setupCommands": ["touch suspeito.dat", "mkdir -p investigacao", "rm -f investigacao/suspeito.dat"],
+      "verificationScript": "if [ -f 'investigacao/suspeito.dat' ] && [ -f 'suspeito.dat' ]; then echo 'OK'; exit 0; else echo 'A cópia não foi encontrada na pasta investigacao.'; exit 1; fi",
+      "difficulty": "tutorial"
+    },
+    {
+      "id": "05_cleanup",
+      "title": "5. Remoção de Risco",
+      "summary": "Remova o arquivo 'malware.sh'.",
+      "fullGuideHtml": "<h1>Limpando Ameaças</h1><p>Existe um script perigoso chamado <code>malware.sh</code> na pasta atual.</p><h3>Missão</h3><p>Use o bloco <strong>rm</strong> para apagar esse arquivo permanentemente.</p><p><strong>Cuidado:</strong> Não apague outros arquivos!</p>",
+      "setupCommands": ["touch malware.sh", "touch importante.doc"],
+      "verificationScript": "if [ ! -f 'malware.sh' ] && [ -f 'importante.doc' ]; then echo 'OK'; exit 0; else echo 'O malware ainda existe ou você apagou o arquivo errado!'; exit 1; fi",
+      "difficulty": "tutorial"
+    },
+    {
+      "id": "06_reading",
+      "title": "6. Leitura de Dados",
+      "summary": "Leia o conteúdo de 'pista.txt'.",
+      "fullGuideHtml": "<h1>Analisando Conteúdo</h1><p>Agora começa a investigação real. O que está escrito no arquivo?</p><h3>Missão</h3><p>Use o comando <strong>cat</strong> para ler o arquivo <code>pista.txt</code> na tela.</p>",
+      "setupCommands": ["echo 'A senha começa com 123' > pista.txt"],
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'A senha começa com 123' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O conteúdo do arquivo não foi exibido na tela.'; exit 1; fi",
+      "difficulty": "training"
+    },
+    {
+      "id": "07_redirect",
+      "title": "7. O Diário de Bordo",
+      "summary": "Salve a data atual em 'timestamp.txt'.",
+      "fullGuideHtml": "<h1>Redirecionamento (>)</h1><p>Precisamos registrar quando a investigação começou. O comando <code>date</code> mostra a hora, mas queremos salvar isso em um arquivo.</p><h3>Missão</h3><p>Use o bloco <strong>date</strong> e conecte-o ao bloco <strong>></strong> (Redirecionar para arquivo) apontando para <code>timestamp.txt</code>.</p>",
+      "setupCommands": ["rm -f timestamp.txt"],
+      "verificationScript": "if [ -f 'timestamp.txt' ] && [ -s 'timestamp.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo timestamp.txt não existe ou está vazio.'; exit 1; fi",
+      "difficulty": "training"
+    },
+    {
+      "id": "08_grep_search",
+      "title": "8. Agulha no Palheiro",
+      "summary": "Encontre a linha com 'ERROR' no arquivo 'server.log'.",
+      "fullGuideHtml": "<h1>Filtros com Grep</h1><p>O arquivo de log é enorme. Ler tudo com <code>cat</code> é impossível.</p><h3>Missão</h3><p>Use o bloco <strong>grep</strong> para buscar a palavra <code>ERROR</code> dentro de <code>server.log</code>.</p>",
+      "setupCommands": ["echo 'INFO: start' > server.log", "echo 'ERROR: invasion detected' >> server.log", "echo 'INFO: running' >> server.log"],
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'invasion detected' .last_cmd_out && ! grep -q 'INFO' .last_cmd_out; then echo 'OK'; exit 0; else echo 'Você não filtrou apenas as linhas de erro.'; exit 1; fi",
+      "difficulty": "training"
+    },
+    {
+      "id": "09_pipe_connect",
+      "title": "9. O Encanamento (Pipe)",
+      "summary": "Liste os arquivos e filtre apenas os '.conf'.",
+      "fullGuideHtml": "<h1>Conectando Comandos (|)</h1><p>O verdadeiro poder do Linux! Queremos listar os arquivos e, <em>imediatamente</em>, filtrar o resultado.</p><h3>Missão</h3><p>1. Use <strong>ls</strong> para gerar a lista.<br>2. Conecte com um <strong>Pipe (|)</strong>.<br>3. Envie para o <strong>grep</strong> buscar por <code>.conf</code>.</p>",
+      "setupCommands": ["touch nginx.conf", "touch app.js", "touch db.conf", "touch style.css"],
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'nginx.conf' .last_cmd_out && grep -q 'db.conf' .last_cmd_out && ! grep -q 'app.js' .last_cmd_out; then echo 'OK'; exit 0; else echo 'A filtragem falhou. Use ls | grep .conf'; exit 1; fi",
+      "difficulty": "training"
+    },
+    {
+      "id": "10_background",
+      "title": "10. Multitarefa",
+      "summary": "Execute 'long_task.sh' em background (&).",
+      "fullGuideHtml": "<h1>Segundo Plano (&)</h1><p>Precisamos rodar um script de auditoria, mas ele demora 10 segundos e trava o terminal.</p><h3>Missão</h3><p>Use o bloco <strong>&</strong> para rodar o <code>./long_task.sh</code> em background, liberando o terminal imediatamente.</p>",
+      "setupCommands": ["echo 'sleep 2; echo Done' > long_task.sh", "chmod +x long_task.sh"],
+      "verificationScript": "if ps | grep -q 'sleep'; then echo 'OK'; exit 0; else echo 'O processo não parece estar rodando em background (ou já terminou).'; exit 1; fi",
+      "difficulty": "training"
+    },
+	{
+      "id": "11_network_check",
+      "title": "11. Diagnóstico de Interface",
+      "summary": "Verifique se a interface de rede local está ativa.",
+      "fullGuideHtml": "<h1>Teste de Loopback</h1><p>Estamos isolados da rede externa, mas precisamos saber se a placa de rede do servidor está respondendo.</p><h3>Missão</h3><p>Use o comando <strong>ping</strong> para testar o endereço local <code>127.0.0.1</code> (localhost).</p>",
+      "setupCommands": [], 
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q '127.0.0.1' .last_cmd_out && grep -q 'bytes from' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O teste de loopback falhou.'; exit 1; fi",
+      "difficulty": "training"
+    },
+    {
+      "id": "12_download_curl",
+      "title": "12. Download de Carga",
+      "summary": "Baixe o arquivo 'segredo.txt' do servidor local.",
+      "fullGuideHtml": "<h1>Download (Curl)</h1><p>Identificamos um servidor interno rodando na porta 8000.</p><h3>Missão</h3><p>Use o <strong>curl</strong> para baixar o arquivo: <code>http://localhost:8000/segredo.txt</code>.</p><p><em>Dica: O servidor já está rodando!</em></p>",
       "setupCommands": [
-        "rm -rf cofre",
-        "mkdir cofre",
-        "rm -f plano_secreto.txt",
-        "touch plano_secreto.txt"
+        "pkill -f http.server || true", 
+        "mkdir -p public_html", 
+        "echo 'TOP_SECRET_CODE_99' > public_html/segredo.txt", 
+        "cd public_html && python3 -m http.server 8000 &"
       ],
-      "verificationScript": "if [ -f 'cofre/plano_secreto.txt' ] && [ ! -f 'plano_secreto.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo não está no cofre ou ainda existe na origem.'; exit 1; fi"
+      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'TOP_SECRET_CODE_99' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O download falhou ou o conteúdo está errado.'; exit 1; fi",
+      "difficulty": "challenge"
     },
     {
-      "id": "copy_multiple",
-      "title": "Cópia em Série",
-      "summary": "Copie a.txt, b.txt e c.txt para a pasta 'backup'.",
-      "fullGuideHtml": "<h1>Backups são Importantes</h1><p>Antes de modificar arquivos, é sempre bom ter uma cópia de segurança.</p><h2>O Comando cp</h2><p>O comando <code>cp</code> (copy) duplica arquivos. Você pode copiar vários arquivos de uma vez indicando o destino no final.</p><h3>Sua Missão</h3><p>Copie os arquivos <code>a.txt</code>, <code>b.txt</code> e <code>c.txt</code> para dentro do diretório <code>backup</code>.</p>",
+      "id": "13_final_ctf",
+      "title": "13. DESAFIO FINAL",
+      "summary": "Baixe 'dados.log', encontre a 'SENHA' e salve em 'solucao.txt'.",
+      "fullGuideHtml": "<h1>O Resgate Final</h1><p>Esta é sua prova final. Um arquivo de log está disponível em <code>http://localhost:8000/dados.log</code>.</p><h3>Sua Missão</h3><ol><li>Baixe ou leia o arquivo da rede.</li><li>Filtre a linha que contém a palavra <code>SENHA</code>.</li><li>Salve essa linha no arquivo <code>solucao.txt</code>.</li></ol><p>Boa sorte, agente!</p>",
       "setupCommands": [
-        "rm -rf backup",
-        "mkdir backup",
-        "rm -f a.txt b.txt c.txt",
-        "touch a.txt b.txt c.txt"
+        "pkill -f http.server || true", 
+        "mkdir -p public_html", 
+        "echo 'Lixo 1' > public_html/dados.log", 
+        "echo 'Lixo 2' >> public_html/dados.log", 
+        "echo 'A SENHA É: DELTA-FORCE-7' >> public_html/dados.log", 
+        "echo 'Lixo 3' >> public_html/dados.log", 
+        "cd public_html && python3 -m http.server 8000 &"
       ],
-      "verificationScript": "if [ -f 'backup/a.txt' ] && [ -f 'backup/b.txt' ] && [ -f 'backup/c.txt' ]; then echo 'OK'; exit 0; else echo 'Nem todos os arquivos foram copiados.'; exit 1; fi"
-    },
-    {
-      "id": "remove_safely",
-      "title": "Remoção Cuidadosa",
-      "summary": "Apague apenas o arquivo 'temp.log'.",
-      "fullGuideHtml": "<h1>Limpando a Casa</h1><p>Arquivos temporários ocupam espaço e precisam ser removidos.</p><h2>O Comando rm</h2><p>O comando <code>rm</code> (remove) deleta arquivos permanentemente. <strong>Cuidado!</strong> Não há lixeira no terminal padrão.</p><h3>Sua Missão</h3><p>Existe um arquivo <code>temp.log</code> e um arquivo <code>importante.txt</code>. Apague <strong>apenas</strong> o arquivo de log.</p>",
-      "setupCommands": [
-        "rm -f temp.log",
-        "touch temp.log",
-        "touch importante.txt"
-      ],
-      "verificationScript": "if [ ! -f 'temp.log' ] && [ -f 'importante.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo temp.log ainda existe ou importante.txt foi apagado.'; exit 1; fi"
-    },
-    {
-      "id": "cat_read",
-      "title": "Lendo Arquivos",
-      "summary": "Leia o conteúdo de 'mensagem.txt'.",
-      "fullGuideHtml": "<h1>Visualizando Conteúdo</h1><p>Como saber o que está escrito dentro de um arquivo de texto sem abri-lo em um editor?</p><h2>O Comando cat</h2><p>O comando <code>cat</code> (concatenate) lê o arquivo e joga todo o texto na tela (stdout).</p><h3>Sua Missão</h3><p>Use o bloco <code>cat</code> para ler o arquivo <code>mensagem.txt</code>.</p>",
-      "setupCommands": ["echo 'Olá mundo' > mensagem.txt"],
-      "verificationScript": "if cat mensagem.txt | grep -q 'Olá mundo'; then echo 'OK'; exit 0; else echo 'O conteúdo não foi exibido corretamente.'; exit 1; fi"
-    },
-    {
-      "id": "grep_filter",
-      "title": "Filtrando Logs",
-      "summary": "Filtre as linhas com 'ERRO' no arquivo 'sistema.log'.",
-      "fullGuideHtml": "<h1>Encontrando Agulha no Palheiro</h1><p>Arquivos de log podem ser gigantescos. Ler tudo com o <code>cat</code> é impossível.</p><h2>O Comando grep</h2><p>O <code>grep</code> é um filtro poderoso. Ele busca por um texto específico e imprime <strong>apenas as linhas</strong> onde esse texto aparece.</p><h3>Sua Missão</h3><p>Exiba apenas as linhas que contêm a palavra <code>ERRO</code> dentro do arquivo <code>sistema.log</code>.</p>",
-      "setupCommands": [
-        "rm -f sistema.log",
-        "echo 'INFO: início' >> sistema.log",
-        "echo 'ERRO: falha de conexão' >> sistema.log",
-        "echo 'INFO: processando' >> sistema.log",
-        "echo 'ERRO: disco cheio' >> sistema.log",
-        "echo 'INFO: fim' >> sistema.log"
-      ],
-      "verificationScript": "if grep 'ERRO' sistema.log | grep -q 'falha'; then echo 'OK'; exit 0; else echo 'As linhas com ERRO não foram filtradas.'; exit 1; fi"
-    },
-    {
-      "id": "pipe_chain",
-      "title": "O Poder do Pipe",
-      "summary": "Liste arquivos e filtre apenas os '.txt'.",
-      "fullGuideHtml": "<h1>Conectando Comandos</h1><p>A verdadeira força do Shell está em conectar pequenos comandos para fazer grandes coisas.</p><h2>O Operador Pipe (|)</h2><p>O caractere <code>|</code> (pipe) pega a saída do comando da esquerda e a entrega como entrada para o comando da direita.</p><h3>Sua Missão</h3><p>1. Liste os arquivos da pasta (<code>ls</code>).<br>2. Conecte essa lista a um filtro (<code>grep</code>) para mostrar apenas o que termina em <code>.txt</code>.</p>",
-      "setupCommands": [
-        "rm -f a.txt b.txt c.log",
-        "touch a.txt b.txt c.log"
-      ],
-      "verificationScript": "output=$(ls | grep '\\.txt$'); if echo \"$output\" | grep -q 'a.txt' && echo \"$output\" | grep -q 'b.txt' && ! echo \"$output\" | grep -q 'c.log'; then echo 'OK'; exit 0; else echo 'A filtragem ou o encadeamento falhou.'; exit 1; fi"
-    },
-    {
-      "id": "conditional_logic",
-      "title": "Decisões Lógicas",
-      "summary": "Se 'dados.csv' existir, diga 'OK', senão diga 'Erro'.",
-      "fullGuideHtml": "<h1>Automação Inteligente</h1><p>Scripts nem sempre são lineares. Às vezes precisamos tomar decisões baseadas no estado do sistema.</p><h2>O Bloco If (Se)</h2><p>O bloco <code>if</code> verifica uma condição. Se for verdadeira, executa o primeiro bloco. Se não, executa o bloco <code>else</code>.</p><h3>Sua Missão</h3><p>Verifique se o arquivo <code>dados.csv</code> existe.<br>- Se existir: imprima <code>OK</code>.<br>- Se não existir: imprima <code>Erro</code> ou <code>dados.csv não encontrado</code>.</p>",
-      "setupCommands": ["rm -f dados.csv", "touch dados.csv"],
-      "verificationScript": "if [ -f dados.csv ]; then echo 'OK'; exit 0; else echo 'dados.csv não encontrado.'; exit 1; fi"
-    },
-    {
-      "id": "loop_processing",
-      "title": "Repetição (Loops)",
-      "summary": "Imprima o nome de cada arquivo .txt individualmente.",
-      "fullGuideHtml": "<h1>Trabalho Repetitivo</h1><p>Imagine ter que rodar um comando para 100 arquivos diferentes. É para isso que servem os loops!</p><h2>O Loop For</h2><p>O <code>for</code> percorre uma lista de itens (como arquivos em uma pasta) e executa os blocos internos para cada um deles.</p><h3>Sua Missão</h3><p>Use um loop para pegar todos os arquivos <code>*.txt</code> e, para cada um, use o <code>echo</code> para imprimir seu nome.</p>",
-      "setupCommands": ["rm -f a.txt b.txt", "touch a.txt b.txt"],
-      "verificationScript": "count=$(for f in *.txt; do echo \"$f\"; done | wc -l); if [ \"$count\" -ge 2 ]; then echo 'OK'; exit 0; else echo 'Loop não percorreu todos os arquivos.'; exit 1; fi"
+      "verificationScript": "if [ -f solucao.txt ] && grep -q 'DELTA-FORCE-7' solucao.txt; then echo 'OK'; exit 0; else echo 'O arquivo solucao.txt não contém a senha correta.'; exit 1; fi",
+      "difficulty": "challenge"
     }
   ],
   "levelOrder": [
-    "intro_mkdir",
-    "intro_cd",
-    "mkdir_nested",
-    "file_mv",
-    "copy_multiple",
-    "remove_safely",
-    "cat_read",
-    "grep_filter",
-    "pipe_chain",
-    "conditional_logic",
-    "loop_processing"
+    "01_recon", "02_navigation", "03_workspace", "04_evidence", "05_cleanup",
+    "06_reading", "07_redirect", "08_grep_search", "09_pipe_connect",
+    "10_background", "11_network_check", "12_download_curl", "13_final_ctf"
   ]
 }

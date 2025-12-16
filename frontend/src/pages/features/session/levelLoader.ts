@@ -1,16 +1,37 @@
 import * as API from "@/types/api";
+import * as ShellBlocks from "shellblocks";
 import { getGameData } from "./dataManager";
+import * as PersistenceManager from "./persistenceManager";
+import * as Logger from "../ui/systemLogger";
 
-let currentLevelId: string | null = null;
+export const SANDBOX_LEVEL_ID = "sandbox";
 
-export function getCurrentLevelId(): string | null {
+let levelsCache: Map<string, API.Level> = new Map();
+let orderedLevels: API.Level[] = [];
+
+let currentLevelId: string = SANDBOX_LEVEL_ID;
+
+export function getCurrentLevelId(): string {
     return currentLevelId;
 }
 
-/**
- * Configura o seletor de níveis e os painéis de descrição.
- * Recebe os elementos do DOM diretamente.
- */
+export function notifyLevelCompleted(levelId: string): void {
+    if (levelId === SANDBOX_LEVEL_ID) return;
+
+    const levelIndex = orderedLevels.findIndex((level) => level.id === levelId);
+    if (levelIndex === -1) return;
+
+    const progress = PersistenceManager.getExperimentProgress();
+    if (levelIndex !== progress) return;
+
+    PersistenceManager.unlockNextLevel();
+
+    Logger.log(
+        `Progresso atualizado: nível ${levelIndex + 1} concluído.`,
+        ShellBlocks.LogLevel.INFO,
+    );
+}
+
 export async function setupLevelSelector(
     levelSelect: HTMLSelectElement,
     summaryElement: HTMLElement,
@@ -25,65 +46,142 @@ export async function setupLevelSelector(
         return;
     }
 
-    const levels = getSortedLevels(data);
+    levelsCache.clear();
+    orderedLevels = getSortedLevels(data);
+    orderedLevels.forEach((level) => levelsCache.set(level.id, level));
+
+    const unlockedCount = PersistenceManager.getExperimentProgress();
 
     levelSelect.innerHTML = "";
 
-    const options = [buildSandboxOption(), ...buildLevelOptions(levels)];
+    levelSelect.appendChild(
+        createOption(SANDBOX_LEVEL_ID, "Modo Livre (Sandbox)"),
+    );
 
-    options.forEach((option) => levelSelect.appendChild(option));
+    orderedLevels.forEach((level, index) => {
+        const option = createOption(
+            level.id,
+            `Nível ${index + 1}: ${level.title}`,
+        );
+
+        if (index > unlockedCount + 1) {
+            option.disabled = true;
+            option.text += " [BLOQUEADO]";
+        }
+
+        levelSelect.appendChild(option);
+    });
 
     registerLevelSelectorEvents(levelSelect, summaryElement, detailsElement);
 
+    levelSelect.value = SANDBOX_LEVEL_ID;
     levelSelect.dispatchEvent(new Event("change"));
 }
 
 function getSortedLevels(gameData: API.GameData): API.Level[] {
-    const levelsMap = new Map(gameData.levels.map((l) => [l.id, l]));
+    const levelsMap = new Map(
+        gameData.levels.map((level) => [level.id, level]),
+    );
     return gameData.levelOrder
         .map((id) => levelsMap.get(id))
         .filter((level): level is API.Level => level !== undefined);
 }
 
-function buildSandboxOption(): HTMLOptionElement {
+function createOption(value: string, text: string): HTMLOptionElement {
     const option = document.createElement("option");
-    option.value = "";
-    option.text = "Modo Livre (Sandbox)";
-
-    option.dataset.summary = "Ambiente livre sem objetivos.";
-    option.dataset.details = "<h1>Modo Livre</h1><p>Use este espaço para testar comandos e blocos livremente.</p>";
-
+    option.value = value;
+    option.text = text;
     return option;
-}
-
-function buildLevelOptions(levels: API.Level[]): HTMLOptionElement[] {
-    return levels.map((level, index) => {
-        const option = document.createElement("option");
-        option.value = level.id;
-        option.text = `Nível ${index + 1}: ${level.title}`;
-
-        option.dataset.summary = level.summary || "";
-        option.dataset.details = level.fullGuideHtml || `<p>${level.summary || ""}</p>`;
-
-        return option;
-    });
 }
 
 function registerLevelSelectorEvents(
     selectElement: HTMLSelectElement,
     summaryElement: HTMLElement,
-    detailsElement: HTMLElement
-) {
+    detailsElement: HTMLElement,
+): void {
     selectElement.addEventListener("change", () => {
-        currentLevelId = selectElement.value || null;
+        currentLevelId = selectElement.value;
 
-        const selectedOption = selectElement.selectedOptions[0];
-        if (!selectedOption) return;
+        if (currentLevelId === SANDBOX_LEVEL_ID) {
+            renderSandboxMode(summaryElement, detailsElement);
+            return;
+        }
 
-        // Atualiza a UI lendo do dataset da opção selecionada
-        // .textContent para texto puro (segurança)
-        summaryElement.textContent = selectedOption.dataset.summary || "";
-        // .innerHTML para o guia rico (renderiza o HTML string)
-        detailsElement.innerHTML = selectedOption.dataset.details || "";
+        const level = levelsCache.get(currentLevelId);
+        if (level) {
+            renderLevelMode(level, summaryElement, detailsElement);
+        } else {
+            renderErrorState(currentLevelId, summaryElement, detailsElement);
+        }
     });
+}
+
+function renderSandboxMode(
+    summaryElement: HTMLElement,
+    detailsElement: HTMLElement,
+): void {
+    const badgeHtml = getBadgeHtml("sandbox");
+
+    summaryElement.innerHTML = `
+        <span class="summary-label">Ambiente livre sem objetivos.</span>
+        ${badgeHtml}
+    `;
+
+    detailsElement.innerHTML = `
+        <h1>Modo Livre</h1>
+        <p>Use este espaço para testar comandos e blocos livremente.</p>
+    `;
+}
+
+function renderLevelMode(
+    level: API.Level,
+    summaryElement: HTMLElement,
+    detailsElement: HTMLElement,
+): void {
+    const difficulty = level.difficulty || "tutorial";
+    const badgeHtml = getBadgeHtml(difficulty);
+
+    summaryElement.innerHTML = `
+        <span class="summary-label">${level.summary || ""}</span>
+        ${badgeHtml}
+    `;
+
+    detailsElement.innerHTML = level.fullGuideHtml || `<p>${level.summary}</p>`;
+}
+
+function renderErrorState(
+    invalidId: string,
+    summaryElement: HTMLElement,
+    detailsElement: HTMLElement,
+): void {
+    Logger.log(
+        `Erro: nível (${invalidId}) não encontrado.`,
+        ShellBlocks.LogLevel.ERROR,
+    );
+    summaryElement.textContent = "Erro ao carregar nível.";
+    detailsElement.innerHTML = "";
+}
+
+function getBadgeHtml(
+    inputDifficulty?: API.LevelDifficulty | "sandbox",
+): string {
+    if (!inputDifficulty) return "";
+
+    let label = "TREINO";
+    let cssClass = "badge-training";
+
+    const difficulty = inputDifficulty.toLowerCase();
+
+    if (difficulty === "tutorial") {
+        label = "TUTORIAL";
+        cssClass = "badge-tutorial";
+    } else if (difficulty === "challenge") {
+        label = "DESAFIO";
+        cssClass = "badge-challenge";
+    } else if (difficulty === "sandbox") {
+        label = "MODO LIVRE";
+        cssClass = "badge-sandbox";
+    }
+
+    return `<span class="difficulty-badge ${cssClass}">${label}</span>`;
 }

@@ -1,0 +1,43 @@
+.difficulty-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    height: 22px;
+    padding: 2px 8px;
+    border-radius: 4px;
+
+    min-width: 80px;
+
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.badge-sandbox {
+    background-color: #f7f7f7;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.badge-tutorial {
+    background-color: #dcfce7;
+    color: #14532d;
+    border: 1px solid #bbf7d0;
+}
+
+.badge-training {
+    background-color: #e0f2fe;
+    color: var(--color-brand-primary);
+    border: 1px solid #bae6fd;
+}
+
+.badge-challenge {
+    background-color: #fee2e2;
+    color: var(--color-danger-hover);
+    border: 1px solid #fecaca;
+}

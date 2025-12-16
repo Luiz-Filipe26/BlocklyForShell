@@ -1,21 +1,47 @@
 .level-full-details h1 {
     font-size: 1.6em;
     margin: 0.67em 0;
+    color: #2c3e50;
 }
 
 .level-full-details h2 {
-    font-size: 1.4em;
-    margin: 0.75em 0;
+    font-size: 1.4em; margin: 0.75em 0; border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
 }
 
 .level-full-details h3 {
     font-size: 1.2em;
     margin: 0.83em 0;
+    color: #444;
 }
 
 .level-full-details h4 {
     font-size: 1.1em;
     margin: 1em 0;
+}
+
+.level-full-details p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+.level-full-details ul,
+.level-full-details ol {
+    margin-bottom: 1em;
+    padding-left: 20px;
+}
+
+.level-full-details li {
+    margin-bottom: 0.5em;
+}
+
+.level-full-details code {
+    background-color: #f1f3f5;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    color: #d63384;
+    font-size: 0.9em;
 }
 
 .level-full-details > *:first-child {

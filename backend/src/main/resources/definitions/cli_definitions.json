@@ -617,7 +617,7 @@
           "type": "statement",
           "check": "command",
           "label": "Então faça (then):",
-          "syntaxPrefix": "then",
+          "syntaxPrefix": " ; then",
           "obligatory": true
         },
         {
@@ -625,7 +625,7 @@
           "type": "statement",
           "check": "command",
           "label": "Senão (else):",
-          "syntaxPrefix": "else",
+		  "syntaxPrefix": " \nelse ",
           "obligatory": false
         }
       ]
@@ -651,7 +651,7 @@
           "type": "statement",
           "check": "command",
           "label": "Faça (do):",
-          "syntaxPrefix": "do",
+          "syntaxPrefix": " ; do ",
           "obligatory": true
         }
       ]

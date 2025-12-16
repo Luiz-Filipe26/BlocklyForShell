@@ -12,14 +12,36 @@ export interface SemanticBinding {
     name: string;
 }
 
+export interface SemanticControlSlot {
+    name: string;
+    syntaxPrefix?: string | null;
+    obligatory?: boolean;
+}
+
+export interface SemanticControlDefinition {
+    syntaxEnd?: string | null;
+    slots: SemanticControlSlot[];
+}
+
+export interface SemanticOperatorSlot {
+    name: string;
+    symbol?: string | null;
+    symbolPlacement?: "before" | "after" | null;
+}
+
+export interface SemanticOperatorDefinition {
+    slots: SemanticOperatorSlot[];
+}
+
 export interface SemanticData {
     nodeType: SemanticNodeKind;
     name: string;
     bindings: SemanticBinding[];
-}
 
-export interface ScriptSemanticData extends SemanticData {
-    nodeType: "script";
+    definition?: {
+        control?: SemanticControlDefinition;
+        operator?: SemanticOperatorDefinition;
+    };
 }
 
 export interface ASTField {
@@ -40,5 +62,5 @@ export interface ASTNode {
 }
 
 export interface AST extends ASTNode {
-    semanticData: ScriptSemanticData
+    semanticData: SemanticData & { nodeType: "script" };
 }

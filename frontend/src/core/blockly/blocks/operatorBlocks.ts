@@ -25,6 +25,18 @@ export function createOperatorBlock(operatorDefinition: CLI.CLIOperator): void {
                     source: "input",
                     name: slot.name,
                 })),
+
+                definition: {
+                    operator: {
+                        slots: operatorDefinition.slots.map((slot) => ({
+                            name: slot.name,
+                            symbol: slot.symbol || null,
+                            symbolPlacement:
+                                (slot.symbolPlacement as "before" | "after") ||
+                                null,
+                        })),
+                    },
+                },
             });
 
             this.setInputsInline(true);

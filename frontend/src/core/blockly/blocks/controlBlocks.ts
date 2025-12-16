@@ -12,12 +12,22 @@ export function createControlBlock(controlDefinition: CLI.CLIControl): void {
         init: function(this: Blockly.BlockSvg) {
             setBlockSemanticData(this, {
                 nodeType: "control",
-                name: controlDefinition.id,
+                name: controlDefinition.shellCommand,
                 bindings: controlDefinition.slots.map((slot) => ({
                     key: slot.name,
                     source: "input",
                     name: slot.name,
                 })),
+                definition: {
+                    control: {
+                        syntaxEnd: controlDefinition.syntaxEnd || null,
+                        slots: controlDefinition.slots.map((slot) => ({
+                            name: slot.name,
+                            syntaxPrefix: slot.syntaxPrefix || null,
+                            obligatory: slot.obligatory || false,
+                        })),
+                    },
+                },
             });
 
             appendControlHeader(controlDefinition, this);

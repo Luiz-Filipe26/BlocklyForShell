@@ -6,13 +6,14 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import br.edu.ifmg.cli.config.ServerConfig;
 import br.edu.ifmg.cli.controllers.DefinitionController;
 import br.edu.ifmg.cli.controllers.ExecutionController;
+import br.edu.ifmg.cli.controllers.LevelController;
 import br.edu.ifmg.cli.controllers.ScriptController;
+import br.edu.ifmg.cli.services.DockerService;
 import br.edu.ifmg.cli.services.LevelService;
 import br.edu.ifmg.cli.services.SandboxRunner;
 import br.edu.ifmg.cli.services.ScriptGenerator;
@@ -26,9 +27,16 @@ public class ServerInitializer {
 	private static final Logger logger = LoggerFactory.getLogger(ServerInitializer.class);
 
 	public void start(ServerConfig config) {
-		Gson gson = new GsonBuilder().create();
+		var jsonMapper = createJsonMapper();
+		Javalin app = createJavalinApp(config, jsonMapper);
+		String dockerPrefix = prepareDockerEnvironment();
+		registerControllers(app, dockerPrefix);
+		startServer(app, config.port());
+	}
 
-		JsonMapper gsonMapper = new JsonMapper() {
+	private JsonMapper createJsonMapper() {
+		var gson = new GsonBuilder().create();
+		return new JsonMapper() {
 			@Override
 			public String toJsonString(@NotNull Object obj, @NotNull Type type) {
 				return gson.toJson(obj, type);
@@ -39,10 +47,12 @@ public class ServerInitializer {
 				return gson.fromJson(json, targetType);
 			}
 		};
+	}
 
-		var app = Javalin.create(javalinConfig -> {
+	private Javalin createJavalinApp(ServerConfig config, JsonMapper jsonMapper) {
+		return Javalin.create(javalinConfig -> {
 			javalinConfig.staticFiles.add(PUBLIC_FOLDER, Location.CLASSPATH);
-			javalinConfig.jsonMapper(gsonMapper);
+			javalinConfig.jsonMapper(jsonMapper);
 
 			javalinConfig.bundledPlugins.enableCors(cors -> {
 				cors.addRule(it -> {
@@ -52,18 +62,27 @@ public class ServerInitializer {
 			});
 			javalinConfig.http.defaultContentType = "application/json";
 		});
+	}
 
+	private String prepareDockerEnvironment() {
+		var dockerService = new DockerService();
+		dockerService.ensureImageExists();
+		return dockerService.getCommandPrefix();
+	}
+
+	private void registerControllers(Javalin app, String dockerPrefix) {
 		var scriptGenerator = new ScriptGenerator();
-		var sandboxRunner = new SandboxRunner();
+		var sandboxRunner = new SandboxRunner(dockerPrefix);
 		var levelService = new LevelService();
-
 		new DefinitionController().registerRoutes(app);
+		new LevelController(levelService).registerRoutes(app);
 		new ExecutionController(scriptGenerator, sandboxRunner, levelService).registerRoutes(app);
 		new ScriptController(scriptGenerator).registerRoutes(app);
+	}
 
-		app.start(config.port());
-
-		logger.info("Servidor Backend iniciado na porta {}", config.port());
+	private void startServer(Javalin app, int port) {
+		app.start(port);
+		logger.info("Servidor Backend iniciado na porta {}", port);
 		logger.info("Clique em \"Abrir Navegador\" para começar.");
 	}
 }

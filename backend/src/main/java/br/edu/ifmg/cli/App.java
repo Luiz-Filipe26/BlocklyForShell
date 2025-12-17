@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import br.edu.ifmg.cli.config.ServerConfig;
 import br.edu.ifmg.cli.server.ServerInitializer;
-import br.edu.ifmg.cli.services.DockerService;
 import br.edu.ifmg.cli.ui.LauncherWindow;
 
 public class App {
@@ -43,7 +42,6 @@ public class App {
 			logger.info("   Ambiente DEV (CORS): {}", config.devFrontendUrl());
 			window.setWebAppUrl("http://localhost:" + config.port());
 
-			new DockerService().ensureImageExists();
 			new ServerInitializer().start(config);
 			window.enableBrowserButton();
 

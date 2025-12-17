@@ -1,6 +1,7 @@
 package br.edu.ifmg.cli.controllers;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +31,6 @@ public class ExecutionController {
 
 	public void registerRoutes(Javalin app) {
 		app.post("/api/run", this::run);
-		app.get("/api/game-data", this::getGameData);
-	}
-
-	private void getGameData(Context ctx) {
-		ctx.json(levelService.getGameData());
 	}
 
 	private void run(Context ctx) {
@@ -43,7 +39,7 @@ public class ExecutionController {
 
 			String userScript = generator.generate(request.ast());
 
-			var setupCmds = Collections.<String>emptyList();
+			List<String> setupCmds = Collections.emptyList();
 			String verifyScript = "";
 
 			if (request.levelId() != null && !request.levelId().isEmpty()) {
@@ -59,7 +55,7 @@ public class ExecutionController {
 			ctx.json(result);
 
 		} catch (Exception e) {
-			logger.error("Erro ao processar requisição", e);
+			logger.error("Erro ao processar requisição de execução", e);
 			ctx.status(400).json(new ExecutionResult("", "Erro: " + e.getMessage(), 1));
 		}
 	}

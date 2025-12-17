@@ -72,7 +72,11 @@ function enforceExperimentRestrictions() {
 function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
     pageElements.runBtn.addEventListener("click", async () => {
         runScript(workspace, pageElements, getCurrentLevelId(), (levelId) =>
-            onLevelSuccesEvent(levelId, pageElements.levelSelect),
+            onLevelSuccesEvent(
+                levelId,
+                pageElements.levelSelect,
+                IS_EXPERIMENT_MODE,
+            ),
         );
     });
 

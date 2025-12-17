@@ -2,85 +2,69 @@ package br.edu.ifmg.cli.services;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import br.edu.ifmg.cli.models.ExecutionResult;
 
 public class SandboxRunner {
 
-    private static final int TIMEOUT_SECONDS = 8;
-    private static final Logger logger = LoggerFactory.getLogger(SandboxRunner.class);
+	private static final int TIMEOUT_SECONDS = 8;
+	private static final Logger logger = LoggerFactory.getLogger(SandboxRunner.class);
 
-    public ExecutionResult run(String userScript, List<String> setupCommands, String verificationScript) {
-        
-        try {
-            StringBuilder fullScript = new StringBuilder();
+	private final String dockerPrefix;
 
-            if (setupCommands != null && !setupCommands.isEmpty()) {
-                fullScript.append("{ ");
-                for (String cmd : setupCommands) {
-                    fullScript.append(cmd).append(" ; ");
-                }
-                fullScript.append(" } > /dev/null 2>&1 && ");
-            }
+	public SandboxRunner(String dockerPrefix) {
+		this.dockerPrefix = dockerPrefix;
+	}
 
-            fullScript.append(" ( ");
-            fullScript.append(userScript);
-            fullScript.append(" ) | tee .last_cmd_out && ");
+	public ExecutionResult run(String userScript, List<String> setupCommands, String verificationScript) {
+		try {
+			StringBuilder fullScript = new StringBuilder();
+			if (setupCommands != null && !setupCommands.isEmpty()) {
+				fullScript.append("{ ");
+				for (String cmd : setupCommands)
+					fullScript.append(cmd).append(" ; ");
+				fullScript.append(" } > /dev/null 2>&1 && ");
+			}
+			fullScript.append(" ( ").append(userScript).append(" ) | tee .last_cmd_out && ");
+			String verify = (verificationScript != null && !verificationScript.isBlank()) ? verificationScript
+					: "exit 0";
+			fullScript.append("\n").append(verify);
 
-            String verify = (verificationScript != null && !verificationScript.isBlank()) 
-                            ? verificationScript 
-                            : "exit 0";
-            
-            fullScript.append("\n").append(verify);
+			var command = new ArrayList<String>();
+			String commandBeggining = this.dockerPrefix
+					+ " run --rm --net none --memory 100m --cpus 0.5 blockly-shell-env bash -c";
+			command.addAll(Arrays.asList(commandBeggining.split("\\s+")));
+			command.add(fullScript.toString());
 
-            // MONTAGEM DO COMANDO USANDO O PREFIXO DO SERVICE (docker ou sudo docker)
-            List<String> command = new ArrayList<>(DockerService.getDockerCommand());
-            
-            // Adiciona os argumentos do comando run
-            command.add("run");
-            command.add("--rm");
-            command.add("--net"); command.add("none");
-            command.add("--memory"); command.add("100m");
-            command.add("--cpus"); command.add("0.5");
-            command.add(DockerService.IMAGE_NAME);
-            command.add("bash");
-            command.add("-c");
-            command.add(fullScript.toString());
+			ProcessBuilder pb = new ProcessBuilder(command);
+			Process process = pb.start();
+			boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-            ProcessBuilder pb = new ProcessBuilder(command);
+			String stdout, stderr;
+			int exitCode;
 
-            Process process = pb.start();
-            boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			if (!finished) {
+				process.destroyForcibly();
+				stdout = "";
+				stderr = "⏱️ Timeout.";
+				exitCode = 124;
+			} else {
+				stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+				stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+				exitCode = process.exitValue();
+				if (exitCode >= 125)
+					stderr = "\n[ERRO CONTAINER] Exit " + exitCode + "\n" + stderr;
+			}
 
-            String stdout;
-            String stderr;
-            int exitCode;
+			return new ExecutionResult(stdout, stderr, exitCode);
 
-            if (!finished) {
-                process.destroyForcibly();
-                stdout = "";
-                stderr = "⏱️ Tempo limite excedido (" + TIMEOUT_SECONDS + "s). Loop infinito ou comando travado?";
-                exitCode = 124;
-            } else {
-                stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
-                exitCode = process.exitValue();
-
-                if (exitCode == 125 || exitCode == 126 || exitCode == 127) {
-                    stderr = "\n[ERRO SISTEMA] Falha no container (Exit " + exitCode + ").\n" + stderr;
-                }
-            }
-
-            return new ExecutionResult(stdout, stderr, exitCode);
-
-        } catch (Exception e) {
-            logger.error("Erro interno no SandboxRunner", e);
-            return new ExecutionResult("", "Erro interno: " + e.getMessage(), 1);
-        }
-    }
+		} catch (Exception e) {
+			logger.error("Erro interno", e);
+			return new ExecutionResult("", "Erro: " + e.getMessage(), 1);
+		}
+	}
 }

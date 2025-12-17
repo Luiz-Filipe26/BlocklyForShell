@@ -16,7 +16,12 @@ interface RunDependencies {
     closeModalBtn: HTMLButtonElement;
 }
 
-export type OnLevelSuccess = (levelId: string) => void;
+export interface LevelSuccessResult {
+    unlockedNewLevel: boolean;
+    nextLevelTitle?: string;
+}
+
+export type OnLevelSuccess = (levelId: string) => LevelSuccessResult;
 
 export async function runScript(
     workspace: Blockly.WorkspaceSvg,
@@ -140,7 +145,19 @@ function renderExecutionOutput(
     if (currentLevelId !== SANDBOX_LEVEL_ID) {
         if (result.exitCode === 0) {
             cliOutput.textContent += "[SUCESSO] Objetivo concluído.\n";
-            onLevelSuccess(currentLevelId);
+
+            const status = onLevelSuccess(currentLevelId);
+
+            if (status.unlockedNewLevel) {
+                cliOutput.textContent +=
+                    "------------------------------------------------\n";
+                cliOutput.textContent += "SISTEMA: Novo nível desbloqueado!\n";
+                if (status.nextLevelTitle) {
+                    cliOutput.textContent += `PRÓXIMO: ${status.nextLevelTitle}\n`;
+                }
+                cliOutput.textContent +=
+                    "------------------------------------------------\n";
+            }
         } else {
             cliOutput.textContent += "[FALHA] O objetivo não foi atingido.\n";
         }
@@ -149,4 +166,5 @@ function renderExecutionOutput(
     }
 
     cliOutput.textContent += "$";
+    cliOutput.scrollTop = cliOutput.scrollHeight; // Garante que o usuário veja a mensagem final
 }

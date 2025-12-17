@@ -2,7 +2,7 @@ import * as API from "@/types/api";
 import * as ShellBlocks from "shellblocks";
 import * as PersistenceManager from "./persistenceManager";
 import * as Logger from "../ui/systemLogger";
-import { IS_EXPERIMENT_MODE } from "@/pages";
+import { LevelSuccessResult } from "../execution/scriptRunner";
 
 export const SANDBOX_LEVEL_ID = "sandbox";
 
@@ -18,41 +18,78 @@ export function getCurrentLevelId(): string {
 export function onLevelSuccesEvent(
     levelId: string,
     levelSelect: HTMLSelectElement,
-): void {
-    if (!IS_EXPERIMENT_MODE) return;
+    isExperimentMode: boolean,
+): LevelSuccessResult {
+    if (!isExperimentMode) return { unlockedNewLevel: false };
 
     const nonSandboxOptions = [...levelSelect.options].filter(
         (option) => option.value !== SANDBOX_LEVEL_ID,
     );
+
     const currentLevelIdIndex = nonSandboxOptions.findIndex(
         (option) => option.value == levelId,
     );
+
     if (levelId !== SANDBOX_LEVEL_ID && currentLevelIdIndex < 0) {
         Logger.log(
-            "Não foi possível descobrir o nível atual",
+            `Erro de rastreio: Nível ID ${levelId} não identificado no seletor.`,
             ShellBlocks.LogLevel.ERROR,
         );
+        return { unlockedNewLevel: false };
     }
+
     Logger.log(
-        `Nível ${currentLevelIdIndex + 1} concluído.`,
+        `Evento: Nível ${currentLevelIdIndex + 1} concluído.`,
         ShellBlocks.LogLevel.INFO,
     );
-    if (currentLevelIdIndex === nonSandboxOptions.length - 1) return;
-    let lastUnlockedLevelId =
+
+    if (currentLevelIdIndex === nonSandboxOptions.length - 1) {
+        Logger.log(
+            "Status: Todos os níveis concluídos.",
+            ShellBlocks.LogLevel.INFO,
+        );
+        return { unlockedNewLevel: false };
+    }
+
+    const lastUnlockedLevelId =
         PersistenceManager.getLastUnlockedLevelId() ||
         nonSandboxOptions[0].value ||
         "";
+
     const lastUnlockedLevelIndex = nonSandboxOptions.findIndex(
         (option) => option.value === lastUnlockedLevelId,
     );
+
     const newLastUnlockedLevelIndex = Math.max(
         currentLevelIdIndex + 1,
         lastUnlockedLevelIndex,
     );
+
     const newLastUnlockedLevelId =
         nonSandboxOptions[newLastUnlockedLevelIndex].value || "";
-    PersistenceManager.unlockLevel(newLastUnlockedLevelId);
-    modifyOptionsToDisplayProgress(nonSandboxOptions, newLastUnlockedLevelId);
+
+    if (newLastUnlockedLevelIndex > lastUnlockedLevelIndex) {
+        PersistenceManager.unlockLevel(newLastUnlockedLevelId);
+        modifyOptionsToDisplayProgress(
+            nonSandboxOptions,
+            newLastUnlockedLevelId,
+        );
+
+        const nextTitle =
+            nonSandboxOptions[newLastUnlockedLevelIndex].dataset.title;
+
+        Logger.log(
+            `Progresso: Nível ${newLastUnlockedLevelIndex + 1} (${nextTitle}) desbloqueado.`,
+            ShellBlocks.LogLevel.INFO,
+        );
+
+        return {
+            unlockedNewLevel: true,
+            nextLevelTitle: nextTitle,
+        };
+    }
+
+    return { unlockedNewLevel: false };
 }
 
 export interface SelectorDependencies {

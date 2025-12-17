@@ -10,7 +10,7 @@ export interface ExecutionResult {
     exitCode: number;
 }
 
-export type LevelDifficulty = 'tutorial' | 'training' | 'challenge';
+export type LevelDifficulty = "tutorial" | "training" | "challenge";
 
 export interface Level {
     id: string;

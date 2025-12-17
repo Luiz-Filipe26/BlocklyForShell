@@ -10,8 +10,8 @@ public record CliDefinitions(List<CommandDef> commands, @Nullable List<OperatorD
 		@Nullable List<ControlDef> controls, List<CategoryDef> categories) {
 
 	public record CommandDef(String id, String shellCommand, String label, String description, String color,
-			String optionColor, List<OptionDef> options, List<List<String>> exclusiveOptions,
-			List<OperandDef> operands) {
+			String optionColor, List<OptionDef> options, List<List<String>> exclusiveOptions, List<OperandDef> operands,
+			@Nullable List<OperandSyntaxRule> operandSyntaxRules, @Nullable String operandIdsSequenceSeparator) {
 	}
 
 	public record OptionDef(String flag, @Nullable String longFlag, String description,
@@ -33,6 +33,9 @@ public record CliDefinitions(List<CommandDef> commands, @Nullable List<OperatorD
 
 	public record OperatorDef(String id, String label, String description, String color, List<SlotDef> slots,
 			List<String> slotsWithImplicitData) {
+	}
+
+	public record OperandSyntaxRule(String regexPattern, @Nullable String errorMessage) {
 	}
 
 	public record ControlDef(String id, String shellCommand, String label, String description, String color,

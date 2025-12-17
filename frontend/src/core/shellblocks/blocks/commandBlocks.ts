@@ -13,6 +13,7 @@ import {
 } from "../validation/autofix";
 import { validateCardinality } from "../validation/cardinalityValidator";
 import { addLocalChangeListener } from "../events/blockEventListeners";
+import { validateOperandSyntax } from "../validation/syntaxValidator";
 
 export function createCommandBlock(commandDefinition: CLI.CLICommand): void {
     Blockly.Blocks[commandDefinition.id] = {
@@ -35,22 +36,20 @@ export function createCommandBlock(commandDefinition: CLI.CLICommand): void {
             });
             appendCommandHeader(commandDefinition, this);
             appendCommandInputs(commandDefinition, this);
-            setupCommandDeduplication(commandDefinition, this);
-            setupExclusiveOptionsValidation(commandDefinition, this);
-            setupCardinalityPipeline(commandDefinition, this);
+            setupCommandIntegrityPipeline(commandDefinition, this);
         },
     };
 }
 
 function appendCommandHeader(
     commandDefinition: CLI.CLICommand,
-    block: Blockly.BlockSvg,
+    commandBlock: Blockly.BlockSvg,
 ): void {
     const helpIcon = BlockComponents.createGenericHelpIcon(() =>
         buildCommandHelpHTML(commandDefinition),
     );
 
-    block
+    commandBlock
         .appendDummyInput(BlockIDs.DUMMY_INPUTS.HEADER)
         .appendField(commandDefinition.label)
         .appendField(" ")
@@ -63,77 +62,67 @@ function appendCommandHeader(
 
 function appendCommandInputs(
     commandDefinition: CLI.CLICommand,
-    block: Blockly.BlockSvg,
+    commandBlock: Blockly.BlockSvg,
 ): void {
     if (commandDefinition.options && commandDefinition.options.length > 0) {
-        block
+        commandBlock
             .appendStatementInput(BlockIDs.INPUTS.OPTIONS)
             .setCheck(BlockIDs.commandOptionStatementType(commandDefinition))
             .appendField("Opções:");
     }
 
     if (commandDefinition.operands && commandDefinition.operands.length > 0) {
-        block
+        commandBlock
             .appendStatementInput(BlockIDs.INPUTS.OPERANDS)
             .setCheck(BlockIDs.commandOperandStatementType(commandDefinition))
             .appendField("Operandos:");
     }
 
-    block.setPreviousStatement(true, BlockIDs.commandStatementType());
-    block.setNextStatement(true, BlockIDs.commandStatementType());
-    block.setColour(commandDefinition.color);
-    block.setTooltip(commandDefinition.description);
+    commandBlock.setPreviousStatement(true, BlockIDs.commandStatementType());
+    commandBlock.setNextStatement(true, BlockIDs.commandStatementType());
+    commandBlock.setColour(commandDefinition.color);
+    commandBlock.setTooltip(commandDefinition.description);
 }
 
-function setupCommandDeduplication(
+function setupCommandIntegrityPipeline(
     commandDefinition: CLI.CLICommand,
-    block: Blockly.BlockSvg,
+    commandBlock: Blockly.BlockSvg,
 ): void {
-    addLocalChangeListener(block, () => {
-        const optionBlocks = BlockTraversal.getBlocksList(
-            block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
+    addLocalChangeListener(commandBlock, () => {
+        let optionBlocks = BlockTraversal.getBlocksList(
+            commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
             BlockIDs.commandOptionBlockType(commandDefinition),
+        );
+
+        let operandBlocks = BlockTraversal.getBlocksList(
+            commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
+            BlockIDs.INPUTS.OPERANDS,
         );
 
         unplugDuplicatesFromList(optionBlocks, (child) =>
             child.getFieldValue(BlockIDs.FIELDS.FLAG),
         );
-    });
-}
-
-function setupCardinalityPipeline(
-    commandDefinition: CLI.CLICommand,
-    block: Blockly.BlockSvg,
-): void {
-    addLocalChangeListener(block, () => {
-        validateCardinality(block, commandDefinition);
-        renderBlockWarnings(block);
-        BlockComponents.updateCardinalityIndicator(block);
-        autoFixExcessOperands(block, commandDefinition);
-    });
-}
-
-function setupExclusiveOptionsValidation(
-    commandDefinition: CLI.CLICommand,
-    block: Blockly.BlockSvg,
-): void {
-    if (
-        !commandDefinition.exclusiveOptions ||
-        commandDefinition.exclusiveOptions.length === 0
-    )
-        return;
-
-    addLocalChangeListener(block, () => {
-        const optionBlocks = BlockTraversal.getBlocksList(
-            block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
-            BlockIDs.commandOptionBlockType(commandDefinition),
-        );
+        optionBlocks = optionBlocks.filter((b) => b.getParent() !== null);
 
         if (commandDefinition.exclusiveOptions) {
             unplugExclusiveOptionsFromCommand(
                 optionBlocks,
                 commandDefinition.exclusiveOptions,
             );
+            optionBlocks = optionBlocks.filter((b) => b.getParent() !== null);
         }
+
+        autoFixExcessOperands(operandBlocks, commandDefinition);
+        operandBlocks = operandBlocks.filter((b) => b.getParent() !== null);
+
+        validateCardinality(commandBlock, commandDefinition, {
+            optionBlocks: optionBlocks,
+            operandBlocks: operandBlocks,
+        });
+
+        validateOperandSyntax(commandBlock, commandDefinition, operandBlocks);
+
+        renderBlockWarnings(commandBlock);
+        BlockComponents.updateCardinalityIndicator(commandBlock);
     });
 }

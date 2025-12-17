@@ -3,6 +3,7 @@ import type { CLIOperand, CLIControlSlot } from "../types/cli";
 export const VALIDATION_ERRORS = {
     CARDINALITY_MIN_OPTIONS: "CARDINALITY_MIN_OPTIONS",
     CARDINALITY_MIN_OPERANDS: "CARDINALITY_MIN_OPERANDS",
+    SYNTAX_ERROR_ID: "syntax_operand_sequence",
 } as const;
 
 export type FixedValidationError =

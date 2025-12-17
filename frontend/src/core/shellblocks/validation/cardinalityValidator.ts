@@ -45,19 +45,32 @@ function clearAllControlCardinalityErrors(
 export function validateCardinality(
     commandBlock: Blockly.Block,
     commandDefinition: CLI.CLICommand,
+    blocks: {
+        options: Blockly.Block[];
+        operands: Blockly.Block[];
+    },
 ): void {
     clearAllOperandCardinalityErrors(commandBlock, commandDefinition);
-    validateOptionsGroupCardinality(commandBlock, commandDefinition);
+    validateOptionsGroupCardinality(
+        commandBlock,
+        commandDefinition,
+        blocks.options,
+    );
 
     if (shouldRelaxOperandChecks(commandBlock)) return;
 
-    validateOperandsGroupCardinality(commandBlock, commandDefinition);
-    validateSpecificOperandsCardinality(commandBlock, commandDefinition);
+    validateOperandsGroupCardinality(
+        commandBlock,
+        commandDefinition,
+        blocks.operands,
+    );
+    validateSpecificOperandsCardinality(
+        commandBlock,
+        commandDefinition,
+        blocks.operands,
+    );
 }
 
-/**
- * Limpa todos os possíveis erros de cardinalidade do bloco.
- */
 function clearAllOperandCardinalityErrors(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
@@ -79,9 +92,6 @@ function clearAllOperandCardinalityErrors(
     );
 }
 
-/**
- * Valida se o operador possui todos os slots preenchidos e sem blocos empilhados.
- */
 export function validateOperatorIntegrity(
     block: Blockly.Block,
     operatorDefinition: CLI.CLIOperator,
@@ -128,19 +138,14 @@ function isOperatorSlotStacked(
     return Boolean(targetBlock?.getNextBlock());
 }
 
-/**
- * Valida cardinalidade mínima do grupo de opções.
- */
 function validateOptionsGroupCardinality(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
+    optionBlocks: Blockly.Block[],
 ): void {
     if (!commandDefinition.optionsMin) return;
 
-    const currentCount = BlockTraversal.getBlocksList(
-        block.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
-    ).length;
-
+    const currentCount = optionBlocks.length;
     const missing = Math.max(0, commandDefinition.optionsMin - currentCount);
 
     if (missing === 0) return;
@@ -152,9 +157,6 @@ function validateOptionsGroupCardinality(
     );
 }
 
-/**
- * Verifica se o bloco está conectado a um slot que já fornece dados (Ex: Pipe).
- */
 function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
     const parent = block.getSurroundParent();
     if (!parent) return false;
@@ -170,19 +172,14 @@ function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
     );
 }
 
-/**
- * Verifica cardinalidade mínima do grupo de operandos.
- */
 function validateOperandsGroupCardinality(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
+    operandBlocks: Blockly.Block[],
 ): void {
     if (!commandDefinition.operandsMin) return;
 
-    const currentCount = BlockTraversal.getBlocksList(
-        block.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
-    ).length;
-
+    const currentCount = operandBlocks.length;
     const missing = Math.max(0, commandDefinition.operandsMin - currentCount);
 
     if (missing === 0) return;
@@ -194,21 +191,15 @@ function validateOperandsGroupCardinality(
     );
 }
 
-/**
- * Verifica cardinalidade mínima por tipo específico de operando.
- */
 function validateSpecificOperandsCardinality(
     block: Blockly.Block,
     commandDefinition: CLI.CLICommand,
+    operandBlocks: Blockly.Block[],
 ): void {
     if (commandDefinition.operands.length === 0) return;
 
-    const allBlocks = BlockTraversal.getBlocksList(
-        block.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
-    );
-
     const countsByType = new Map<string, number>();
-    for (const child of allBlocks) {
+    for (const child of operandBlocks) {
         const current = countsByType.get(child.type) || 0;
         countsByType.set(child.type, current + 1);
     }

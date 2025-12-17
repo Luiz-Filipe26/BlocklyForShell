@@ -1,6 +1,5 @@
 {
   "$schema": "./cli_schema.json",
-  
   "commands": [
     {
       "id": "ls",
@@ -233,6 +232,17 @@
             }
           ]
         }
+      ],
+      "operandIdsSequenceDelimiter": "-",
+      "operandSyntaxRules": [
+        {
+          "regexPattern": "(source-)+destination-",
+          "errorMessage": null
+        },
+        {
+          "regexPattern": "destination-(source-)+",
+          "errorMessage": "O 'Destino' deve ser sempre o último bloco do comando cp."
+        }
       ]
     },
     {
@@ -288,6 +298,17 @@
               "errorMessage": "Caminho inválido."
             }
           ]
+        }
+      ],
+      "operandIdsSequenceDelimiter": "-",
+      "operandSyntaxRules": [
+        {
+          "regexPattern": "(source-)+destination-",
+          "errorMessage": null
+        },
+        {
+          "regexPattern": "destination-(source-)+",
+          "errorMessage": "O 'Destino' deve ser o último bloco para que o comando mv saiba para onde mover os arquivos."
         }
       ]
     },
@@ -454,6 +475,17 @@
               "errorMessage": "Nome de arquivo inválido."
             }
           ]
+        }
+      ],
+      "operandIdsSequenceDelimiter": "-",
+      "operandSyntaxRules": [
+        {
+          "regexPattern": "pattern-(files-)+",
+          "errorMessage": null
+        },
+        {
+          "regexPattern": "files-pattern-",
+          "errorMessage": "Inversão detectada: O 'Padrão' de busca deve vir antes do arquivo no comando grep."
         }
       ]
     },
@@ -625,7 +657,7 @@
           "type": "statement",
           "check": "command",
           "label": "Senão (else):",
-		  "syntaxPrefix": " \nelse ",
+          "syntaxPrefix": " \nelse ",
           "obligatory": false
         }
       ]

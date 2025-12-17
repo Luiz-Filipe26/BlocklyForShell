@@ -3,6 +3,11 @@ export interface CLIValidation {
     errorMessage: string;
 }
 
+export interface OperandSyntaxRule {
+    regexPattern: string;
+    errorMessage?: string;
+}
+
 export interface CLICardinality {
     min: number;
     max: number | "unlimited";
@@ -45,6 +50,8 @@ export interface CLICommand {
     exclusiveOptions?: string[][];
     operands: CLIOperand[];
     operandsMin?: number;
+    operandSyntaxRules?: OperandSyntaxRule[];
+    operandIdsSequenceDelimiter?: string;
 }
 
 export interface CLIControlSlot {

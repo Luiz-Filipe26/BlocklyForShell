@@ -3,15 +3,32 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["commands", "operators", "controls", "categories"],
-  
   "$defs": {
     "validationDef": {
       "type": "object",
       "additionalProperties": false,
       "required": ["regex", "errorMessage"],
       "properties": {
-        "regex": { "type": "string" },
-        "errorMessage": { "type": "string" }
+        "regex": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "syntaxRuleDef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["regexPattern"],
+      "properties": {
+        "regexPattern": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": ["string", "null"],
+          "description": "Se nulo, indica que o padrão é válido. Se string, é a mensagem de erro para um erro conhecido."
+        }
       }
     },
     "cardinalityDef": {
@@ -19,11 +36,19 @@
       "additionalProperties": false,
       "required": ["min", "max"],
       "properties": {
-        "min": { "type": "integer", "minimum": 0 },
+        "min": {
+          "type": "integer",
+          "minimum": 0
+        },
         "max": {
           "oneOf": [
-            { "type": "integer", "minimum": 0 },
-            { "const": "unlimited" }
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unlimited"
+            }
           ]
         }
       }
@@ -33,14 +58,32 @@
       "additionalProperties": false,
       "required": ["name", "type", "check"],
       "properties": {
-        "name": { "type": "string" },
-        "type": { "type": "string", "enum": ["statement", "value", "dummy"] },
-        "check": { "type": "string" },
-        "label": { "type": "string" },
-        "symbol": { "type": "string" },
-        "symbolPlacement": { "type": "string", "enum": ["before", "after"] },
-        "syntaxPrefix": { "type": "string" },
-        "obligatory": { "type": "boolean" }
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["statement", "value", "dummy"]
+        },
+        "check": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "symbolPlacement": {
+          "type": "string",
+          "enum": ["before", "after"]
+        },
+        "syntaxPrefix": {
+          "type": "string"
+        },
+        "obligatory": {
+          "type": "boolean"
+        }
       }
     },
     "hexColor": {
@@ -51,9 +94,10 @@
       "type": ["string", "number", "boolean"]
     }
   },
-
   "properties": {
-    "$schema": { "type": "string" },
+    "$schema": {
+      "type": "string"
+    },
     "commands": {
       "type": "array",
       "items": {
@@ -61,12 +105,24 @@
         "additionalProperties": false,
         "required": ["id", "shellCommand", "label", "description"],
         "properties": {
-          "id": { "type": "string" },
-          "shellCommand": { "type": "string" },
-          "label": { "type": "string" },
-          "description": { "type": "string" },
-          "color": { "$ref": "#/$defs/hexColor" },
-          "optionColor": { "$ref": "#/$defs/hexColor" },
+          "id": {
+            "type": "string"
+          },
+          "shellCommand": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/$defs/hexColor"
+          },
+          "optionColor": {
+            "$ref": "#/$defs/hexColor"
+          },
           "options": {
             "type": "array",
             "items": {
@@ -74,20 +130,35 @@
               "additionalProperties": false,
               "required": ["flag", "description"],
               "properties": {
-                "flag": { "type": "string" },
-                "longFlag": { "type": "string" },
-                "description": { "type": "string" },
+                "flag": {
+                  "type": "string"
+                },
+                "longFlag": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
                 "argument": {
                   "type": "object",
                   "additionalProperties": false,
                   "required": ["type", "label"],
                   "properties": {
-                    "type": { "type": "string", "enum": ["string", "number", "boolean", "file", "folder"] },
-                    "label": { "type": "string" },
-                    "defaultValue": { "$ref": "#/$defs/defaultValueDef" },
+                    "type": {
+                      "type": "string",
+                      "enum": ["string", "number", "boolean", "file", "folder"]
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "defaultValue": {
+                      "$ref": "#/$defs/defaultValueDef"
+                    },
                     "validations": {
                       "type": "array",
-                      "items": { "$ref": "#/$defs/validationDef" }
+                      "items": {
+                        "$ref": "#/$defs/validationDef"
+                      }
                     }
                   }
                 }
@@ -98,7 +169,9 @@
             "type": "array",
             "items": {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "minItems": 2
             }
           },
@@ -109,18 +182,45 @@
               "additionalProperties": false,
               "required": ["id", "label", "description", "type", "cardinality"],
               "properties": {
-                "id": { "type": "string" },
-                "label": { "type": "string" },
-                "description": { "type": "string" },
-                "color": { "$ref": "#/$defs/hexColor" },
-                "type": { "type": "string", "enum": ["string", "number", "file", "folder", "boolean"] },
-                "defaultValue": { "$ref": "#/$defs/defaultValueDef" },
-                "cardinality": { "$ref": "#/$defs/cardinalityDef" },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "color": {
+                  "$ref": "#/$defs/hexColor"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["string", "number", "file", "folder", "boolean"]
+                },
+                "defaultValue": {
+                  "$ref": "#/$defs/defaultValueDef"
+                },
+                "cardinality": {
+                  "$ref": "#/$defs/cardinalityDef"
+                },
                 "validations": {
                   "type": "array",
-                  "items": { "$ref": "#/$defs/validationDef" }
+                  "items": {
+                    "$ref": "#/$defs/validationDef"
+                  }
                 }
               }
+            }
+          },
+          "operandIdsSequenceDelimiter": {
+            "type": "string",
+            "description": "Caractere usado para separar IDs na validação de sequência (ex: '-')."
+          },
+          "operandSyntaxRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/syntaxRuleDef"
             }
           }
         }
@@ -133,17 +233,29 @@
         "additionalProperties": false,
         "required": ["id", "label", "description", "slots"],
         "properties": {
-          "id": { "type": "string" },
-          "label": { "type": "string" },
-          "description": { "type": "string" },
-          "color": { "$ref": "#/$defs/hexColor" },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/$defs/hexColor"
+          },
           "slots": {
             "type": "array",
-            "items": { "$ref": "#/$defs/slotDef" }
+            "items": {
+              "$ref": "#/$defs/slotDef"
+            }
           },
           "slotsWithImplicitData": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
@@ -155,15 +267,29 @@
         "additionalProperties": false,
         "required": ["id", "shellCommand", "label", "description", "slots"],
         "properties": {
-          "id": { "type": "string" },
-          "shellCommand": { "type": "string" },
-          "label": { "type": "string" },
-          "description": { "type": "string" },
-          "color": { "$ref": "#/$defs/hexColor" },
-          "syntaxEnd": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "shellCommand": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/$defs/hexColor"
+          },
+          "syntaxEnd": {
+            "type": "string"
+          },
           "slots": {
             "type": "array",
-            "items": { "$ref": "#/$defs/slotDef" }
+            "items": {
+              "$ref": "#/$defs/slotDef"
+            }
           }
         }
       }
@@ -175,10 +301,14 @@
         "additionalProperties": false,
         "required": ["name", "commands"],
         "properties": {
-          "name": { "type": "string" },
+          "name": {
+            "type": "string"
+          },
           "commands": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

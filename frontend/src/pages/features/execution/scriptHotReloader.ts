@@ -15,6 +15,8 @@ export function setupScriptHotReloader(
     workspace: Blockly.WorkspaceSvg,
     codeOutput: HTMLPreElement,
 ): void {
+    sendAstToBackend(workspace, codeOutput);
+
     workspace.addChangeListener((event) => {
         if (event.isUiEvent) return;
 
@@ -71,7 +73,10 @@ async function sendAstToBackend(
 
         if (!response.ok) {
             codeOutput.textContent = "// Erro ao gerar script no backend";
-            Logger.log("Erro ao gerar script no backend", ShellBlocks.LogLevel.ERROR);
+            Logger.log(
+                "Erro ao gerar script no backend",
+                ShellBlocks.LogLevel.ERROR,
+            );
             return;
         }
 

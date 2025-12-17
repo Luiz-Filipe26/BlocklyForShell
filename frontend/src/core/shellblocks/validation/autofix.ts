@@ -6,9 +6,6 @@ import { showToast } from "../ui/toast";
 import { LogLevel } from "../types/logger";
 import { coreLog } from "../services/logging";
 
-/**
- * Despluga blocos de opção duplicados
- */
 export function unplugDuplicatesFromList(
     blocks: Blockly.Block[],
     valueFn: (block: Blockly.Block) => string,
@@ -51,20 +48,23 @@ function resolveGroupConflicts(
     const workspace = BlockTraversal.getWorkspaceFromBlocks(remainingBlocks);
 
     while (true) {
-        const foundBlocks = findGroupBlocks(remainingBlocks, group);
+        const foundBlocks = remainingBlocks.filter((block) =>
+            group.includes(String(block.getFieldValue(BlockIDs.FIELDS.FLAG))),
+        );
+
         if (foundBlocks.length <= 1) return;
 
         const keeper = foundBlocks[0];
         const intruder = foundBlocks[1];
 
         const keeperFlag = String(keeper.getFieldValue(BlockIDs.FIELDS.FLAG));
-        const intruderFlag = String(
-            intruder.getFieldValue(BlockIDs.FIELDS.FLAG),
-        );
+        const intruderFlag = String(intruder.getFieldValue(BlockIDs.FIELDS.FLAG));
 
-        unplugAndTrim(intruder, remainingBlocks);
+        intruder.unplug(true);
+        const idx = remainingBlocks.indexOf(intruder);
+        if (idx !== -1) remainingBlocks.splice(idx, 1);
 
-        const message = `Conflito: A opção \"${intruderFlag}\" não pode ser usada com \"${keeperFlag}\".`;
+        const message = `Conflito: A opção "${intruderFlag}" não pode ser usada com "${keeperFlag}".`;
         if (workspace) {
             showToast(workspace, message);
             coreLog(workspace, message, LogLevel.WARN);
@@ -72,62 +72,36 @@ function resolveGroupConflicts(
     }
 }
 
-function findGroupBlocks(
-    blocks: Blockly.Block[],
-    group: string[],
-): Blockly.Block[] {
-    return blocks.filter((block) =>
-        group.includes(String(block.getFieldValue(BlockIDs.FIELDS.FLAG))),
-    );
-}
-
-function unplugAndTrim(
-    block: Blockly.Block,
-    remainingBlocks: Blockly.Block[],
-): void {
-    block.unplug(true);
-    const idx = remainingBlocks.indexOf(block);
-    if (idx === -1) return;
-    remainingBlocks.splice(idx, remainingBlocks.length - idx);
-}
-
-/**
- * Remoção de excesso de operands
- */
 export function autoFixExcessOperands(
-    commandBlock: Blockly.BlockSvg,
+    operandBlocks: Blockly.Block[],
     commandDefinition: CLI.CLICommand,
 ): void {
-    const allBlocks = BlockTraversal.getBlocksList(
-        commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
-    );
+    if (operandBlocks.length === 0) return;
 
-    if (allBlocks.length === 0) return;
-
-    const workspace = BlockTraversal.getWorkspaceFromBlocks(allBlocks);
-
+    const workspace = BlockTraversal.getWorkspaceFromBlocks(operandBlocks);
     const blocksByType = new Map<string, Blockly.Block[]>();
-    for (const block of allBlocks) {
-        const list = blocksByType.get(block.type);
-        if (list) {
-            list.push(block);
-        } else {
-            blocksByType.set(block.type, [block]);
-        }
+
+    for (const block of operandBlocks) {
+        const list = blocksByType.get(block.type) || [];
+        list.push(block);
+        blocksByType.set(block.type, list);
     }
 
     for (const operandDef of commandDefinition.operands) {
         const max = operandDef.cardinality?.max ?? 0;
         if (max === "unlimited") continue;
+
         const operandType = BlockIDs.commandOperandBlockType(
             commandDefinition,
             operandDef,
         );
         const blocksOfType = blocksByType.get(operandType);
+
         if (!blocksOfType || blocksOfType.length <= max) continue;
+
         blocksOfType.slice(max).forEach((block) => block.unplug(true));
 
-        const message = `Limite de ${max} excedido para \"${operandDef.label}\".`;
+        const message = `Limite de ${max} excedido para "${operandDef.label}".`;
         if (workspace) {
             showToast(workspace, message);
             coreLog(workspace, message, LogLevel.WARN);

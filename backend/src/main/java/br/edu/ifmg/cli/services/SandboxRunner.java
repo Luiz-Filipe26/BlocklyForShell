@@ -1,6 +1,7 @@
 package br.edu.ifmg.cli.services;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -37,16 +38,21 @@ public class SandboxRunner {
             
             fullScript.append("\n").append(verify);
 
-            ProcessBuilder pb = new ProcessBuilder(
-                "docker", "run", 
-                "--rm",
-                "--net", "none",
-                "--memory", "100m",
-                "--cpus", "0.5",
-                DockerService.IMAGE_NAME, 
-                "bash", "-c", 
-                fullScript.toString()
-            );
+            // MONTAGEM DO COMANDO USANDO O PREFIXO DO SERVICE (docker ou sudo docker)
+            List<String> command = new ArrayList<>(DockerService.getDockerCommand());
+            
+            // Adiciona os argumentos do comando run
+            command.add("run");
+            command.add("--rm");
+            command.add("--net"); command.add("none");
+            command.add("--memory"); command.add("100m");
+            command.add("--cpus"); command.add("0.5");
+            command.add(DockerService.IMAGE_NAME);
+            command.add("bash");
+            command.add("-c");
+            command.add(fullScript.toString());
+
+            ProcessBuilder pb = new ProcessBuilder(command);
 
             Process process = pb.start();
             boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -76,6 +82,5 @@ public class SandboxRunner {
             logger.error("Erro interno no SandboxRunner", e);
             return new ExecutionResult("", "Erro interno: " + e.getMessage(), 1);
         }
-        // REMOVIDO: finally { deleteDirectory... } -> O Docker --rm já faz a limpeza!
     }
 }

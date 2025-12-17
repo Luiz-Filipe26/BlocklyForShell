@@ -27,5 +27,5 @@ export interface GameData {
 
 export interface RunRequest {
     ast: ShellBlocks.AST.AST | null;
-    levelId: string | null;
+    level: Level | null;
 }

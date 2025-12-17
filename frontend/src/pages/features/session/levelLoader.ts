@@ -15,6 +15,10 @@ export function getCurrentLevelId(): string {
     return currentLevelId;
 }
 
+export function getCachedLevelData(levelId: string): API.Level | undefined {
+    return levelsCache.get(levelId);
+}
+
 export function onLevelSuccesEvent(
     levelId: string,
     levelSelect: HTMLSelectElement,

@@ -5,7 +5,7 @@ import { AppConfig } from "@/config/appConfig";
 import { ApiRoutes } from "@/config/apiRoutes";
 import * as Logger from "../ui/systemLogger";
 import * as Blockly from "blockly";
-import { SANDBOX_LEVEL_ID } from "../session/levelLoader";
+import { getCachedLevelData, SANDBOX_LEVEL_ID } from "../session/levelLoader";
 
 interface RunDependencies {
     cliOutput: HTMLPreElement;
@@ -51,7 +51,10 @@ export async function runScript(
     cliOutput.scrollTop = cliOutput.scrollHeight;
 
     try {
-        const payload: API.RunRequest = { ast, levelId: currentLevelId };
+        const payload: API.RunRequest = {
+            ast,
+            level: getCachedLevelData(currentLevelId) || null,
+        };
         const result = await requestExecution(payload);
         renderExecutionOutput(
             result,

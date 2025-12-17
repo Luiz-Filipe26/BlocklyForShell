@@ -73,10 +73,9 @@ public class ServerInitializer {
 	private void registerControllers(Javalin app, String dockerPrefix) {
 		var scriptGenerator = new ScriptGenerator();
 		var sandboxRunner = new SandboxRunner(dockerPrefix);
-		var levelService = new LevelService();
 		new DefinitionController().registerRoutes(app);
-		new LevelController(levelService).registerRoutes(app);
-		new ExecutionController(scriptGenerator, sandboxRunner, levelService).registerRoutes(app);
+		new LevelController(new LevelService()).registerRoutes(app);
+		new ExecutionController(scriptGenerator, sandboxRunner).registerRoutes(app);
 		new ScriptController(scriptGenerator).registerRoutes(app);
 	}
 

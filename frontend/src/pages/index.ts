@@ -2,7 +2,7 @@ import "blockly/blocks";
 import "blockly/msg/pt";
 import {
     getCurrentLevelId,
-    notifyLevelCompleted,
+    onLevelSuccesEvent,
     setupLevelSelector,
 } from "./features/session/levelLoader";
 import { setupScriptHotReloader } from "./features/execution/scriptHotReloader";
@@ -11,13 +11,16 @@ import * as Blockly from "blockly";
 import * as Logger from "./features/ui/systemLogger";
 import * as PersistenceManager from "./features/session/persistenceManager";
 import { setupHeaderBehavior } from "./features/ui/headerController";
-import { getDefinitions } from "./features/session/dataManager";
+import { getDefinitions, getGameData } from "./features/session/dataManager";
 import * as ShellBlocks from "shellblocks";
 import { MAIN_WORKSPACE_ID } from "./features/constants/constants";
 import { getPageElements } from "./features/ui/DOMProvider";
+import { GameData } from "@/types/api";
 
 const pageElements = getPageElements();
-const IS_EXPERIMENT_MODE = import.meta.env.VITE_EXPERIMENT_MODE === "true";
+let gameData: GameData | null = null;
+export const IS_EXPERIMENT_MODE =
+    import.meta.env.VITE_EXPERIMENT_MODE === "true";
 start();
 
 async function start(): Promise<void> {
@@ -47,11 +50,8 @@ async function start(): Promise<void> {
 
     setupHeaderBehavior(pageElements.appHeader, pageElements.headerToggleBtn);
 
-    await setupLevelSelector(
-        pageElements.levelSelect,
-        pageElements.levelSummaryText,
-        pageElements.levelFullDetails,
-    );
+    gameData = await getGameData();
+    await setupLevelSelector(gameData, pageElements);
 
     setupScriptHotReloader(workspace, pageElements.codeOutput);
     registerButtonListeners(workspace);
@@ -71,17 +71,9 @@ function enforceExperimentRestrictions() {
 
 function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
     pageElements.runBtn.addEventListener("click", async () => {
-        runScript(workspace, pageElements, getCurrentLevelId(), () => {
-            notifyLevelCompleted(getCurrentLevelId());
-            if (IS_EXPERIMENT_MODE) {
-                PersistenceManager.unlockNextLevel();
-                setupLevelSelector(
-                    pageElements.levelSelect,
-                    pageElements.levelSummaryText,
-                    pageElements.levelFullDetails,
-                );
-            }
-        });
+        runScript(workspace, pageElements, getCurrentLevelId(), (levelId) =>
+            onLevelSuccesEvent(levelId, pageElements.levelSelect),
+        );
     });
 
     pageElements.clearBtn.addEventListener("click", () => {
@@ -115,11 +107,7 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
             )
         ) {
             PersistenceManager.resetToFactorySettings(workspace, async () => {
-                await setupLevelSelector(
-                    pageElements.levelSelect,
-                    pageElements.levelSummaryText,
-                    pageElements.levelFullDetails,
-                );
+                await setupLevelSelector(gameData, pageElements);
                 pageElements.levelSelect.selectedIndex = 0;
                 pageElements.levelSelect.dispatchEvent(new Event("change"));
             });
@@ -128,11 +116,7 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
 
     pageElements.btnLoadGame.addEventListener("click", () => {
         PersistenceManager.uploadGameData(workspace, () => {
-            setupLevelSelector(
-                pageElements.levelSelect,
-                pageElements.levelSummaryText,
-                pageElements.levelFullDetails,
-            );
+            setupLevelSelector(gameData, pageElements);
         });
     });
 }

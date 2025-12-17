@@ -1,23 +1,17 @@
 import * as Blockly from "blockly";
-import * as ShellBlocks from "shellblocks"
+import * as ShellBlocks from "shellblocks";
 import * as Logger from "../ui/systemLogger";
 import * as API from "@/types/api";
 import * as DataManager from "../session/dataManager";
 
-const EXPERIMENT_PROGRESS_KEY = "experiment_progress_v1";
+const LAST_UNLOCKED_LEVEL_ID_KEY = "experiment_progress_v1";
 
-export function getExperimentProgress(): number {
-    const raw = localStorage.getItem(EXPERIMENT_PROGRESS_KEY);
-    if (!raw) return 0;
-    return parseInt(raw, 10) || 0;
+export function getLastUnlockedLevelId(): string | null {
+    return localStorage.getItem(LAST_UNLOCKED_LEVEL_ID_KEY);
 }
 
-export function unlockNextLevel(): void {
-    const current = getExperimentProgress();
-    localStorage.setItem(
-        EXPERIMENT_PROGRESS_KEY,
-        String(current + 1),
-    );
+export function unlockLevel(levelId: string): void {
+    localStorage.setItem(LAST_UNLOCKED_LEVEL_ID_KEY, levelId);
 }
 
 /**
@@ -41,7 +35,10 @@ export function downloadScript(workspace: Blockly.WorkspaceSvg): void {
 
         ShellBlocks.showToast(workspace, "Script baixado com sucesso.");
     } catch (error) {
-        Logger.log(`Erro ao salvar script: ${error}`, ShellBlocks.LogLevel.ERROR);
+        Logger.log(
+            `Erro ao salvar script: ${error}`,
+            ShellBlocks.LogLevel.ERROR,
+        );
     }
 }
 
@@ -61,7 +58,11 @@ export function uploadScript(workspace: Blockly.WorkspaceSvg): void {
             ShellBlocks.showToast(workspace, "Script carregado com sucesso!");
         } catch (error) {
             const message = "Arquivo de script inválido.";
-            ShellBlocks.showToast(workspace, message, ShellBlocks.LogLevel.ERROR);
+            ShellBlocks.showToast(
+                workspace,
+                message,
+                ShellBlocks.LogLevel.ERROR,
+            );
             Logger.log(message, ShellBlocks.LogLevel.ERROR);
         }
     });
@@ -73,10 +74,11 @@ export function uploadScript(workspace: Blockly.WorkspaceSvg): void {
 export function uploadDefinitions(workspace: Blockly.WorkspaceSvg): void {
     triggerFileUpload((jsonContent) => {
         try {
-            const definitions: ShellBlocks.CLI.CliDefinitions = JSON.parse(jsonContent);
+            const definitions: ShellBlocks.CLI.CliDefinitions =
+                JSON.parse(jsonContent);
 
             if (!definitions.commands || !Array.isArray(definitions.commands)) {
-                throw new Error("JSON inválido: falta array de \"commands\".");
+                throw new Error('JSON inválido: falta array de "commands".');
             }
 
             DataManager.saveCustomDefinitions(definitions);
@@ -136,7 +138,7 @@ export function uploadGameData(
             const gameData: API.GameData = JSON.parse(jsonContent);
 
             if (!gameData.levels || !Array.isArray(gameData.levels)) {
-                throw new Error("JSON inválido: falta array de \"levels\".");
+                throw new Error('JSON inválido: falta array de "levels".');
             }
 
             DataManager.saveCustomGameData(gameData);

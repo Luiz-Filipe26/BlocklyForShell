@@ -5,6 +5,7 @@ import { AppConfig } from "@/config/appConfig";
 import { ApiRoutes } from "@/config/apiRoutes";
 import * as Logger from "../ui/systemLogger";
 import * as Blockly from "blockly";
+import { SANDBOX_LEVEL_ID } from "../session/levelLoader";
 
 interface RunDependencies {
     cliOutput: HTMLPreElement;
@@ -15,11 +16,13 @@ interface RunDependencies {
     closeModalBtn: HTMLButtonElement;
 }
 
+export type OnLevelSuccess = (levelId: string) => void;
+
 export async function runScript(
     workspace: Blockly.WorkspaceSvg,
     deps: RunDependencies,
-    currentLevelId: string | null,
-    onLevelSuccess?: () => void,
+    currentLevelId: string,
+    onLevelSuccess: OnLevelSuccess,
 ): Promise<void> {
     const { cliOutput, runBtn } = deps;
 
@@ -97,11 +100,10 @@ function showValidationModal(
 async function requestExecution(
     payload: API.RunRequest,
 ): Promise<API.ExecutionResult> {
-    const fullUrl = `${AppConfig.API_BASE_URL}/${ApiRoutes.RUN_SCRIPT}`;
     const response = await executeWithTimeout(
         AppConfig.API_REQUEST_TIMEOUT_MS,
         (signal) =>
-            fetch(fullUrl, {
+            fetch(`${AppConfig.API_BASE_URL}/${ApiRoutes.RUN_SCRIPT}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -119,8 +121,8 @@ async function requestExecution(
 function renderExecutionOutput(
     result: API.ExecutionResult,
     cliOutput: HTMLPreElement,
-    currentLevelId: string | null,
-    onLevelSuccess?: () => void,
+    currentLevelId: string,
+    onLevelSuccess: OnLevelSuccess,
 ): void {
     let output = "";
 
@@ -135,10 +137,10 @@ function renderExecutionOutput(
 
     cliOutput.textContent += output;
 
-    if (currentLevelId) {
+    if (currentLevelId !== SANDBOX_LEVEL_ID) {
         if (result.exitCode === 0) {
             cliOutput.textContent += "[SUCESSO] Objetivo concluído.\n";
-            onLevelSuccess?.();
+            onLevelSuccess(currentLevelId);
         } else {
             cliOutput.textContent += "[FALHA] O objetivo não foi atingido.\n";
         }

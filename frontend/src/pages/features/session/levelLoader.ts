@@ -1,8 +1,8 @@
 import * as API from "@/types/api";
 import * as ShellBlocks from "shellblocks";
-import { getGameData } from "./dataManager";
 import * as PersistenceManager from "./persistenceManager";
 import * as Logger from "../ui/systemLogger";
+import { IS_EXPERIMENT_MODE } from "@/pages";
 
 export const SANDBOX_LEVEL_ID = "sandbox";
 
@@ -15,67 +15,106 @@ export function getCurrentLevelId(): string {
     return currentLevelId;
 }
 
-export function notifyLevelCompleted(levelId: string): void {
-    if (levelId === SANDBOX_LEVEL_ID) return;
+export function onLevelSuccesEvent(
+    levelId: string,
+    levelSelect: HTMLSelectElement,
+): void {
+    if (!IS_EXPERIMENT_MODE) return;
 
-    const levelIndex = orderedLevels.findIndex((level) => level.id === levelId);
-    if (levelIndex === -1) return;
-
-    const progress = PersistenceManager.getExperimentProgress();
-    if (levelIndex !== progress) return;
-
-    PersistenceManager.unlockNextLevel();
-
+    const nonSandboxOptions = [...levelSelect.options].filter(
+        (option) => option.value !== SANDBOX_LEVEL_ID,
+    );
+    const currentLevelIdIndex = nonSandboxOptions.findIndex(
+        (option) => option.value == levelId,
+    );
+    if (levelId !== SANDBOX_LEVEL_ID && currentLevelIdIndex < 0) {
+        Logger.log(
+            "Não foi possível descobrir o nível atual",
+            ShellBlocks.LogLevel.ERROR,
+        );
+    }
     Logger.log(
-        `Progresso atualizado: nível ${levelIndex + 1} concluído.`,
+        `Nível ${currentLevelIdIndex + 1} concluído.`,
         ShellBlocks.LogLevel.INFO,
     );
+    if (currentLevelIdIndex === nonSandboxOptions.length - 1) return;
+    let lastUnlockedLevelId =
+        PersistenceManager.getLastUnlockedLevelId() ||
+        nonSandboxOptions[0].value ||
+        "";
+    const lastUnlockedLevelIndex = nonSandboxOptions.findIndex(
+        (option) => option.value === lastUnlockedLevelId,
+    );
+    const newLastUnlockedLevelIndex = Math.max(
+        currentLevelIdIndex + 1,
+        lastUnlockedLevelIndex,
+    );
+    const newLastUnlockedLevelId =
+        nonSandboxOptions[newLastUnlockedLevelIndex].value || "";
+    PersistenceManager.unlockLevel(newLastUnlockedLevelId);
+    modifyOptionsToDisplayProgress(nonSandboxOptions, newLastUnlockedLevelId);
+}
+
+export interface SelectorDependencies {
+    levelSelect: HTMLSelectElement;
+    levelSummaryText: HTMLElement;
+    levelFullDetails: HTMLElement;
 }
 
 export async function setupLevelSelector(
-    levelSelect: HTMLSelectElement,
-    summaryElement: HTMLElement,
-    detailsElement: HTMLElement,
+    data: API.GameData | null,
+    selectorDependencies: SelectorDependencies,
 ): Promise<void> {
-    const data = await getGameData();
-
+    const { levelSelect, levelSummaryText, levelFullDetails } =
+        selectorDependencies;
     if (!data) {
         levelSelect.innerHTML = "<option>Erro ao carregar níveis</option>";
-        summaryElement.textContent = "Erro de conexão com o servidor.";
-        detailsElement.innerHTML = "";
+        levelSummaryText.textContent = "Erro de conexão com o servidor.";
+        levelFullDetails.innerHTML = "";
         return;
     }
 
     levelsCache.clear();
     orderedLevels = getSortedLevels(data);
     orderedLevels.forEach((level) => levelsCache.set(level.id, level));
-
-    const unlockedCount = PersistenceManager.getExperimentProgress();
-
     levelSelect.innerHTML = "";
 
     levelSelect.appendChild(
         createOption(SANDBOX_LEVEL_ID, "Modo Livre (Sandbox)"),
     );
 
-    orderedLevels.forEach((level, index) => {
-        const option = createOption(
-            level.id,
-            `Nível ${index + 1}: ${level.title}`,
-        );
-
-        if (index > unlockedCount + 1) {
-            option.disabled = true;
-            option.text += " [BLOQUEADO]";
-        }
-
+    const selectOptions = orderedLevels.map((level) => {
+        const option = createOption(level.id, "");
+        option.dataset.title = level.title;
         levelSelect.appendChild(option);
+        return option;
     });
 
-    registerLevelSelectorEvents(levelSelect, summaryElement, detailsElement);
+    const lastUnlockedLevelId = PersistenceManager.getLastUnlockedLevelId();
+    modifyOptionsToDisplayProgress(selectOptions, lastUnlockedLevelId || "");
+
+    registerLevelSelectorEvents(
+        levelSelect,
+        levelSummaryText,
+        levelFullDetails,
+    );
 
     levelSelect.value = SANDBOX_LEVEL_ID;
     levelSelect.dispatchEvent(new Event("change"));
+}
+
+function modifyOptionsToDisplayProgress(
+    nonSandboxSelectOptions: HTMLOptionElement[],
+    lastUnlockedLevelId: string,
+): void {
+    let lastUnlockedLevelIndex = nonSandboxSelectOptions.findIndex(
+        (option) => option.value === lastUnlockedLevelId,
+    );
+    lastUnlockedLevelIndex = Math.max(lastUnlockedLevelIndex, 0);
+    nonSandboxSelectOptions.forEach((option, index) => {
+        option.disabled = index > lastUnlockedLevelIndex;
+        option.text = `Nível ${index + 1}: ${option.dataset.title || ""}${option.disabled ? " [BLOQUEADO]" : ""}`;
+    });
 }
 
 function getSortedLevels(gameData: API.GameData): API.Level[] {
@@ -87,10 +126,10 @@ function getSortedLevels(gameData: API.GameData): API.Level[] {
         .filter((level): level is API.Level => level !== undefined);
 }
 
-function createOption(value: string, text: string): HTMLOptionElement {
+function createOption(value: string, text?: string): HTMLOptionElement {
     const option = document.createElement("option");
     option.value = value;
-    option.text = text;
+    option.text = text || "";
     return option;
 }
 
@@ -150,12 +189,12 @@ function renderLevelMode(
 }
 
 function renderErrorState(
-    invalidId: string,
+    levelId: string,
     summaryElement: HTMLElement,
     detailsElement: HTMLElement,
 ): void {
     Logger.log(
-        `Erro: nível (${invalidId}) não encontrado.`,
+        `Erro: nível (${levelId}) não encontrado.`,
         ShellBlocks.LogLevel.ERROR,
     );
     summaryElement.textContent = "Erro ao carregar nível.";

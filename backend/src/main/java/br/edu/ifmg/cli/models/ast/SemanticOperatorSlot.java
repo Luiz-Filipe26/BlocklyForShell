@@ -1,4 +1,6 @@
 package br.edu.ifmg.cli.models.ast;
 
-public record SemanticOperatorSlot(String name, String symbol, String symbolPlacement) {
+import org.jetbrains.annotations.Nullable;
+
+public record SemanticOperatorSlot(String name, @Nullable String symbol, @Nullable String symbolPlacement) {
 }

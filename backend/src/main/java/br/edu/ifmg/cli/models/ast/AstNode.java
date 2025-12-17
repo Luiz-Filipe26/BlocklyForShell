@@ -4,7 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public record AstNode(String nodeType, List<AstField> fields, List<AstInput> inputs, SemanticData semanticData) {
+import org.jetbrains.annotations.Nullable;
+
+public record AstNode(String nodeType, List<AstField> fields, List<AstInput> inputs,
+		@Nullable SemanticData semanticData) {
 	public AstNode {
 		nodeType = nodeType != null ? nodeType : "unknown";
 		fields = fields != null ? fields : Collections.emptyList();

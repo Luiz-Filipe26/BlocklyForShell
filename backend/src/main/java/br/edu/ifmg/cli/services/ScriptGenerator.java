@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.Nullable;
+
 import br.edu.ifmg.cli.models.ast.AstNode;
 import br.edu.ifmg.cli.models.ast.AstVocabulary.Keys;
 import br.edu.ifmg.cli.models.ast.AstVocabulary.Nodes;
@@ -28,7 +30,7 @@ public class ScriptGenerator {
 		return dispatch(rootNode);
 	}
 
-	private String dispatch(AstNode node) {
+	private String dispatch(@Nullable AstNode node) {
 		if (node == null || node.semanticData() == null)
 			return "";
 
@@ -183,9 +185,9 @@ public class ScriptGenerator {
 		if (rawArgument == null || rawArgument.isEmpty())
 			return "''";
 		if (SAFE_ARGUMENT_PATTERN.matcher(rawArgument).matches()) {
-	        return rawArgument;
-	    }
-		
+			return rawArgument;
+		}
+
 		return "'" + rawArgument.replace("'", "'\\''") + "'";
 	}
 

@@ -4,15 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public record CliDefinitions(List<CommandDef> commands, List<OperatorDef> operators, List<ControlDef> controls,
-		List<CategoryDef> categories) {
+import org.jetbrains.annotations.Nullable;
+
+public record CliDefinitions(List<CommandDef> commands, @Nullable List<OperatorDef> operators,
+		@Nullable List<ControlDef> controls, List<CategoryDef> categories) {
 
 	public record CommandDef(String id, String shellCommand, String label, String description, String color,
 			String optionColor, List<OptionDef> options, List<List<String>> exclusiveOptions,
 			List<OperandDef> operands) {
 	}
 
-	public record OptionDef(String flag, String longFlag, String description, ArgumentDef argument) {
+	public record OptionDef(String flag, @Nullable String longFlag, String description,
+			@Nullable ArgumentDef argument) {
 	}
 
 	public record ArgumentDef(String type, String label, String defaultValue, List<ValidationDef> validations) {

@@ -1,4 +1,6 @@
 package br.edu.ifmg.cli.models.ast;
 
-public record SemanticControlSlot(String name, String syntaxPrefix, boolean obligatory) {
+import org.jetbrains.annotations.Nullable;
+
+public record SemanticControlSlot(String name, @Nullable String syntaxPrefix, boolean obligatory) {
 }

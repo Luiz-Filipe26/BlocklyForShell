@@ -1,4 +1,7 @@
 package br.edu.ifmg.cli.models.ast;
 
-public record SemanticDefinition(SemanticControlDefinition control, SemanticOperatorDefinition operator) {
+import org.jetbrains.annotations.Nullable;
+
+public record SemanticDefinition(@Nullable SemanticControlDefinition control,
+		@Nullable SemanticOperatorDefinition operator) {
 }

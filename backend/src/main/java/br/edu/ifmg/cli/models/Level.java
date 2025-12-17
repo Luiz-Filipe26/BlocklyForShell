@@ -2,6 +2,8 @@ package br.edu.ifmg.cli.models;
 
 import java.util.List;
 
-public record Level(String id, String title, String summary, String fullGuideHtml, List<String> setupCommands,
-		String verificationScript, String difficulty) {
+import org.jetbrains.annotations.Nullable;
+
+public record Level(String id, String title, @Nullable String summary, @Nullable String fullGuideHtml,
+		@Nullable List<String> setupCommands, @Nullable String verificationScript, @Nullable String difficulty) {
 }

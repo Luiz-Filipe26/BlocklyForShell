@@ -46,15 +46,15 @@ export function validateCardinality(
     commandBlock: Blockly.Block,
     commandDefinition: CLI.CLICommand,
     blocks: {
-        options: Blockly.Block[];
-        operands: Blockly.Block[];
+        optionBlocks: Blockly.Block[];
+        operandBlocks: Blockly.Block[];
     },
 ): void {
     clearAllOperandCardinalityErrors(commandBlock, commandDefinition);
     validateOptionsGroupCardinality(
         commandBlock,
         commandDefinition,
-        blocks.options,
+        blocks.optionBlocks,
     );
 
     if (shouldRelaxOperandChecks(commandBlock)) return;
@@ -62,12 +62,12 @@ export function validateCardinality(
     validateOperandsGroupCardinality(
         commandBlock,
         commandDefinition,
-        blocks.operands,
+        blocks.operandBlocks,
     );
     validateSpecificOperandsCardinality(
         commandBlock,
         commandDefinition,
-        blocks.operands,
+        blocks.operandBlocks,
     );
 }
 

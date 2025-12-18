@@ -14,9 +14,20 @@ export function getWorkspaceFromBlocks(
     return null;
 }
 
+/**
+ * Opções de filtragem para a listagem de blocos.
+ */
+export interface BlockFilterOptions {
+    type?: string;
+    predicate?: (block: Blockly.Block) => boolean;
+}
+
+/**
+ * Percorre a sequência de blocos (next) e retorna uma lista filtrada.
+ */
 export function getBlocksList(
     firstBlock: Blockly.Block | null,
-    filter?: string | ((block: Blockly.Block) => boolean),
+    filter?: BlockFilterOptions,
 ): Blockly.Block[] {
     const blocks: Blockly.Block[] = [];
 
@@ -25,11 +36,15 @@ export function getBlocksList(
         current;
         current = current.getNextBlock()
     ) {
-        if (typeof filter === "string") {
-            if (current.type !== filter) continue;
-        } else if (typeof filter === "function") {
-            if (!filter(current)) continue;
+        if (filter) {
+            if (filter.type && current.type !== filter.type) {
+                continue;
+            }
+            if (filter.predicate && !filter.predicate(current)) {
+                continue;
+            }
         }
+
         blocks.push(current);
     }
     return blocks;

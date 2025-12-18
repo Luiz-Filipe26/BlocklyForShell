@@ -12,6 +12,7 @@ const blockHandlersMap = new WeakMap<Blockly.Block, LocalChangeHandler[]>();
 export function addLocalChangeListener(
     block: Blockly.Block,
     listenerFunction: LocalChangeHandler,
+    options: { excludeUiEvent?: boolean } = { excludeUiEvent: true },
 ): void {
     let handlers = blockHandlersMap.get(block);
     if (handlers) {
@@ -22,14 +23,22 @@ export function addLocalChangeListener(
     blockHandlersMap.set(block, [listenerFunction]);
     const workspace = getWorkspaceFromBlocks(block);
 
-    block.setOnChange(() => {
+    block.setOnChange((event: any) => {
+        if (options.excludeUiEvent && event.isUiEvent) {
+            return;
+        }
+
         const currentHandlers = blockHandlersMap.get(block);
         for (const handler of currentHandlers || []) {
             try {
                 handler(block);
             } catch (error) {
                 if (!workspace) continue;
-                coreLog(workspace, `Erro em change-handler: ${error}`, LogLevel.ERROR);
+                coreLog(
+                    workspace,
+                    `Erro em change-handler: ${error}`,
+                    LogLevel.ERROR,
+                );
             }
         }
     });
@@ -41,6 +50,8 @@ export function removeLocalChangeListener(
 ): void {
     const handlers = blockHandlersMap.get(block);
     if (!handlers) return;
-    const newHandlers = handlers.filter((handler) => handler !== listenerFunction);
+    const newHandlers = handlers.filter(
+        (handler) => handler !== listenerFunction,
+    );
     blockHandlersMap.set(block, newHandlers);
 }

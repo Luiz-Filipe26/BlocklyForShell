@@ -91,29 +91,34 @@ function setupCommandIntegrityPipeline(
     addLocalChangeListener(commandBlock, () => {
         let optionBlocks = BlockTraversal.getBlocksList(
             commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPTIONS),
-            BlockIDs.commandOptionBlockType(commandDefinition),
+            { type: BlockIDs.commandOptionBlockType(commandDefinition) },
         );
 
         let operandBlocks = BlockTraversal.getBlocksList(
             commandBlock.getInputTargetBlock(BlockIDs.INPUTS.OPERANDS),
-            BlockIDs.INPUTS.OPERANDS,
         );
 
         unplugDuplicatesFromList(optionBlocks, (child) =>
             child.getFieldValue(BlockIDs.FIELDS.FLAG),
         );
-        optionBlocks = optionBlocks.filter((b) => b.getParent() !== null);
+        optionBlocks = optionBlocks.filter(
+            (block) => block.getParent() !== null,
+        );
 
         if (commandDefinition.exclusiveOptions) {
             unplugExclusiveOptionsFromCommand(
                 optionBlocks,
                 commandDefinition.exclusiveOptions,
             );
-            optionBlocks = optionBlocks.filter((b) => b.getParent() !== null);
+            optionBlocks = optionBlocks.filter(
+                (block) => block.getParent() !== null,
+            );
         }
 
         autoFixExcessOperands(operandBlocks, commandDefinition);
-        operandBlocks = operandBlocks.filter((b) => b.getParent() !== null);
+        operandBlocks = operandBlocks.filter(
+            (block) => block.getParent() !== null,
+        );
 
         validateCardinality(commandBlock, commandDefinition, {
             optionBlocks: optionBlocks,

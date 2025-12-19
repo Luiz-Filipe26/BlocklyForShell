@@ -77,8 +77,11 @@ export function onLevelSuccesEvent(
         modifyOptionsToDisplayProgress(
             nonSandboxOptions,
             newLastUnlockedLevelId,
-            isExperimentMode
+            isExperimentMode,
         );
+
+        levelSelect.value = newLastUnlockedLevelId;
+        levelSelect.dispatchEvent(new Event("change"));
 
         const nextTitle =
             nonSandboxOptions[newLastUnlockedLevelIndex].dataset.title;

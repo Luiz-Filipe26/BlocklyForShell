@@ -122,7 +122,7 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
             )
         ) {
             PersistenceManager.resetToFactorySettings(workspace, async () => {
-                await setupLevelSelector(gameData, pageElements);
+                await setupLevelSelector(gameData, pageElements, IS_EXPERIMENT_MODE);
                 pageElements.levelSelect.selectedIndex = 0;
                 pageElements.levelSelect.dispatchEvent(new Event("change"));
             });
@@ -131,7 +131,7 @@ function registerButtonListeners(workspace: Blockly.WorkspaceSvg) {
 
     pageElements.btnLoadGame.addEventListener("click", () => {
         PersistenceManager.uploadGameData(workspace, () => {
-            setupLevelSelector(gameData, pageElements);
+            setupLevelSelector(gameData, pageElements, IS_EXPERIMENT_MODE);
         });
     });
 }

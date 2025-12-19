@@ -17,6 +17,7 @@ export function setupHelpGuide(elements: {
             makeGuideNeutral();
             PersistenceManager.saveHasSeenHelpGuide();
         }
+        requestAnimationFrame(() => (helpModal.scrollTop = 0));
     });
     closeHelpBtn.addEventListener("click", () => {
         helpModal.close();

@@ -81,11 +81,17 @@ function buildOperandField(
         operandDefinition.defaultValue || "",
     );
 
-    textField.setValidator((newValue) => {
-        validateOperandValue(newValue, operandDefinition.validations, block);
-        renderBlockWarnings(block);
-        return newValue;
-    });
+    if (operandDefinition.validations) {
+        textField.setValidator((newValue) => {
+            validateOperandValue(
+                newValue,
+                operandDefinition.validations,
+                block,
+            );
+            renderBlockWarnings(block);
+            return newValue;
+        });
+    }
 
     return textField;
 }

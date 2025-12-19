@@ -23,7 +23,7 @@ import { setupHelpGuide } from "./features/ui/helpController";
 const pageElements = getPageElements();
 let gameData: GameData | null = null;
 export const IS_EXPERIMENT_MODE =
-    import.meta.env.VITE_EXPERIMENT_MODE === "true" || true;
+    import.meta.env.VITE_EXPERIMENT_MODE === "true";
 start();
 
 async function start(): Promise<void> {

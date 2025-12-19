@@ -2,6 +2,8 @@ import * as Blockly from "blockly";
 import * as CLI from "../types/cli";
 import { setError, clearError } from "./validationManager";
 import { getBlockSemanticData } from "../serialization/metadataManager";
+import * as BlockTraversal from "../helpers/blockTraversal";
+import { getOperatorDefinition } from "../blocks/operatorBlocks";
 import { VALIDATION_ERRORS } from "../constants/validationErrors";
 
 /**
@@ -16,6 +18,8 @@ export function validateOperandSyntax(
 
     const rules = commandDefinition.operandSyntaxRules;
     if (!rules || rules.length === 0) return;
+
+    if (shouldRelaxOperandChecks(commandBlock)) return;
 
     const normalizedSequence = getNormalizedSequence(
         operandBlocks,
@@ -48,6 +52,21 @@ export function validateOperandSyntax(
         commandBlock,
         VALIDATION_ERRORS.SYNTAX_ERROR_ID,
         "A ordem ou combinação de blocos é inválida para este comando.",
+    );
+}
+
+function shouldRelaxOperandChecks(block: Blockly.Block): boolean {
+    const parent = block.getSurroundParent();
+    if (!parent) return false;
+
+    const operatorDefinition = getOperatorDefinition(parent.type);
+    if (!operatorDefinition) return false;
+
+    const slotName = BlockTraversal.getParentInputName(block);
+    if (!slotName) return false;
+
+    return (
+        operatorDefinition.slotsWithImplicitData?.includes(slotName) ?? false
     );
 }
 

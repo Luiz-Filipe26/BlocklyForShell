@@ -5,26 +5,17 @@ import path from "path";
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
 
-    const FRONTEND_DEV_PORT = parseInt(env.VITE_FRONTEND_DEV_PORT) || 5173;
-    const BACKEND_URL = env.BACKEND_URL || "http://localhost:7000";
-    const EXPERIMENT_MODE = env.VITE_EXPERIMENT_MODE || "false";
-
     return {
         plugins: [tsconfigPaths()],
         root: "src/pages",
         publicDir: path.resolve(__dirname, "public"),
 
-        define: {
-            "import.meta.env.VITE_EXPERIMENT_MODE":
-                JSON.stringify(EXPERIMENT_MODE),
-        },
-
         server: {
-            port: FRONTEND_DEV_PORT,
+            port: Number(env.VITE_FRONTEND_DEV_PORT) || 5173,
             strictPort: true,
             proxy: {
                 "/api": {
-                    target: BACKEND_URL,
+                    target: env.VITE_BACKEND_URL || "http://localhost:7000",
                     changeOrigin: true,
                     secure: false,
                 },

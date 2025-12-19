@@ -228,17 +228,22 @@
         },
         {
             "id": "18_challenge_security",
-            "title": "Desafio: O Incidente",
-            "summary": "Investigue o sistema e neutralize a ameaça.",
-            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um programa malicioso está rodando em background. Você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Procure por algo rodando via <strong>python</strong> que não deveria estar aí.</li><li><strong>Inteligência:</strong> O comando acima vai revelar o nome do arquivo (ex: <code>virus.py</code>). Use o <code>cat</code> nele para descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Crie o arquivo <code>blacklist.txt</code> com o IP e remova o malware.</li></ol>",
+            "title": "Desafio: O Keylogger",
+            "summary": "Identifique o malware, extraia a prova e elimine a ameaça.",
+            "fullGuideHtml": "<h1>Investigação Digital 🕵️‍♂️</h1><p>Um programa espião (Keylogger) está rodando no servidor e gravando tudo o que digitamos no arquivo <code>teclado.log</code>.</p><h3>Sua Missão</h3><ol><li><strong>Identificar:</strong> Use o <strong>ps aux</strong> para descobrir o nome do arquivo Python do espião (algo como <code>keylogger.py</code>).</li><li><strong>Extrair a Prova:</strong> O arquivo <code>teclado.log</code> está cheio de lixo, mas tem uma linha contendo a palavra <strong>SENHA</strong>. Use o <strong>grep</strong> para pegar essa linha e salve-a em <code>evidencia.txt</code> (use o redirecionador <code>></code>).</li><li><strong>Eliminar:</strong> Use o <strong>rm</strong> para apagar o arquivo do script espião que você descobriu no passo 1.</li></ol>",
             "setupCommands": [
-                "pkill -f malware.py || true",
+                "pkill -f keylogger_v3.py || true",
                 "rm -rf *",
-                "echo 'print(\"ROUBANDO DADOS PARA: 203.0.113.55\"); import time; time.sleep(400)' > malware.py",
-                "(python3 malware.py > /dev/null 2>&1 &)",
+                "echo 'a' > teclado.log",
+                "echo 'b' >> teclado.log",
+                "echo 'user: admin' >> teclado.log",
+                "echo '[ALERTA] SENHA CAPTURADA: 123456' >> teclado.log",
+                "echo 'c' >> teclado.log",
+                "echo 'import time; time.sleep(400)' > keylogger_v3.py",
+                "(python3 keylogger_v3.py > /dev/null 2>&1 &)",
                 "sleep 1"
             ],
-            "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.py ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
+            "verificationScript": "if [ ! -f keylogger_v3.py ] && [ -f evidencia.txt ] && grep -q 'SENHA' evidencia.txt; then exit 0; else if [ -f keylogger_v3.py ]; then echo 'O script malicioso ainda não foi removido.'; else echo 'Você removeu o script, mas não salvou a evidência corretamente em evidencia.txt.'; fi; exit 1; fi",
             "difficulty": "challenge"
         },
         {

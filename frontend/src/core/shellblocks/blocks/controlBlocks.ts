@@ -17,6 +17,7 @@ export function createControlBlock(controlDefinition: CLI.CLIControl): void {
                     key: slot.name,
                     source: "input",
                     name: slot.name,
+                    breakLineBefore: slot.breakLineBefore || false,
                 })),
                 definition: {
                     control: {

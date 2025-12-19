@@ -1,28 +1,12 @@
 package br.edu.ifmg.cli.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
-
-import br.edu.ifmg.cli.models.ast.AstNode;
-import br.edu.ifmg.cli.models.ast.AstVocabulary.Keys;
-import br.edu.ifmg.cli.models.ast.AstVocabulary.Nodes;
-import br.edu.ifmg.cli.models.ast.AstVocabulary.Sources;
-import br.edu.ifmg.cli.models.ast.AstVocabulary.Values;
-import br.edu.ifmg.cli.models.ast.SemanticBinding;
-import br.edu.ifmg.cli.models.ast.SemanticControlDefinition;
-import br.edu.ifmg.cli.models.ast.SemanticControlSlot;
-import br.edu.ifmg.cli.models.ast.SemanticOperatorDefinition;
-import br.edu.ifmg.cli.models.ast.SemanticOperatorSlot;
+import br.edu.ifmg.cli.models.ast.*;
 
 public class ScriptGenerator {
 
-	private final AstNavigator navigator = new AstNavigator();
-	private static final Pattern SAFE_ARGUMENT_PATTERN = java.util.regex.Pattern.compile("^[a-zA-Z0-9._/-]+$");
+	private static final Pattern SAFE_ARGUMENT_PATTERN = Pattern.compile("^[a-zA-Z0-9._/-]+$");
 
 	public String generate(AstNode rootNode) {
 		if (rootNode == null)
@@ -30,164 +14,164 @@ public class ScriptGenerator {
 		return dispatch(rootNode);
 	}
 
-	private String dispatch(@Nullable AstNode node) {
-		if (node == null || node.semanticData() == null)
+	private String dispatch(AstNode node) {
+		if (node == null)
 			return "";
-
-		String kind = node.semanticData().nodeType();
-
-		return switch (kind) {
-		case Nodes.SCRIPT -> generateScript(node);
-		case Nodes.COMMAND -> generateCommand(node);
-		case Nodes.CONTROL -> generateControl(node);
-		case Nodes.OPERATOR -> generateOperator(node);
-		case Nodes.OPTION -> generateOption(node);
-		case Nodes.OPERAND -> generateOperand(node);
+		return switch (node.type()) {
+		case AstVocabulary.Nodes.SCRIPT -> generateScript(node);
+		case AstVocabulary.Nodes.COMMAND -> generateCommand(node);
+		case AstVocabulary.Nodes.CONTROL -> generateControl(node);
+		case AstVocabulary.Nodes.OPERATOR -> generateOperator(node);
+		case AstVocabulary.Nodes.OPTION -> generateOption(node);
+		case AstVocabulary.Nodes.OPERAND -> generateOperand(node);
 		default -> "";
 		};
 	}
 
-	private String generateScript(AstNode node) {
-		var parts = new ArrayList<String>();
-		var data = node.semanticData();
+	private String generateControl(AstNode node) {
+		if (node.controlConfig() == null)
+			return "";
 
-		for (var binding : data.bindings()) {
-			String content = resolveBindingContent(node, binding, "\n");
-			if (!content.isBlank()) {
-				parts.add(content);
+		var controlConfig = node.controlConfig();
+		var sb = new StringBuilder(node.name());
+
+		for (var slot : controlConfig.slots()) {
+			var parameterOpt = node.getParameter(slot.key());
+
+			if (parameterOpt.isPresent()) {
+				var parameter = parameterOpt.get();
+				String content = renderParameter(parameter, "\n");
+
+				if (content.isBlank() && !slot.obligatory())
+					continue;
+
+				if (slot.breakLineBefore()) {
+					if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') {
+						sb.append("\n");
+					}
+				} else {
+					ensureSpaceSeparator(sb);
+				}
+
+				if (slot.syntaxPrefix() != null) {
+					sb.append(slot.syntaxPrefix());
+				}
+
+				if (parameter.isContainer()) {
+					sb.append("\n").append(indent(content));
+				} else {
+					ensureSpaceSeparator(sb);
+					sb.append(content);
+				}
 			}
 		}
-		return String.join("\n", parts);
-	}
 
-	private String generateCommand(AstNode node) {
-		var sb = new StringBuilder();
-		sb.append(node.semanticData().name());
-
-		var optionNodes = navigator.extractChildren(node, Keys.OPTIONS);
-		String optionsStr = renderNodeList(optionNodes, " ");
-		if (!optionsStr.isBlank()) {
-			sb.append(" ").append(optionsStr);
-		}
-
-		var operandNodes = navigator.extractChildren(node, Keys.OPERANDS);
-		String operandsStr = renderNodeList(operandNodes, " ");
-		if (!operandsStr.isBlank()) {
-			sb.append(" ").append(operandsStr);
+		if (controlConfig.syntaxEnd() != null) {
+			if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '\n') {
+				sb.append("\n");
+			}
+			sb.append(controlConfig.syntaxEnd());
 		}
 
 		return sb.toString();
 	}
 
-	private String generateOption(AstNode node) {
-		String flag = navigator.extractValue(node, Keys.FLAG).orElse("");
-		String value = navigator.extractValue(node, Keys.VALUE).orElse("");
+	private void ensureSpaceSeparator(StringBuilder sb) {
+		if (sb.length() > 0) {
+			char lastChar = sb.charAt(sb.length() - 1);
+			if (lastChar != '\n' && lastChar != ' ') {
+				sb.append(" ");
+			}
+		}
+	}
 
-		StringBuilder sb = new StringBuilder();
+	private String generateScript(AstNode node) {
+		return node.parameters().stream().map(p -> renderParameter(p, "\n")).filter(s -> !s.isBlank())
+				.collect(Collectors.joining("\n"));
+	}
+
+	private String generateCommand(AstNode node) {
+		var sb = new StringBuilder(node.name());
+
+		node.getParameter(AstVocabulary.Keys.OPTIONS).ifPresent(p -> {
+			String val = renderParameter(p, " ");
+			if (!val.isBlank())
+				sb.append(" ").append(val);
+		});
+
+		node.getParameter(AstVocabulary.Keys.OPERANDS).ifPresent(p -> {
+			String val = renderParameter(p, " ");
+			if (!val.isBlank())
+				sb.append(" ").append(val);
+		});
+
+		return sb.toString();
+	}
+
+	private String generateOperator(AstNode node) {
+		if (node.operatorConfig() == null)
+			return "";
+
+		var sb = new StringBuilder();
+		var config = node.operatorConfig();
+
+		for (var slot : config.slots()) {
+			node.getParameter(slot.key()).ifPresent(parameter -> {
+				String content = renderParameter(parameter, "\n");
+				if (content.isBlank())
+					return;
+
+				if (sb.length() > 0)
+					sb.append(" ");
+
+				if (slot.symbol() != null) {
+					if (AstVocabulary.Values.PLACEMENT_BEFORE.equals(slot.symbolPlacement())) {
+						sb.append(slot.symbol()).append(" ").append(content);
+					} else {
+						sb.append(content).append(" ").append(slot.symbol());
+					}
+				} else {
+					sb.append(content);
+				}
+			});
+		}
+		return sb.toString();
+	}
+
+	private String generateOption(AstNode node) {
+		String flag = node.getParameter(AstVocabulary.Keys.FLAG).map(AstParameter::value).orElse("");
+		String value = node.getParameter(AstVocabulary.Keys.VALUE).map(AstParameter::value).orElse("");
+		var sb = new StringBuilder();
 		if (!flag.isBlank()) {
 			sb.append(flag);
-			if (!value.isBlank()) {
+			if (!value.isBlank())
 				sb.append(" ").append(quoteArgumentIfUnsafe(value));
-			}
 		}
 		return sb.toString();
 	}
 
 	private String generateOperand(AstNode node) {
-		String value = navigator.extractValue(node, Keys.VALUE).orElse("");
-		if (!value.isBlank()) {
-			return quoteArgumentIfUnsafe(value);
-		}
-		return "";
+		return node.getParameter(AstVocabulary.Keys.VALUE).map(AstParameter::value).map(this::quoteArgumentIfUnsafe)
+				.orElse("");
 	}
 
-	private String generateControl(AstNode node) {
-		var sb = new StringBuilder();
-		var data = node.semanticData();
-		var controlDef = data.definition().control();
-
-		sb.append(data.name());
-
-		for (var binding : data.bindings()) {
-			String content = resolveBindingContent(node, binding, "\n");
-
-			if (content.isBlank())
-				continue;
-
-			findControlSlot(controlDef, binding.key()).map(SemanticControlSlot::syntaxPrefix).ifPresent(sb::append);
-
-			if (content.contains("\n")) {
-				sb.append("\n").append(indent(content));
-			} else {
-				sb.append(" ").append(content);
-			}
+	private String renderParameter(AstParameter parameter, String separator) {
+		if (parameter.isContainer()) {
+			return renderChildren(parameter, separator);
 		}
-
-		if (controlDef.syntaxEnd() != null) {
-			sb.append("\n").append(controlDef.syntaxEnd());
-		}
-		return sb.toString().trim();
+		return parameter.value();
 	}
 
-	private String generateOperator(AstNode node) {
-		var sb = new StringBuilder();
-		var data = node.semanticData();
-		var operatorDef = data.definition().operator();
-
-		for (var binding : data.bindings()) {
-			String content = resolveBindingContent(node, binding, " ");
-
-			if (content.isBlank())
-				continue;
-
-			String finalContent = findOperatorSlot(operatorDef, binding.key()).map(slot -> {
-				String symbol = slot.symbol();
-				if (symbol == null)
-					return content;
-
-				boolean isBefore = Values.PLACEMENT_BEFORE.equals(slot.symbolPlacement());
-				return isBefore ? " " + symbol + " " + content : content + " " + symbol + " ";
-			}).orElse(content);
-
-			sb.append(finalContent);
-		}
-		return sb.toString().trim();
-	}
-
-	private String resolveBindingContent(AstNode node, SemanticBinding binding, String separator) {
-		if (Sources.INPUT.equals(binding.source())) {
-			var children = navigator.getNodesFromBinding(node, binding);
-			return renderNodeList(children, separator);
-		} else if (Sources.FIELD.equals(binding.source())) {
-			return navigator.getValueFromBinding(node, binding).orElse("");
-		}
-		return "";
-	}
-
-	private String renderNodeList(List<AstNode> nodes, String separator) {
-		return nodes.stream().map(this::dispatch).filter(result -> !result.isBlank())
+	private String renderChildren(AstParameter parameter, String separator) {
+		return parameter.children().stream().map(this::dispatch).filter(rendered -> !rendered.isBlank())
 				.collect(Collectors.joining(separator));
-	}
-
-	private Optional<SemanticControlSlot> findControlSlot(SemanticControlDefinition controlDef, String key) {
-		if (controlDef == null)
-			return Optional.empty();
-		return controlDef.slots().stream().filter(slot -> slot.name().equals(key)).findFirst();
-	}
-
-	private Optional<SemanticOperatorSlot> findOperatorSlot(SemanticOperatorDefinition operatorDef, String key) {
-		if (operatorDef == null)
-			return Optional.empty();
-		return operatorDef.slots().stream().filter(slot -> slot.name().equals(key)).findFirst();
 	}
 
 	private String quoteArgumentIfUnsafe(String rawArgument) {
 		if (rawArgument == null || rawArgument.isEmpty())
 			return "''";
-		if (SAFE_ARGUMENT_PATTERN.matcher(rawArgument).matches()) {
+		if (SAFE_ARGUMENT_PATTERN.matcher(rawArgument).matches())
 			return rawArgument;
-		}
-
 		return "'" + rawArgument.replace("'", "'\\''") + "'";
 	}
 

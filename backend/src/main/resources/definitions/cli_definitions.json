@@ -649,7 +649,7 @@
           "type": "statement",
           "check": "command",
           "label": "Então faça (then):",
-          "syntaxPrefix": " ; then",
+          "syntaxPrefix": "; then",
           "obligatory": true
         },
         {
@@ -657,7 +657,8 @@
           "type": "statement",
           "check": "command",
           "label": "Senão (else):",
-          "syntaxPrefix": " \nelse ",
+          "syntaxPrefix": "else ",
+		  "breakLineBefore": true,
           "obligatory": false
         }
       ]
@@ -683,7 +684,8 @@
           "type": "statement",
           "check": "command",
           "label": "Faça (do):",
-          "syntaxPrefix": " ; do ",
+          "syntaxPrefix": "; do ",
+		  "breakLineBefore": false,
           "obligatory": true
         }
       ]

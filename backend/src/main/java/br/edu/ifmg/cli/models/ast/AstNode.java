@@ -6,20 +6,13 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
-public record AstNode(String nodeType, List<AstField> fields, List<AstInput> inputs,
-		@Nullable SemanticData semanticData) {
+public record AstNode(String type, String name, List<AstParameter> parameters, @Nullable AstControlConfig controlConfig,
+		@Nullable AstOperatorConfig operatorConfig) {
 	public AstNode {
-		nodeType = nodeType != null ? nodeType : "unknown";
-		fields = fields != null ? fields : Collections.emptyList();
-		inputs = inputs != null ? inputs : Collections.emptyList();
+		parameters = parameters != null ? parameters : Collections.emptyList();
 	}
 
-	public Optional<String> getRawFieldValue(String technicalName) {
-		return fields.stream().filter(f -> f.name().equals(technicalName)).findFirst().map(AstField::value);
-	}
-
-	public List<AstNode> getRawInputChildren(String technicalName) {
-		return inputs.stream().filter(i -> i.name().equals(technicalName)).findFirst().map(AstInput::children)
-				.orElse(Collections.emptyList());
+	public Optional<AstParameter> getParameter(String key) {
+		return parameters.stream().filter(p -> p.key().equals(key)).findFirst();
 	}
 }

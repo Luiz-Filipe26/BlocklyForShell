@@ -1,13 +1,14 @@
 import * as Blockly from "blockly";
-import * as BlockIDs from "../constants/blockIds";
 import type * as AST from "../types/ast";
 import { getBlockSemanticData } from "./metadataManager";
 import { findScriptRoot } from "../blocks/systemBlocks";
-
-const IGNORED_FIELDS: string[] = [
-    BlockIDs.FIELDS.CARDINALITY_ICON,
-    BlockIDs.FIELDS.PARENT_INDICATOR,
-];
+import * as BlockTraversal from "../helpers/blockTraversal";
+import {
+    SemanticData,
+    Binding,
+    SemanticControlDefinition,
+    SemanticOperatorDefinition,
+} from "../types/semanticData";
 
 export function serializeWorkspaceToAST(
     workspace: Blockly.WorkspaceSvg,
@@ -15,83 +16,134 @@ export function serializeWorkspaceToAST(
     const rootBlock = findScriptRoot(workspace);
     if (!rootBlock) return null;
 
-    const ast = serializeNode(rootBlock);
-    return ast.semanticData?.nodeType == "script" ? (ast as AST.AST) : null;
+    const node = serializeNode(rootBlock);
+    return node.type === "script" ? (node as AST.AST) : null;
 }
 
-/**
- * Processamento sequencial
- * Percorre a lista ligada vertical (Next Block) iterativamente.
- */
-function serializeVerticalChain(startBlock: Blockly.Block): AST.ASTNode[] {
-    const list: AST.ASTNode[] = [];
-    let currentBlock: Blockly.Block | null = startBlock;
-
-    while (currentBlock) {
-        if (currentBlock.isEnabled()) {
-            list.push(serializeNode(currentBlock));
-        }
-        currentBlock = currentBlock.getNextBlock();
-    }
-
-    return list;
-}
-
-/**
- * Processamento recursivo em profundidade
- * Serializa um único nó e seus inputs aninhados.
- */
 function serializeNode(block: Blockly.Block): AST.ASTNode {
-    const fields = extractBlockFields(block);
-    const inputs = extractBlockInputs(block);
-    const semanticData = getBlockSemanticData(block);
-
-    const node: AST.ASTNode = {
-        name: block.type,
-        fields,
-        inputs,
-    };
-
-    if (semanticData) {
-        node.semanticData = semanticData;
+    const semanticMetadata = getBlockSemanticData(block);
+    if (!semanticMetadata) {
+        throw new Error(`Bloco ${block.type} sem metadados semânticos.`);
     }
+    const node = createBaseNode(block, semanticMetadata);
+    return enrichNodeWithMetadata(node, semanticMetadata);
+}
 
+/**
+ * Cria a estrutura fundamental do nó: tipo, nome e parâmetros.
+ */
+function createBaseNode(
+    block: Blockly.Block,
+    semanticMetadata: SemanticData,
+): AST.ASTNode {
+    return {
+        type: semanticMetadata.nodeType,
+        name: semanticMetadata.name,
+        parameters: extractParamsFromBlock(block, semanticMetadata.bindings),
+    };
+}
+
+/**
+ * Extrai os dados do bloco Blockly e seus filhos
+ */
+function extractParamsFromBlock(
+    sourceBlock: Blockly.Block,
+    bindingsGuide: Binding[],
+): AST.ASTParameter[] {
+    return bindingsGuide.map((binding) => {
+        const parameter: AST.ASTParameter = {
+            key: binding.key,
+            value: "",
+            children: [],
+        };
+
+        if (binding.source === "field") {
+            parameter.value = String(
+                sourceBlock.getFieldValue(binding.name) ?? "",
+            );
+        } else {
+            parameter.children = serializeInputChain(sourceBlock, binding.name);
+        }
+        return parameter;
+    });
+}
+
+/**
+ * Captura e serializa a sequência de blocos conectada a um input específico.
+ * Usa o utilitário de traversal para obter a lista e mapeia cada bloco para um nó AST.
+ */
+function serializeInputChain(
+    block: Blockly.Block,
+    inputName: string,
+): AST.ASTNode[] {
+    const targetBlock = block.getInputTargetBlock(inputName);
+    if (!targetBlock) {
+        return [];
+    }
+    return BlockTraversal.getBlocksList(targetBlock).map(serializeNode);
+}
+
+/**
+ * Adiciona metadados de controle ou operador caso o nó os exija.
+ */
+function enrichNodeWithMetadata(
+    node: AST.ASTNode,
+    data: SemanticData,
+): AST.ASTNode {
+    if (data.nodeType === "control" && data.definition?.control) {
+        node.controlConfig = mapControlConfiguration(
+            data.definition.control,
+            data.bindings,
+        );
+    } else if (data.nodeType === "operator" && data.definition?.operator) {
+        node.operatorConfig = mapOperatorConfiguration(
+            data.definition.operator,
+            data.bindings,
+        );
+    }
     return node;
 }
 
-function extractBlockInputs(block: Blockly.Block): AST.ASTInput[] {
-    const inputs: AST.ASTInput[] = [];
-
-    block.inputList.forEach((input) => {
-        if (!input.connection) return;
-
-        const targetBlock = input.connection.targetBlock();
-
-        inputs.push({
-            name: input.name,
-            children: targetBlock ? serializeVerticalChain(targetBlock) : [],
-        });
-    });
-
-    return inputs;
+/**
+ * Converte a definição semântica de controle para a configuração da AST.
+ */
+function mapControlConfiguration(
+    controlDefinition: SemanticControlDefinition,
+    bindingsGuide: Binding[],
+): AST.ASTControlConfig {
+    return {
+        syntaxEnd: controlDefinition.syntaxEnd,
+        slots: controlDefinition.slots.map((slot) => ({
+            key: findKeyForTechnicalName(slot.name, bindingsGuide),
+            syntaxPrefix: slot.syntaxPrefix,
+            obligatory: slot.obligatory,
+            breakLineBefore: slot.breakLineBefore,
+        })),
+    };
 }
 
-function extractBlockFields(block: Blockly.Block): AST.ASTField[] {
-    const fields: AST.ASTField[] = [];
+/**
+ * Converte a definição semântica de operador para a configuração da AST.
+ */
+function mapOperatorConfiguration(
+    operatorDefinition: SemanticOperatorDefinition,
+    bindingsGuide: Binding[],
+): AST.ASTOperatorConfig {
+    return {
+        slots: operatorDefinition.slots.map((slot) => ({
+            key: findKeyForTechnicalName(slot.name, bindingsGuide),
+            symbol: slot.symbol,
+            symbolPlacement: slot.symbolPlacement,
+        })),
+    };
+}
 
-    block.inputList.forEach((input) => {
-        input.fieldRow.forEach((field) => {
-            const name = field.name;
-            const value = field.getValue();
-
-            if (name && value !== null && !IGNORED_FIELDS.includes(name)) {
-                fields.push({
-                    name,
-                    value: String(value),
-                });
-            }
-        });
-    });
-
-    return fields;
+function findKeyForTechnicalName(
+    technicalName: string,
+    bindingsGuide: Binding[],
+): string {
+    const binding = bindingsGuide.find(
+        (binding) => binding.name === technicalName,
+    );
+    return binding ? binding.key : technicalName;
 }

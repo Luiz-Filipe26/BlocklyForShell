@@ -5,12 +5,13 @@
     padding: 10px;
     border-radius: 5px;
 
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 0.9em;
+    white-space: pre;
+    word-wrap: normal;
+    overflow-x: auto;
 
     flex: 1;
     overflow-y: auto;
+    font-size: 0.9em;
 }
 
 .level-select-input {
@@ -76,9 +77,11 @@
 .log-entry.error {
     color: var(--color-danger);
 }
+
 .log-entry.warn {
     color: #856404;
 }
+
 .log-entry.info {
     color: #004085;
 }

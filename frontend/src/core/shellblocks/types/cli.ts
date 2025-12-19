@@ -63,6 +63,7 @@ export interface CLIControlSlot {
     symbolPlacement?: "before" | "after";
     syntaxPrefix?: string;
     obligatory?: boolean;
+    breakLineBefore?: boolean;
 }
 
 export interface CLIOperator {

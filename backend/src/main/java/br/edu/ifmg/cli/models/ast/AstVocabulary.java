@@ -14,11 +14,6 @@ public class AstVocabulary {
 		public static final String OPERAND = "operand";
 	}
 
-	public static class Sources {
-		public static final String INPUT = "input";
-		public static final String FIELD = "field";
-	}
-
 	public static class Keys {
 		public static final String OPTIONS = "options";
 		public static final String OPERANDS = "operands";

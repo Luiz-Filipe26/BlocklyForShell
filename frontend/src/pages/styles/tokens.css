@@ -1,11 +1,9 @@
 :root {
     --header-brand-height: 40px;
     --header-context-height: 60px;
-    --header-height-collapsed: calc(
-        var(--header-brand-height) + var(--header-context-height)
-    );
+    --header-height-collapsed: calc(var(--header-brand-height) + var(--header-context-height));
 
-    --sidebar-width: 400px;
+    --sidebar-width: 480px;
     --bottom-panel-height: 150px;
 
     --level-details-max-width: 900px;

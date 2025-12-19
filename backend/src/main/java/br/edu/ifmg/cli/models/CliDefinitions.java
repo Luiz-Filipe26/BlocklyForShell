@@ -43,7 +43,7 @@ public record CliDefinitions(List<CommandDef> commands, @Nullable List<OperatorD
 	}
 
 	public record SlotDef(String name, String type, String label, String check, String symbol, String symbolPlacement,
-			String syntaxPrefix, boolean obligatory) {
+			String syntaxPrefix, boolean obligatory, boolean breakLineBefore) {
 	}
 
 	public record CategoryDef(String name, List<String> commands) {

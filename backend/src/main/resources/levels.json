@@ -1,139 +1,154 @@
 {
-  "levels": [
-    {
-      "id": "01_recon",
-      "title": "Reconhecimento",
-      "summary": "Liste os arquivos para saber onde você está.",
-      "fullGuideHtml": "<h1>Onde estou?</h1><p>Você acessou o servidor. O terminal não mostra nada até você pedir.</p><h3>Missão</h3><p>Use o bloco <strong>ls</strong> para listar o conteúdo da pasta atual.</p>",
-      "setupCommands": ["rm -rf *", "touch notas.txt", "mkdir -p sistema/logs"],
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'notas.txt' .last_cmd_out; then echo 'OK'; exit 0; else echo 'Você não listou os arquivos ou a saída não foi mostrada.'; exit 1; fi",
-      "difficulty": "tutorial"
-    },
-    {
-      "id": "02_navigation",
-      "title": "Infiltração",
-      "summary": "Entre na pasta 'sistema'.",
-      "fullGuideHtml": "<h1>Entrando em Pastas</h1><p>Vimos uma pasta chamada <code>sistema</code>. Precisamos investigar o que há dentro dela.</p><h3>Missão</h3><p>Use o bloco <strong>cd</strong> para entrar no diretório <code>sistema</code>.</p>",
-      "setupCommands": ["mkdir -p sistema"],
-      "verificationScript": "if [[ \"$PWD\" == */sistema ]]; then echo 'OK'; exit 0; else echo 'Você ainda não está dentro da pasta sistema.'; exit 1; fi",
-      "difficulty": "tutorial"
-    },
-    {
-      "id": "03_workspace",
-      "title": "Base de Operações",
-      "summary": "Crie uma pasta chamada 'investigacao'.",
-      "fullGuideHtml": "<h1>Criando Espaço</h1><p>Precisamos de um lugar limpo para guardar evidências.</p><h3>Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta chamada <code>investigacao</code>.</p>",
-      "setupCommands": ["rm -rf investigacao"],
-      "verificationScript": "if [ -d 'investigacao' ]; then echo 'OK'; exit 0; else echo 'A pasta investigacao não foi encontrada.'; exit 1; fi",
-      "difficulty": "tutorial"
-    },
-    {
-      "id": "04_evidence",
-      "title": "Preservação",
-      "summary": "Copie o arquivo 'suspeito.dat' para 'investigacao'.",
-      "fullGuideHtml": "<h1>Cópia de Segurança</h1><p>Achamos um arquivo <code>suspeito.dat</code>. Antes de analisá-lo, faça uma cópia.</p><h3>Missão</h3><p>Use o bloco <strong>cp</strong> (copy) para copiar o arquivo <code>suspeito.dat</code> para dentro da pasta <code>investigacao</code>.</p>",
-      "setupCommands": ["touch suspeito.dat", "mkdir -p investigacao", "rm -f investigacao/suspeito.dat"],
-      "verificationScript": "if [ -f 'investigacao/suspeito.dat' ] && [ -f 'suspeito.dat' ]; then echo 'OK'; exit 0; else echo 'A cópia não foi encontrada na pasta investigacao.'; exit 1; fi",
-      "difficulty": "tutorial"
-    },
-    {
-      "id": "05_cleanup",
-      "title": "Remoção de Risco",
-      "summary": "Remova o arquivo 'malware.sh'.",
-      "fullGuideHtml": "<h1>Limpando Ameaças</h1><p>Existe um script perigoso chamado <code>malware.sh</code> na pasta atual.</p><h3>Missão</h3><p>Use o bloco <strong>rm</strong> para apagar esse arquivo permanentemente.</p><p><strong>Cuidado:</strong> Não apague outros arquivos!</p>",
-      "setupCommands": ["touch malware.sh", "touch importante.doc"],
-      "verificationScript": "if [ ! -f 'malware.sh' ] && [ -f 'importante.doc' ]; then echo 'OK'; exit 0; else echo 'O malware ainda existe ou você apagou o arquivo errado!'; exit 1; fi",
-      "difficulty": "tutorial"
-    },
-    {
-      "id": "06_reading",
-      "title": "Leitura de Dados",
-      "summary": "Leia o conteúdo de 'pista.txt'.",
-      "fullGuideHtml": "<h1>Analisando Conteúdo</h1><p>Agora começa a investigação real. O que está escrito no arquivo?</p><h3>Missão</h3><p>Use o comando <strong>cat</strong> para ler o arquivo <code>pista.txt</code> na tela.</p>",
-      "setupCommands": ["echo 'A senha começa com 123' > pista.txt"],
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'A senha começa com 123' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O conteúdo do arquivo não foi exibido na tela.'; exit 1; fi",
-      "difficulty": "training"
-    },
-    {
-      "id": "07_redirect",
-      "title": "O Diário de Bordo",
-      "summary": "Salve a data atual em 'timestamp.txt'.",
-      "fullGuideHtml": "<h1>Redirecionamento (>)</h1><p>Precisamos registrar quando a investigação começou. O comando <code>date</code> mostra a hora, mas queremos salvar isso em um arquivo.</p><h3>Missão</h3><p>Use o bloco <strong>date</strong> e conecte-o ao bloco <strong>></strong> (Redirecionar para arquivo) apontando para <code>timestamp.txt</code>.</p>",
-      "setupCommands": ["rm -f timestamp.txt"],
-      "verificationScript": "if [ -f 'timestamp.txt' ] && [ -s 'timestamp.txt' ]; then echo 'OK'; exit 0; else echo 'O arquivo timestamp.txt não existe ou está vazio.'; exit 1; fi",
-      "difficulty": "training"
-    },
-    {
-      "id": "08_grep_search",
-      "title": "Agulha no Palheiro",
-      "summary": "Encontre a linha com 'ERROR' no arquivo 'server.log'.",
-      "fullGuideHtml": "<h1>Filtros com Grep</h1><p>O arquivo de log é enorme. Ler tudo com <code>cat</code> é impossível.</p><h3>Missão</h3><p>Use o bloco <strong>grep</strong> para buscar a palavra <code>ERROR</code> dentro de <code>server.log</code>.</p>",
-      "setupCommands": ["echo 'INFO: start' > server.log", "echo 'ERROR: invasion detected' >> server.log", "echo 'INFO: running' >> server.log"],
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'invasion detected' .last_cmd_out && ! grep -q 'INFO' .last_cmd_out; then echo 'OK'; exit 0; else echo 'Você não filtrou apenas as linhas de erro.'; exit 1; fi",
-      "difficulty": "training"
-    },
-    {
-      "id": "09_pipe_connect",
-      "title": "O Encanamento (Pipe)",
-      "summary": "Liste os arquivos e filtre apenas os '.conf'.",
-      "fullGuideHtml": "<h1>Conectando Comandos (|)</h1><p>O verdadeiro poder do Linux! Queremos listar os arquivos e, <em>imediatamente</em>, filtrar o resultado.</p><h3>Missão</h3><p>1. Use <strong>ls</strong> para gerar a lista.<br>2. Conecte com um <strong>Pipe (|)</strong>.<br>3. Envie para o <strong>grep</strong> buscar por <code>.conf</code>.</p>",
-      "setupCommands": ["touch nginx.conf", "touch app.js", "touch db.conf", "touch style.css"],
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'nginx.conf' .last_cmd_out && grep -q 'db.conf' .last_cmd_out && ! grep -q 'app.js' .last_cmd_out; then echo 'OK'; exit 0; else echo 'A filtragem falhou. Use ls | grep .conf'; exit 1; fi",
-      "difficulty": "training"
-    },
-    {
-      "id": "10_background",
-      "title": "Multitarefa",
-      "summary": "Execute 'long_task.sh' em background (&).",
-      "fullGuideHtml": "<h1>Segundo Plano (&)</h1><p>Precisamos rodar um script de auditoria, mas ele demora 10 segundos e trava o terminal.</p><h3>Missão</h3><p>Use o bloco <strong>&</strong> para rodar o <code>./long_task.sh</code> em background, liberando o terminal imediatamente.</p>",
-      "setupCommands": ["echo 'sleep 2; echo Done' > long_task.sh", "chmod +x long_task.sh"],
-      "verificationScript": "if ps | grep -q 'sleep'; then echo 'OK'; exit 0; else echo 'O processo não parece estar rodando em background (ou já terminou).'; exit 1; fi",
-      "difficulty": "training"
-    },
-	{
-      "id": "11_network_check",
-      "title": "Diagnóstico de Interface",
-      "summary": "Verifique se a interface de rede local está ativa.",
-      "fullGuideHtml": "<h1>Teste de Loopback</h1><p>Estamos isolados da rede externa, mas precisamos saber se a placa de rede do servidor está respondendo.</p><h3>Missão</h3><p>Use o comando <strong>ping</strong> para testar o endereço local <code>127.0.0.1</code> (localhost).</p>",
-      "setupCommands": [], 
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q '127.0.0.1' .last_cmd_out && grep -q 'bytes from' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O teste de loopback falhou.'; exit 1; fi",
-      "difficulty": "training"
-    },
-    {
-      "id": "12_download_curl",
-      "title": "Download de Carga",
-      "summary": "Baixe o arquivo 'segredo.txt' do servidor local.",
-      "fullGuideHtml": "<h1>Download (Curl)</h1><p>Identificamos um servidor interno rodando na porta 8000.</p><h3>Missão</h3><p>Use o <strong>curl</strong> para baixar o arquivo: <code>http://localhost:8000/segredo.txt</code>.</p><p><em>Dica: O servidor já está rodando!</em></p>",
-      "setupCommands": [
-        "pkill -f http.server || true", 
-        "mkdir -p public_html", 
-        "echo 'TOP_SECRET_CODE_99' > public_html/segredo.txt", 
-        "cd public_html && python3 -m http.server 8000 &"
-      ],
-      "verificationScript": "if [ -e .last_cmd_out ] && grep -q 'TOP_SECRET_CODE_99' .last_cmd_out; then echo 'OK'; exit 0; else echo 'O download falhou ou o conteúdo está errado.'; exit 1; fi",
-      "difficulty": "challenge"
-    },
-    {
-      "id": "13_final_ctf",
-      "title": "DESAFIO FINAL",
-      "summary": "Baixe 'dados.log', encontre a 'SENHA' e salve em 'solucao.txt'.",
-      "fullGuideHtml": "<h1>O Resgate Final</h1><p>Esta é sua prova final. Um arquivo de log está disponível em <code>http://localhost:8000/dados.log</code>.</p><h3>Sua Missão</h3><ol><li>Baixe ou leia o arquivo da rede.</li><li>Filtre a linha que contém a palavra <code>SENHA</code>.</li><li>Salve essa linha no arquivo <code>solucao.txt</code>.</li></ol><p>Boa sorte, agente!</p>",
-      "setupCommands": [
-        "pkill -f http.server || true", 
-        "mkdir -p public_html", 
-        "echo 'Lixo 1' > public_html/dados.log", 
-        "echo 'Lixo 2' >> public_html/dados.log", 
-        "echo 'A SENHA É: DELTA-FORCE-7' >> public_html/dados.log", 
-        "echo 'Lixo 3' >> public_html/dados.log", 
-        "cd public_html && python3 -m http.server 8000 &"
-      ],
-      "verificationScript": "if [ -f solucao.txt ] && grep -q 'DELTA-FORCE-7' solucao.txt; then echo 'OK'; exit 0; else echo 'O arquivo solucao.txt não contém a senha correta.'; exit 1; fi",
-      "difficulty": "challenge"
-    }
-  ],
-  "levelOrder": [
-    "01_recon", "02_navigation", "03_workspace", "04_evidence", "05_cleanup",
-    "06_reading", "07_redirect", "08_grep_search", "09_pipe_connect",
-    "10_background", "11_network_check", "12_download_curl", "13_final_ctf"
-  ]
+    "levels": [
+        {
+            "id": "01_recon",
+            "title": "Reconhecimento",
+            "summary": "Liste os arquivos para saber onde você está.",
+            "fullGuideHtml": "...",
+            "setupCommands": [
+                "rm -rf *",
+                "touch notas.txt",
+                "mkdir -p sistema/logs"
+            ],
+            "verificationScript": "if [ -e /tmp/last_cmd_out ] && grep -q 'notas.txt' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'Você não listou os arquivos.'; exit 1; fi",
+            "difficulty": "tutorial"
+        },
+        {
+            "id": "02_navigation",
+            "title": "Infiltração",
+            "summary": "Entre na pasta 'sistema'.",
+            "fullGuideHtml": "<h1>Entrando em Pastas</h1><p>Vimos uma pasta chamada <code>sistema</code>. Precisamos investigar o que há dentro dela.</p><h3>Missão</h3><p>Use o bloco <strong>cd</strong> para entrar no diretório <code>sistema</code>.</p>",
+            "setupCommands": [
+                "mkdir -p sistema"
+            ],
+            "verificationScript": "if [[ \"$PWD\" == */sistema ]]; then echo 'OK'; exit 0; else echo 'Você ainda não está dentro da pasta sistema.'; exit 1; fi",
+            "difficulty": "tutorial"
+        },
+        {
+            "id": "03_workspace",
+            "title": "Base de Operações",
+            "summary": "Crie uma pasta chamada 'investigacao'.",
+            "fullGuideHtml": "<h1>Criando Espaço</h1><p>Precisamos de um lugar limpo para guardar evidências.</p><h3>Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta chamada <code>investigacao</code>.</p>",
+            "setupCommands": [
+                "rm -rf investigacao"
+            ],
+            "verificationScript": "if [ -d 'investigacao' ]; then echo 'OK'; exit 0; else echo 'A pasta investigacao não foi encontrada.'; exit 1; fi",
+            "difficulty": "tutorial"
+        },
+        {
+            "id": "04_evidence",
+            "title": "Preservação",
+            "summary": "Copie o arquivo 'suspeito.dat' para 'investigacao'.",
+            "fullGuideHtml": "<h1>Cópia de Segurança</h1><p>Achamos um arquivo <code>suspeito.dat</code>. Antes de analisá-lo, faça uma cópia.</p><h3>Missão</h3><p>Use o bloco <strong>cp</strong> (copy) para copiar o arquivo <code>suspeito.dat</code> para dentro da pasta <code>investigacao</code>.</p>",
+            "setupCommands": [
+                "touch suspeito.dat",
+                "mkdir -p investigacao",
+                "rm -f investigacao/suspeito.dat"
+            ],
+            "verificationScript": "if [ -f 'investigacao/suspeito.dat' ] && [ -f 'suspeito.dat' ]; then echo 'OK'; exit 0; else echo 'A cópia não foi encontrada na pasta investigacao.'; exit 1; fi",
+            "difficulty": "tutorial"
+        },
+        {
+            "id": "05_cleanup",
+            "title": "Remoção de Risco",
+            "summary": "Remova o arquivo 'malware.sh'.",
+            "fullGuideHtml": "<h1>Limpando Ameaças</h1><p>Existe um script perigoso chamado <code>malware.sh</code> na pasta atual.</p><h3>Missão</h3><p>Use o bloco <strong>rm</strong> para apagar esse arquivo permanentemente.</p><p><strong>Cuidado:</strong> Não apague outros arquivos!</p>",
+            "setupCommands": [
+                "touch malware.sh",
+                "touch importante.doc"
+            ],
+            "verificationScript": "if [ ! -f 'malware.sh' ] && [ -f 'importante.doc' ]; then echo 'OK'; exit 0; else echo 'O malware ainda existe ou você apagou o arquivo errado!'; exit 1; fi",
+            "difficulty": "tutorial"
+        },
+        {
+            "id": "06_reading",
+            "title": "Leitura de Dados",
+            "summary": "Leia o conteúdo de 'pista.txt'.",
+            "fullGuideHtml": "...",
+            "setupCommands": [
+                "echo 'A senha começa com 123' > pista.txt"
+            ],
+            "verificationScript": "if [ -e /tmp/last_cmd_out ] && grep -q 'A senha começa com 123' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'O conteúdo não apareceu na tela.'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "08_grep_search",
+            "title": "Agulha no Palheiro",
+            "summary": "Encontre a linha com 'ERROR' no arquivo 'server.log'.",
+            "fullGuideHtml": "...",
+            "setupCommands": [
+                "echo 'INFO: start' > server.log",
+                "echo 'ERROR: invasion detected' >> server.log",
+                "echo 'INFO: running' >> server.log"
+            ],
+            "verificationScript": "if [ -e /tmp/last_cmd_out ] && grep -q 'invasion detected' /tmp/last_cmd_out && ! grep -q 'INFO' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'Filtro incorreto.'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "09_pipe_connect",
+            "title": "O Encanamento (Pipe)",
+            "summary": "Liste os arquivos e filtre apenas os '.conf'.",
+            "fullGuideHtml": "...",
+            "setupCommands": [
+                "touch nginx.conf",
+                "touch app.js",
+                "touch db.conf",
+                "touch style.css"
+            ],
+            "verificationScript": "if grep -q 'Done' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'O script não foi executado. Use ./long_task.sh &'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "11_network_check",
+            "title": "Diagnóstico de Interface",
+            "summary": "Verifique se a interface de rede local está ativa.",
+            "fullGuideHtml": "...",
+            "setupCommands": [],
+            "verificationScript": "if [ -e /tmp/last_cmd_out ] && grep -q '127.0.0.1' /tmp/last_cmd_out && grep -q 'bytes from' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'Falha no ping.'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "12_download_curl",
+            "title": "Download de Carga",
+            "summary": "Baixe o arquivo 'segredo.txt' do servidor local.",
+            "fullGuideHtml": "...",
+            "setupCommands": [
+                "pkill -f http.server || true",
+                "mkdir -p /tmp/www",
+                "echo 'TOP_SECRET_CODE_99' > /tmp/www/segredo.txt",
+                "cd /tmp/www && python3 -m http.server 8000 & sleep 1; cd /"
+            ],
+            "verificationScript": "if [ -e /tmp/last_cmd_out ] && grep -q 'TOP_SECRET_CODE_99' /tmp/last_cmd_out; then echo 'OK'; exit 0; else echo 'Download falhou.'; exit 1; fi",
+            "difficulty": "challenge"
+        },
+        {
+            "id": "13_final_ctf",
+            "title": "DESAFIO FINAL",
+            "summary": "Baixe 'dados.log', encontre a 'SENHA' e salve em 'solucao.txt'.",
+            "fullGuideHtml": "<h1>O Resgate Final</h1><p>Esta é sua prova final. Um arquivo de log está disponível em <code>http://localhost:8000/dados.log</code>.</p><h3>Sua Missão</h3><ol><li>Baixe ou leia o arquivo da rede.</li><li>Filtre a linha que contém a palavra <code>SENHA</code>.</li><li>Salve essa linha no arquivo <code>solucao.txt</code>.</li></ol><p>Boa sorte, agente!</p>",
+            "setupCommands": [
+                "pkill -f http.server || true",
+                "mkdir -p /tmp/www_final",
+                "echo 'A SENHA É: DELTA-FORCE-7' > /tmp/www_final/dados.log",
+                "cd /tmp/www_final && python3 -m http.server 8000 & sleep 1; cd /"
+            ],
+            "verificationScript": "if [ -f /solucao.txt ] || [ -f solucao.txt ]; then if grep -q 'DELTA-FORCE-7' solucao.txt || grep -q 'DELTA-FORCE-7' /solucao.txt; then echo 'OK'; exit 0; fi; fi; echo 'O arquivo solucao.txt não contém a senha correta.'; exit 1;",
+            "difficulty": "challenge"
+        }
+    ],
+    "levelOrder": [
+        "01_recon",
+        "02_navigation",
+        "03_workspace",
+        "04_evidence",
+        "05_cleanup",
+        "06_reading",
+        "07_redirect",
+        "08_grep_search",
+        "09_pipe_connect",
+        "10_background",
+        "11_network_check",
+        "12_download_curl",
+        "13_final_ctf"
+    ]
 }

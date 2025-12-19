@@ -2,7 +2,7 @@ import * as Blockly from "blockly";
 import * as CLI from "../types/cli";
 import * as BlockIDs from "../constants/blockIds";
 import { createToolbox } from "./toolboxBuilder";
-import { initSystemBlocks } from "../blocks/systemBlocks";
+import { findScriptRoot, initSystemBlocks } from "../blocks/systemBlocks";
 import { disableOrphanBlocks } from "./orphanHandler";
 import { createAllBlocksFromDefinition } from "../blocks/blocksBuilder";
 import {
@@ -71,7 +71,7 @@ export async function setupWorkspace(
     if (config.shouldSetupAutosave)
         restored = loadSession(workspace, config.workspaceId);
 
-    if (!restored) createScriptRoot(workspace);
+    if (!findScriptRoot(workspace)) createScriptRoot(workspace);
 
     if (config.shouldSetupAutosave)
         initAutoSaver(workspace, config.workspaceId);
@@ -172,16 +172,27 @@ function initCustomContextMenu(
         callback: (scope) => {
             const workspace = scope.workspace as Blockly.WorkspaceSvg;
             if (!workspace) return;
+            Blockly.Events.setGroup(true);
 
-            if (confirm("Tem certeza que deseja apagar todos os blocos?")) {
-                Blockly.Events.disable();
-                workspace.clear();
+            try {
+                const rootBlock = findScriptRoot(workspace);
+                const allBlocks = workspace.getAllBlocks(false);
+
+                allBlocks.forEach((block) => {
+                    if (block !== rootBlock) {
+                        block.dispose(false);
+                    }
+                });
+
+                if (!rootBlock) {
+                    createScriptRoot(workspace);
+                }
+
                 if (hasAutosave) {
                     clearAutoSave(workspaceId);
                 }
-                Blockly.Events.enable();
-
-                createScriptRoot(workspace);
+            } finally {
+                Blockly.Events.setGroup(false);
             }
         },
         displayText: "Limpar e Resetar",

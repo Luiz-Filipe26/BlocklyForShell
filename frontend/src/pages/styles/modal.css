@@ -75,29 +75,3 @@
     text-align: right;
     border-top: 1px solid var(--color-border-soft);
 }
-
-.btn-close-modal {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.btn-close-modal:hover {
-    background-color: #5a6268;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}

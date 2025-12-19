@@ -5,6 +5,25 @@ import * as API from "@/types/api";
 import * as DataManager from "../session/dataManager";
 
 const LAST_UNLOCKED_LEVEL_ID_KEY = "experiment_progress_v1";
+const SIDEBAR_WIDTH_KEY = "sidebar_pref_width";
+const SIDEBAR_COLLAPSED_KEY = "sidebar_pref_collapsed";
+
+export function isSidebarCollapsed(): boolean {
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+}
+
+
+export function saveSidebarCollapsed(collapsed: boolean): void {
+    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed.toString());
+}
+
+export function getSidebarWidth(): string | null {
+    return localStorage.getItem(SIDEBAR_WIDTH_KEY);
+}
+
+export function saveSidebarWidth(width: number): void {
+    localStorage.setItem(SIDEBAR_WIDTH_KEY, Math.floor(width).toString());
+}
 
 export function getLastUnlockedLevelId(): string | null {
     return localStorage.getItem(LAST_UNLOCKED_LEVEL_ID_KEY);

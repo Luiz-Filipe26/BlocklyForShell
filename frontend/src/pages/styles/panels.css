@@ -56,6 +56,12 @@
     font-weight: 600;
 }
 
+.sidebar .panel h2 {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 .log-display {
     flex: 1;
     background-color: #fff;

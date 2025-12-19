@@ -4,7 +4,8 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     min-height: 100vh;
     font-family: var(--font-sans);
     background-color: var(--color-background-app);
@@ -15,4 +16,10 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --is-small-screen: 1;
+    }
 }

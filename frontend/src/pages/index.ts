@@ -16,6 +16,8 @@ import * as ShellBlocks from "shellblocks";
 import { MAIN_WORKSPACE_ID } from "./features/constants/constants";
 import { getPageElements } from "./features/ui/DOMProvider";
 import { GameData } from "@/types/api";
+import { setupSidebarResizer } from "./features/ui/sidebarResizer";
+import { setupSidebarToggle } from "./features/ui/sidebarController";
 
 const pageElements = getPageElements();
 let gameData: GameData | null = null;
@@ -24,6 +26,9 @@ export const IS_EXPERIMENT_MODE =
 start();
 
 async function start(): Promise<void> {
+    setupSidebarResizer(pageElements.sidebarResizer, pageElements.sidebar);
+    setupSidebarToggle(pageElements.btnToggleSidebar, pageElements.sidebar);
+
     const definitions = await getDefinitions();
     const workspace = await ShellBlocks.setupWorkspace(
         pageElements.blocklyArea,

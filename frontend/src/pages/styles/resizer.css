@@ -1,0 +1,27 @@
+.resizer-gutter {
+    width: 6px;
+    cursor: col-resize;
+    background-color: var(--color-border-default);
+    transition: background-color 0.2s;
+    z-index: 30;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.resizer-gutter::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    right: -4px;
+}
+
+.resizer-gutter:hover,
+body.is-resizing .resizer-gutter {
+    background-color: var(--color-accent);
+}
+
+.sidebar.is-collapsed + .resizer-gutter {
+    display: none;
+}

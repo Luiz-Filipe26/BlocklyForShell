@@ -24,6 +24,9 @@ const pageElements = {
     btnLoadDefs: getElement<HTMLButtonElement>("btn-load-defs"),
     btnLoadGame: getElement<HTMLButtonElement>("btn-load-game"),
     btnResetDefs: getElement<HTMLButtonElement>("btn-reset-defs"),
+    sidebar: getElement<HTMLElement>("sidebar"),
+    sidebarResizer: getElement<HTMLDivElement>("sidebar-resizer"),
+    btnToggleSidebar: getElement<HTMLButtonElement>("btn-toggle-sidebar"),
 };
 
 export function getPageElements(): typeof pageElements {

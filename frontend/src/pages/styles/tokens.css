@@ -1,4 +1,5 @@
 :root {
+    --is-small-screen: 0;
     --header-brand-height: 40px;
     --header-context-height: 60px;
     --header-height-collapsed: calc(var(--header-brand-height) + var(--header-context-height));

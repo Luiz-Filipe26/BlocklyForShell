@@ -1,15 +1,88 @@
 .sidebar {
     width: var(--sidebar-width);
+    min-width: 250px;
+    max-width: 70vw;
     background-color: #e9ecef;
     padding: 10px;
-
     display: flex;
     flex-direction: column;
     gap: 10px;
-
     overflow-y: auto;
     flex-shrink: 0;
     border-left: 1px solid var(--color-border-default);
+    transition: width 0.2s ease-in-out;
+    position: relative;
+}
+
+body.is-resizing .sidebar {
+    transition: none;
+    cursor: col-resize;
+}
+
+.sidebar.is-collapsed {
+    width: 44px !important;
+    min-width: 44px !important;
+    padding: 10px 6px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #dee2e6;
+}
+
+.sidebar.is-collapsed .panel>*,
+.sidebar.is-collapsed .action-buttons-panel>* {
+    display: none !important;
+}
+
+.sidebar.is-collapsed .panel {
+    display: flex !important;
+    padding: 0;
+    background-color: #fff;
+    box-shadow: none;
+    border-radius: 4px;
+    min-height: 32px;
+}
+
+.sidebar.is-collapsed .action-buttons-panel {
+    display: flex !important;
+    min-height: 40px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+}
+
+.btn-sidebar-toggle {
+    position: absolute;
+    top: 25px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    border-radius: 4px;
+    transition:
+        transform 0.2s,
+        right 0.2s,
+        background-color 0.2s;
+}
+
+.btn-sidebar-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-sidebar-toggle img {
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    display: block;
+}
+
+.sidebar.is-collapsed .btn-sidebar-toggle {
+    right: 6px;
+    transform: rotate(180deg);
 }
 
 .sidebar .panel {
@@ -17,7 +90,6 @@
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
@@ -31,12 +103,15 @@
 .sidebar .panel h2 {
     font-size: 0.95em;
     font-weight: 600;
-    margin-bottom: 10px;
     color: #555;
-    border-bottom: 1px solid var(--color-border-soft);
-    padding-bottom: 5px;
-    flex-shrink: 0;
     text-transform: uppercase;
+    margin: 0;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border-soft);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
 }
 
 .sidebar .action-buttons-panel {
@@ -49,12 +124,10 @@
 .sidebar .btn {
     flex: 1;
     padding: 10px;
-    font-size: 1em;
     font-weight: 600;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
 .sidebar .btn-run {

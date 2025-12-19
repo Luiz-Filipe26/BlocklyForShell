@@ -230,12 +230,15 @@
             "id": "18_challenge_security",
             "title": "Desafio: O Incidente",
             "summary": "Investigue o sistema e neutralize a ameaça.",
-            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um script malicioso está rodando. Diferente dos níveis anteriores, você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação (Faça por etapas)</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Ignore os processos do sistema (bash, ps) e procure pelo nome do arquivo suspeito na coluna COMMAND.</li><li><strong>Inteligência:</strong> Limpe o workspace. Use o <code>cat</code> nesse arquivo para ler o conteúdo e descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Limpe de novo. Crie um arquivo <code>blacklist.txt</code> contendo apenas esse IP e use <code>rm</code> para deletar o malware.</li></ol>",
+            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um script malicioso está rodando. Diferente dos níveis anteriores, você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação (Faça por etapas)</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Ignore os processos do sistema e procure pelo arquivo suspeito na coluna COMMAND (ele aparecerá como <code>./nome_do_arquivo.sh</code> ou <code>bash ./nome_do_arquivo.sh</code>).</li><li><strong>Inteligência:</strong> Limpe o workspace. Use o <code>cat</code> nesse arquivo para ler o conteúdo e descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Limpe de novo. Crie um arquivo <code>blacklist.txt</code> contendo apenas esse IP e use <code>rm</code> para deletar o malware.</li></ol>",
             "setupCommands": [
+                "pkill -f malware.sh || true",
                 "rm -rf *",
-                "echo 'Config: server=203.0.113.55; mode=silent' > malware.sh",
+                "echo '# CONFIDENCIAL - ENVIANDO DADOS PARA: 203.0.113.55' > malware.sh",
+                "echo 'sleep 200' >> malware.sh",
                 "chmod +x malware.sh",
-                "(exec -a ./malware.sh sleep 100 &)"
+                "./malware.sh > /dev/null 2>&1 &",
+                "sleep 1"
             ],
             "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.sh ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
             "difficulty": "challenge"

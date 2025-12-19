@@ -165,6 +165,96 @@
             ],
             "verificationScript": "sleep 0.5; if ps aux | grep -v grep | grep -q 'ping'; then exit 0; else echo 'O ping não está rodando em segundo plano. Você usou o & no final?'; exit 1; fi",
             "difficulty": "training"
+        },
+        {
+            "id": "14_organizar",
+            "title": "Arrumando a Casa",
+            "summary": "Organize os arquivos soltos em diretórios.",
+            "fullGuideHtml": "<h1>Caos no Servidor</h1><p>Alguém (provavelmente o estagiário) deixou vários arquivos de log espalhados na pasta raiz. Precisamos organizar isso.</p><h3>Sua Missão</h3><ol><li>Crie um diretório chamado <code>logs</code>.</li><li>Use o comando <strong>mv</strong> para mover os arquivos <code>erro.log</code> e <code>acesso.log</code> para dentro dessa nova pasta.</li></ol>",
+            "setupCommands": [
+                "rm -rf *",
+                "touch erro.log",
+                "touch acesso.log",
+                "touch imagem.png",
+                "touch script.sh"
+            ],
+            "verificationScript": "if [ -d logs ] && [ -f logs/erro.log ] && [ -f logs/acesso.log ] && [ ! -f erro.log ]; then exit 0; else echo 'Os arquivos de log ainda não estão dentro da pasta logs.'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "15_limpeza",
+            "title": "Treino: Protocolo de Segurança",
+            "summary": "Remova arquivos sensíveis expostos.",
+            "fullGuideHtml": "<h1>Vazamento de Dados</h1><p>Um arquivo contendo senhas antigas foi deixado acidentalmente no servidor público. Isso é uma violação de segurança grave.</p><h3>Sua Missão</h3><p>Identifique o arquivo <code>senhas_antigas.txt</code> usando <strong>ls</strong> e remova-o imediatamente usando o comando <strong>rm</strong>.</p><p><em>Dica: O script deve listar os arquivos para confirmar o nome antes de apagar.</em></p>",
+            "setupCommands": [
+                "rm -rf *",
+                "touch notas.txt",
+                "echo 'admin:12345' > senhas_antigas.txt",
+                "touch todo_list.md"
+            ],
+            "verificationScript": "if [ ! -f senhas_antigas.txt ] && grep -q 'senhas_antigas.txt' /tmp/last_cmd_out; then exit 0; else if [ -f senhas_antigas.txt ]; then echo 'O arquivo de senhas ainda existe.'; else echo 'Você removeu o arquivo, mas não o listou (ls) para confirmar a existência dele antes.'; fi; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "16_processamento",
+            "title": "Rotação de Logs",
+            "summary": "Filtre erros críticos e limpe o arquivo original.",
+            "fullGuideHtml": "<h1>Gerenciamento de Espaço</h1><p>O arquivo <code>servidor.log</code> ficou gigante e está ocupando todo o disco. Precisamos salvar apenas os erros e apagar o resto.</p><h3>Sua Missão</h3><ol><li>Use <strong>grep</strong> para filtrar as linhas com a palavra <strong>CRITICO</strong> do arquivo <code>servidor.log</code>.</li><li>Salve o resultado em um novo arquivo chamado <code>erros.txt</code>.</li><li>Após salvar, remova o arquivo original <code>servidor.log</code> para liberar espaço.</li></ol>",
+            "setupCommands": [
+                "rm -rf *",
+                "echo 'INFO: Tudo ok' > servidor.log",
+                "echo 'WARN: Memoria cheia' >> servidor.log",
+                "echo 'CRITICO: Banco de dados caiu' >> servidor.log",
+                "echo 'INFO: Reiniciando' >> servidor.log"
+            ],
+            "verificationScript": "if [ -f erros.txt ] && grep -q 'CRITICO' erros.txt && [ ! -f servidor.log ]; then exit 0; else echo 'Verifique se o arquivo erros.txt foi criado corretamente e se o servidor.log foi removido.'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "17_deploy",
+            "title": "Treino: Download e Deploy",
+            "summary": "Baixe um programa da rede e instale-o na pasta correta.",
+            "fullGuideHtml": "<h1>Instalação Manual</h1><p>Você precisa instalar o novo sistema de vendas que está no servidor central.</p><h3>O Processo de Deploy</h3><p>Instalar nada mais é do que baixar arquivos e colocá-los no lugar certo.</p><h3>Sua Missão</h3><ol><li>Crie um diretório chamado <code>app</code> para organizar o sistema.</li><li>Use o <strong>curl</strong> para ler a URL <code>http://127.0.0.1:8000/vendas.py</code>.</li><li><strong>Importante:</strong> Use o operador <strong>&gt;</strong> para salvar o resultado desse curl num arquivo chamado <code>vendas.py</code>.</li><li>Por fim, use o <strong>mv</strong> para mover esse arquivo para dentro da nova pasta <code>app</code> que você mesmo vai criar.</li></ol>",
+            "setupCommands": [
+                "rm -rf *",
+                "pkill -9 -f http.server || true",
+                "echo 'print(\"Sistema de Vendas v2.0\")' > vendas.py",
+                "(python3 -m http.server 8000 --bind 127.0.0.1 > /dev/null 2>&1 & true)",
+                "sleep 2"
+            ],
+            "verificationScript": "if [ -d app ] && [ -f app/vendas.py ]; then exit 0; else echo 'O arquivo vendas.py não foi encontrado DENTRO da pasta app. Você baixou e moveu ele corretamente?'; exit 1; fi",
+            "difficulty": "training"
+        },
+        {
+            "id": "18_challenge_security",
+            "title": "Desafio: O Incidente",
+            "summary": "Investigue o sistema e neutralize a ameaça.",
+            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Nossos sistemas de monitoramento detectaram um comportamento anômalo. Um script malicioso está rodando e enviando dados para fora.</p><h3>Sua Missão</h3><p>Você tem total autonomia. Resolva o problema:</p><ol><li>Encontre o processo malicioso que está rodando (dica: use <code>ps</code> com flags completas).</li><li>O nome do processo revelará o nome do arquivo do script. Encontre-o.</li><li>Leia o conteúdo desse arquivo para descobrir o <strong>IP de destino</strong> do ataque.</li><li>Salve APENAS esse IP num arquivo chamado <code>blacklist.txt</code>.</li><li>Remova o script malicioso do disco.</li></ol>",
+            "setupCommands": [
+                "rm -rf *",
+                "echo 'Enviando dados roubados para 203.0.113.55...' > malware.sh",
+                "echo 'sleep 10' >> malware.sh",
+                "chmod +x malware.sh",
+                "(./malware.sh & true)"
+            ],
+            "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.sh ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
+            "difficulty": "challenge"
+        },
+        {
+            "id": "19_challenge_deploy",
+            "title": "Desafio Final: O Grande Deploy",
+            "summary": "Prepare o ambiente e coloque a aplicação no ar.",
+            "fullGuideHtml": "<h1>Teste Final de SysAdmin 🎓</h1><p>O time de desenvolvimento terminou a nova API, mas eles não sabem colocar no ar. É com você.</p><h3>Especificações do Deploy</h3><ol><li>Crie a estrutura de pastas: uma pasta <code>app</code> e dentro dela uma pasta <code>logs</code>.</li><li>Baixe o código fonte <code>server.py</code> que está disponível em <code>http://127.0.0.1:8000/server.py</code>.</li><li>Mova o arquivo baixado para dentro da pasta <code>app</code>.</li><li>Execute o servidor (<code>python3 app/server.py</code>) em <strong>segundo plano</strong>.</li></ol>",
+            "setupCommands": [
+                "rm -rf *",
+                "pkill -9 -f http.server || true",
+                "pkill -9 -f server.py || true",
+                "echo 'print(\"Servidor de Producao Rodando...\"); import time; time.sleep(100)' > server.py",
+                "(python3 -m http.server 8000 --bind 127.0.0.1 > /dev/null 2>&1 & true)",
+                "sleep 3"
+            ],
+            "verificationScript": "if [ -d app/logs ] && [ -f app/server.py ] && ps aux | grep -v grep | grep -q 'app/server.py'; then exit 0; else echo 'O deploy falhou. Verifique a estrutura de pastas, o arquivo e se o processo está rodando.'; exit 1; fi",
+            "difficulty": "challenge"
         }
     ],
     "levelOrder": [
@@ -180,6 +270,12 @@
         "10_ping",
         "11_curl",
         "12_ps",
-        "13_background"
+        "13_background",
+        "14_organizar",
+        "15_limpeza",
+        "16_processamento",
+        "17_deploy",
+        "18_challenge_security",
+        "19_challenge_deploy"
     ]
 }

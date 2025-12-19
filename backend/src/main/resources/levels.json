@@ -29,13 +29,13 @@
         },
         {
             "id": "03_mkdir",
-            "title": "Argumentos (Alvos)",
-            "summary": "Crie uma nova pasta definindo um argumento.",
-            "fullGuideHtml": "<h1>Ação e Reação</h1><p>Alguns comandos, como o <code>ls</code>, funcionam sozinhos. Outros precisam de um <strong>alvo</strong> para funcionar.</p><h3>O que é um Argumento?</h3><p>É a informação que você dá para o comando saber <strong>onde</strong> ou <strong>com quem</strong> agir. Pense nisso como um verbo que precisa de um complemento:</p><ul><li><em>Comando:</em> \"Crie uma pasta\" (mkdir)</li><li><em>Argumento:</em> \"...com o nome <strong>projetos</strong>\"</li></ul><h3>Sua Missão</h3><p>Use o bloco <strong>mkdir</strong>. Note que ele tem um espaço vazio: isso é o argumento. Escreva <code>projetos</code> nele para criar sua pasta.</p>",
+            "title": "Operandos (Alvos)",
+            "summary": "Crie uma nova pasta definindo um operando.",
+            "fullGuideHtml": "<h1>Ação e Reação</h1><p>Alguns comandos, como o <code>ls</code>, funcionam sozinhos. Outros precisam de um <strong>alvo</strong> para funcionar.</p><h3>O que é um operando?</h3><p>É a informação que você dá para o comando saber <strong>onde</strong> ou <strong>com quem</strong> agir. Pense nisso como um verbo que precisa de um complemento:</p><ul><li><em>Comando:</em> \"Crie uma pasta\" (mkdir)</li><li><em>Operando:</em> \"...com o nome <strong>projetos</strong>\"</li></ul><h3>Sua Missão</h3><p>Use o bloco <strong>mkdir</strong>. Note que ele tem um espaço vazio: isso é o operando. Escreva <code>projetos</code> nele para criar sua pasta.</p>",
             "setupCommands": [
                 "rm -rf *"
             ],
-            "verificationScript": "if [ -d projetos ]; then echo 'OK'; exit 0; elif [ -d Projetos ] || [ -d PROJETOS ]; then echo 'Atenção: O Linux diferencia maiúsculas de minúsculas. Você criou Projetos, mas pedimos projetos.'; exit 1; else echo 'A pasta projetos não foi encontrada. Você preencheu o argumento com o nome correto?'; exit 1; fi",
+            "verificationScript": "if [ -d projetos ]; then echo 'OK'; exit 0; elif [ -d Projetos ] || [ -d PROJETOS ]; then echo 'Atenção: O Linux diferencia maiúsculas de minúsculas. Você criou Projetos, mas pedimos projetos.'; exit 1; else echo 'A pasta projetos não foi encontrada. Você preencheu o operando com o nome correto?'; exit 1; fi",
             "difficulty": "tutorial"
         },
         {
@@ -54,7 +54,7 @@
             "id": "05_cp",
             "title": "Clonando Arquivos",
             "summary": "Faça uma cópia de segurança do arquivo.",
-            "fullGuideHtml": "<h1>A Arte de Copiar</h1><p>O comando <strong>cp</strong> (Copy) é o nosso copiador. Diferente do 'Mover', o arquivo original permanece lá.</p><h3>Dois Argumentos</h3><p>Este comando precisa de duas informações, nesta ordem exata:</p><ol><li><strong>Origem:</strong> O que você quer copiar? (<code>plano.txt</code>)</li><li><strong>Destino:</strong> Qual será o nome da cópia? (<code>backup.txt</code>)</li></ol><h3>Sua Missão</h3><p>Configure o bloco <strong>cp</strong> para copiar o arquivo <code>plano.txt</code> e criar o <code>backup.txt</code>.</p>",
+            "fullGuideHtml": "<h1>A Arte de Copiar</h1><p>O comando <strong>cp</strong> (Copy) é o nosso copiador. Diferente do 'Mover', o arquivo original permanece lá.</p><h3>Dois Operandos</h3><p>Este comando precisa de duas informações, nesta ordem exata:</p><ol><li><strong>Origem:</strong> O que você quer copiar? (<code>plano.txt</code>)</li><li><strong>Destino:</strong> Qual será o nome da cópia? (<code>backup.txt</code>)</li></ol><h3>Sua Missão</h3><p>Configure o bloco <strong>cp</strong> para copiar o arquivo <code>plano.txt</code> e criar o <code>backup.txt</code>.</p>",
             "setupCommands": [
                 "rm -rf *",
                 "echo 'Dominar o mundo' > plano.txt"
@@ -149,10 +149,11 @@
             "summary": "Veja o que está rodando no sistema agora.",
             "fullGuideHtml": "<h1>O Sistema está Vivo</h1><p>Mesmo quando você não digita nada, o computador está rodando vários programas invisíveis.</p><h3>O Comando ps</h3><p>O comando <strong>ps</strong> (Process Status) lista os programas que estão ativos no momento. É como o Gerenciador de Tarefas do Windows.</p><h3>Sua Missão</h3><p>Existe um processo chamado <code>servidor_oculto</code> rodando agora. Use o comando <strong>ps</strong> para encontrá-lo na lista de processos ativos.</p>",
             "setupCommands": [
+                "pkill -f servidor_oculto || true",
                 "rm -rf *",
-                "(exec -a servidor_oculto sleep 30 &)"
+                "(exec -a servidor_oculto sleep 200 &)"
             ],
-            "verificationScript": "if grep -q 'servidor_oculto' /tmp/last_cmd_out; then exit 0; else echo 'Você não listou os processos corretamente ou o servidor oculto não apareceu.'; exit 1; fi",
+            "verificationScript": "if grep -q 'servidor_oculto' /tmp/last_cmd_out; then exit 0; else echo 'Você não listou os processos corretamente ou o servidor oculto não apareceu (tente executar novamente).'; exit 1; fi",
             "difficulty": "tutorial"
         },
         {
@@ -229,13 +230,12 @@
             "id": "18_challenge_security",
             "title": "Desafio: O Incidente",
             "summary": "Investigue o sistema e neutralize a ameaça.",
-            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Nossos sistemas de monitoramento detectaram um comportamento anômalo. Um script malicioso está rodando e enviando dados para fora.</p><h3>Sua Missão</h3><p>Você tem total autonomia. Resolva o problema:</p><ol><li>Encontre o processo malicioso que está rodando (dica: use <code>ps</code> com flags completas).</li><li>O nome do processo revelará o nome do arquivo do script. Encontre-o.</li><li>Leia o conteúdo desse arquivo para descobrir o <strong>IP de destino</strong> do ataque.</li><li>Salve APENAS esse IP num arquivo chamado <code>blacklist.txt</code>.</li><li>Remova o script malicioso do disco.</li></ol>",
+            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um script malicioso está rodando. Diferente dos níveis anteriores, você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação (Faça por etapas)</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Ignore os processos do sistema (bash, ps) e procure pelo nome do arquivo suspeito na coluna COMMAND.</li><li><strong>Inteligência:</strong> Limpe o workspace. Use o <code>cat</code> nesse arquivo para ler o conteúdo e descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Limpe de novo. Crie um arquivo <code>blacklist.txt</code> contendo apenas esse IP e use <code>rm</code> para deletar o malware.</li></ol>",
             "setupCommands": [
                 "rm -rf *",
-                "echo 'Enviando dados roubados para 203.0.113.55...' > malware.sh",
-                "echo 'sleep 10' >> malware.sh",
+                "echo 'Config: server=203.0.113.55; mode=silent' > malware.sh",
                 "chmod +x malware.sh",
-                "(./malware.sh & true)"
+                "(exec -a ./malware.sh sleep 100 &)"
             ],
             "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.sh ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
             "difficulty": "challenge"

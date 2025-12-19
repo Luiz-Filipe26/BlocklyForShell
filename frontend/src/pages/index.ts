@@ -62,7 +62,7 @@ async function start(): Promise<void> {
     setupHeaderBehavior(pageElements.appHeader, pageElements.headerToggleBtn);
 
     gameData = await getGameData();
-    await setupLevelSelector(gameData, pageElements);
+    await setupLevelSelector(gameData, pageElements, IS_EXPERIMENT_MODE);
 
     setupScriptHotReloader(workspace, pageElements.codeOutput);
     registerButtonListeners(workspace);

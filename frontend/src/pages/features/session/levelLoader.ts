@@ -77,6 +77,7 @@ export function onLevelSuccesEvent(
         modifyOptionsToDisplayProgress(
             nonSandboxOptions,
             newLastUnlockedLevelId,
+            isExperimentMode
         );
 
         const nextTitle =
@@ -105,6 +106,7 @@ export interface SelectorDependencies {
 export async function setupLevelSelector(
     data: API.GameData | null,
     selectorDependencies: SelectorDependencies,
+    isExperimentMode: boolean,
 ): Promise<void> {
     const { levelSelect, levelSummaryText, levelFullDetails } =
         selectorDependencies;
@@ -132,7 +134,11 @@ export async function setupLevelSelector(
     });
 
     const lastUnlockedLevelId = PersistenceManager.getLastUnlockedLevelId();
-    modifyOptionsToDisplayProgress(selectOptions, lastUnlockedLevelId || "");
+    modifyOptionsToDisplayProgress(
+        selectOptions,
+        lastUnlockedLevelId || "",
+        isExperimentMode,
+    );
 
     registerLevelSelectorEvents(
         levelSelect,
@@ -147,13 +153,15 @@ export async function setupLevelSelector(
 function modifyOptionsToDisplayProgress(
     nonSandboxSelectOptions: HTMLOptionElement[],
     lastUnlockedLevelId: string,
+    isExperimentMode?: boolean,
 ): void {
     let lastUnlockedLevelIndex = nonSandboxSelectOptions.findIndex(
         (option) => option.value === lastUnlockedLevelId,
     );
     lastUnlockedLevelIndex = Math.max(lastUnlockedLevelIndex, 0);
     nonSandboxSelectOptions.forEach((option, index) => {
-        option.disabled = index > lastUnlockedLevelIndex;
+        option.disabled =
+            Boolean(isExperimentMode) && index > lastUnlockedLevelIndex;
         option.text = `Nível ${index + 1}: ${option.dataset.title || ""}${option.disabled ? " 🔒" : ""}`;
     });
 }

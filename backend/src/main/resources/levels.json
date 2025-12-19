@@ -230,17 +230,15 @@
             "id": "18_challenge_security",
             "title": "Desafio: O Incidente",
             "summary": "Investigue o sistema e neutralize a ameaça.",
-            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um script malicioso está rodando. Diferente dos níveis anteriores, você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação (Faça por etapas)</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Procure pelo arquivo suspeito na coluna COMMAND (deve aparecer como <code>./nome_do_arquivo.sh</code>).</li><li><strong>Inteligência:</strong> Limpe o workspace. Use o <code>cat</code> nesse arquivo para ler o conteúdo e descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Limpe de novo. Crie um arquivo <code>blacklist.txt</code> contendo apenas esse IP e use <code>rm</code> para deletar o malware.</li></ol>",
+            "fullGuideHtml": "<h1>Alerta de Intrusão 🚨</h1><p>Um programa malicioso está rodando em background. Você não sabe o nome dele ainda.</p><h3>Estratégia de Investigação</h3><ol><li><strong>Sondagem:</strong> Execute <code>ps aux</code>. Procure por algo rodando via <strong>python</strong> que não deveria estar aí.</li><li><strong>Inteligência:</strong> O comando acima vai revelar o nome do arquivo (ex: <code>virus.py</code>). Use o <code>cat</code> nele para descobrir o <strong>IP</strong>.</li><li><strong>Ação:</strong> Crie o arquivo <code>blacklist.txt</code> com o IP e remova o malware.</li></ol>",
             "setupCommands": [
-                "pkill -f malware.sh || true",
+                "pkill -f malware.py || true",
                 "rm -rf *",
-                "echo '# DADOS ROUBADOS ENVIADOS PARA: 203.0.113.55' > malware.sh",
-                "echo 'while true; do sleep 1; done' >> malware.sh",
-                "chmod +x malware.sh",
-                "(./malware.sh > /dev/null 2>&1 &)",
+                "echo 'print(\"ROUBANDO DADOS PARA: 203.0.113.55\"); import time; time.sleep(400)' > malware.py",
+                "(python3 malware.py > /dev/null 2>&1 &)",
                 "sleep 1"
             ],
-            "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.sh ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
+            "verificationScript": "if [ -f blacklist.txt ] && grep -q '203.0.113.55' blacklist.txt && [ ! -f malware.py ]; then exit 0; else echo 'A ameaça não foi neutralizada ou o IP não foi salvo corretamente.'; exit 1; fi",
             "difficulty": "challenge"
         },
         {

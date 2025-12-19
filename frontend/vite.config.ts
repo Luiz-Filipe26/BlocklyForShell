@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [tsconfigPaths()],
         root: "src/pages",
+        envDir: path.resolve(__dirname),
         publicDir: path.resolve(__dirname, "public"),
 
         server: {

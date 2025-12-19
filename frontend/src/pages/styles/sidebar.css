@@ -124,6 +124,7 @@ body.is-resizing .sidebar {
 .sidebar .btn {
     flex: 1;
     padding: 10px;
+    font-size: 1em;
     font-weight: 600;
     border: none;
     border-radius: 5px;

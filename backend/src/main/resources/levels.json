@@ -2,7 +2,7 @@
   "levels": [
     {
       "id": "01_recon",
-      "title": "1. Reconhecimento",
+      "title": "Reconhecimento",
       "summary": "Liste os arquivos para saber onde você está.",
       "fullGuideHtml": "<h1>Onde estou?</h1><p>Você acessou o servidor. O terminal não mostra nada até você pedir.</p><h3>Missão</h3><p>Use o bloco <strong>ls</strong> para listar o conteúdo da pasta atual.</p>",
       "setupCommands": ["rm -rf *", "touch notas.txt", "mkdir -p sistema/logs"],
@@ -11,7 +11,7 @@
     },
     {
       "id": "02_navigation",
-      "title": "2. Infiltração",
+      "title": "Infiltração",
       "summary": "Entre na pasta 'sistema'.",
       "fullGuideHtml": "<h1>Entrando em Pastas</h1><p>Vimos uma pasta chamada <code>sistema</code>. Precisamos investigar o que há dentro dela.</p><h3>Missão</h3><p>Use o bloco <strong>cd</strong> para entrar no diretório <code>sistema</code>.</p>",
       "setupCommands": ["mkdir -p sistema"],
@@ -20,7 +20,7 @@
     },
     {
       "id": "03_workspace",
-      "title": "3. Base de Operações",
+      "title": "Base de Operações",
       "summary": "Crie uma pasta chamada 'investigacao'.",
       "fullGuideHtml": "<h1>Criando Espaço</h1><p>Precisamos de um lugar limpo para guardar evidências.</p><h3>Missão</h3><p>Use o bloco <strong>mkdir</strong> para criar uma pasta chamada <code>investigacao</code>.</p>",
       "setupCommands": ["rm -rf investigacao"],
@@ -29,7 +29,7 @@
     },
     {
       "id": "04_evidence",
-      "title": "4. Preservação",
+      "title": "Preservação",
       "summary": "Copie o arquivo 'suspeito.dat' para 'investigacao'.",
       "fullGuideHtml": "<h1>Cópia de Segurança</h1><p>Achamos um arquivo <code>suspeito.dat</code>. Antes de analisá-lo, faça uma cópia.</p><h3>Missão</h3><p>Use o bloco <strong>cp</strong> (copy) para copiar o arquivo <code>suspeito.dat</code> para dentro da pasta <code>investigacao</code>.</p>",
       "setupCommands": ["touch suspeito.dat", "mkdir -p investigacao", "rm -f investigacao/suspeito.dat"],
@@ -38,7 +38,7 @@
     },
     {
       "id": "05_cleanup",
-      "title": "5. Remoção de Risco",
+      "title": "Remoção de Risco",
       "summary": "Remova o arquivo 'malware.sh'.",
       "fullGuideHtml": "<h1>Limpando Ameaças</h1><p>Existe um script perigoso chamado <code>malware.sh</code> na pasta atual.</p><h3>Missão</h3><p>Use o bloco <strong>rm</strong> para apagar esse arquivo permanentemente.</p><p><strong>Cuidado:</strong> Não apague outros arquivos!</p>",
       "setupCommands": ["touch malware.sh", "touch importante.doc"],
@@ -47,7 +47,7 @@
     },
     {
       "id": "06_reading",
-      "title": "6. Leitura de Dados",
+      "title": "Leitura de Dados",
       "summary": "Leia o conteúdo de 'pista.txt'.",
       "fullGuideHtml": "<h1>Analisando Conteúdo</h1><p>Agora começa a investigação real. O que está escrito no arquivo?</p><h3>Missão</h3><p>Use o comando <strong>cat</strong> para ler o arquivo <code>pista.txt</code> na tela.</p>",
       "setupCommands": ["echo 'A senha começa com 123' > pista.txt"],
@@ -56,7 +56,7 @@
     },
     {
       "id": "07_redirect",
-      "title": "7. O Diário de Bordo",
+      "title": "O Diário de Bordo",
       "summary": "Salve a data atual em 'timestamp.txt'.",
       "fullGuideHtml": "<h1>Redirecionamento (>)</h1><p>Precisamos registrar quando a investigação começou. O comando <code>date</code> mostra a hora, mas queremos salvar isso em um arquivo.</p><h3>Missão</h3><p>Use o bloco <strong>date</strong> e conecte-o ao bloco <strong>></strong> (Redirecionar para arquivo) apontando para <code>timestamp.txt</code>.</p>",
       "setupCommands": ["rm -f timestamp.txt"],
@@ -65,7 +65,7 @@
     },
     {
       "id": "08_grep_search",
-      "title": "8. Agulha no Palheiro",
+      "title": "Agulha no Palheiro",
       "summary": "Encontre a linha com 'ERROR' no arquivo 'server.log'.",
       "fullGuideHtml": "<h1>Filtros com Grep</h1><p>O arquivo de log é enorme. Ler tudo com <code>cat</code> é impossível.</p><h3>Missão</h3><p>Use o bloco <strong>grep</strong> para buscar a palavra <code>ERROR</code> dentro de <code>server.log</code>.</p>",
       "setupCommands": ["echo 'INFO: start' > server.log", "echo 'ERROR: invasion detected' >> server.log", "echo 'INFO: running' >> server.log"],
@@ -74,7 +74,7 @@
     },
     {
       "id": "09_pipe_connect",
-      "title": "9. O Encanamento (Pipe)",
+      "title": "O Encanamento (Pipe)",
       "summary": "Liste os arquivos e filtre apenas os '.conf'.",
       "fullGuideHtml": "<h1>Conectando Comandos (|)</h1><p>O verdadeiro poder do Linux! Queremos listar os arquivos e, <em>imediatamente</em>, filtrar o resultado.</p><h3>Missão</h3><p>1. Use <strong>ls</strong> para gerar a lista.<br>2. Conecte com um <strong>Pipe (|)</strong>.<br>3. Envie para o <strong>grep</strong> buscar por <code>.conf</code>.</p>",
       "setupCommands": ["touch nginx.conf", "touch app.js", "touch db.conf", "touch style.css"],
@@ -83,7 +83,7 @@
     },
     {
       "id": "10_background",
-      "title": "10. Multitarefa",
+      "title": "Multitarefa",
       "summary": "Execute 'long_task.sh' em background (&).",
       "fullGuideHtml": "<h1>Segundo Plano (&)</h1><p>Precisamos rodar um script de auditoria, mas ele demora 10 segundos e trava o terminal.</p><h3>Missão</h3><p>Use o bloco <strong>&</strong> para rodar o <code>./long_task.sh</code> em background, liberando o terminal imediatamente.</p>",
       "setupCommands": ["echo 'sleep 2; echo Done' > long_task.sh", "chmod +x long_task.sh"],
@@ -92,7 +92,7 @@
     },
 	{
       "id": "11_network_check",
-      "title": "11. Diagnóstico de Interface",
+      "title": "Diagnóstico de Interface",
       "summary": "Verifique se a interface de rede local está ativa.",
       "fullGuideHtml": "<h1>Teste de Loopback</h1><p>Estamos isolados da rede externa, mas precisamos saber se a placa de rede do servidor está respondendo.</p><h3>Missão</h3><p>Use o comando <strong>ping</strong> para testar o endereço local <code>127.0.0.1</code> (localhost).</p>",
       "setupCommands": [], 
@@ -101,7 +101,7 @@
     },
     {
       "id": "12_download_curl",
-      "title": "12. Download de Carga",
+      "title": "Download de Carga",
       "summary": "Baixe o arquivo 'segredo.txt' do servidor local.",
       "fullGuideHtml": "<h1>Download (Curl)</h1><p>Identificamos um servidor interno rodando na porta 8000.</p><h3>Missão</h3><p>Use o <strong>curl</strong> para baixar o arquivo: <code>http://localhost:8000/segredo.txt</code>.</p><p><em>Dica: O servidor já está rodando!</em></p>",
       "setupCommands": [
@@ -115,7 +115,7 @@
     },
     {
       "id": "13_final_ctf",
-      "title": "13. DESAFIO FINAL",
+      "title": "DESAFIO FINAL",
       "summary": "Baixe 'dados.log', encontre a 'SENHA' e salve em 'solucao.txt'.",
       "fullGuideHtml": "<h1>O Resgate Final</h1><p>Esta é sua prova final. Um arquivo de log está disponível em <code>http://localhost:8000/dados.log</code>.</p><h3>Sua Missão</h3><ol><li>Baixe ou leia o arquivo da rede.</li><li>Filtre a linha que contém a palavra <code>SENHA</code>.</li><li>Salve essa linha no arquivo <code>solucao.txt</code>.</li></ol><p>Boa sorte, agente!</p>",
       "setupCommands": [

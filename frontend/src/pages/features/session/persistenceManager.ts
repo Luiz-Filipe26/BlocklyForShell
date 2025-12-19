@@ -7,6 +7,15 @@ import * as DataManager from "../session/dataManager";
 const LAST_UNLOCKED_LEVEL_ID_KEY = "experiment_progress_v1";
 const SIDEBAR_WIDTH_KEY = "sidebar_pref_width";
 const SIDEBAR_COLLAPSED_KEY = "sidebar_pref_collapsed";
+const KEY_HAS_SEEN_GUIDE = "shellblocks_has_seen_guide";
+
+export function hasSeenHelpGuide(): boolean {
+    return localStorage.getItem(KEY_HAS_SEEN_GUIDE) === "true";
+}
+
+export function saveHasSeenHelpGuide(): void {
+    localStorage.setItem(KEY_HAS_SEEN_GUIDE, "true");
+}
 
 export function isSidebarCollapsed(): boolean {
     return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";

@@ -19,6 +19,11 @@
             </div>
 
             <div class="header-context">
+                <button id="btn-help-guide" class="btn-tool btn-guide-urgent">
+                    <img src="/icons/lucid/help-circle.svg" class="btn-icon" alt="" />
+                    Explicar Ferramenta
+                </button>
+
                 <div class="context-controls">
                     <div class="context-summary">
                         <img src="/icons/lucid/info.svg" class="icon-inline" alt="" />
@@ -92,7 +97,7 @@
             <div id="sidebar-resizer" class="resizer-gutter"></div>
 
             <aside class="sidebar" id="sidebar">
-                <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Recolher Sidebar">
+                <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Recolher/Expandir Sidebar">
                     <img src="/icons/lucid/circle-chevron-right.svg" class="btn-icon" alt="" />
                 </button>
                 <div class="panel panel-expand">
@@ -129,6 +134,104 @@
                 </div>
                 <div class="modal-footer">
                     <button id="close-modal-btn" class="btn btn-close-modal">Entendi</button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="help-modal" class="validation-dialog">
+            <div class="modal-content info-theme">
+                <div class="modal-header" style="background-color: var(--color-brand-primary)">
+                    <h2 class="modal-title">
+                        <img src="/icons/lucid/circle-question-mark.svg" class="icon-inline" style="filter: brightness(0) invert(1)" alt="" />
+                        Guia de Sobrevivência
+                    </h2>
+                </div>
+
+                <div class="modal-body help-guide-body" style="line-height: 1.6; color: #333; padding: 20px">
+                    <section>
+                        <h3 style="color: var(--color-brand-primary); margin-bottom: 5px">O que é "Linha de Comando"?</h3>
+                        <p>
+                            A maioria usa o computador clicando em ícones (Interface Gráfica). A <strong>Linha de Comando (CLI)</strong> é a
+                            forma original de conversar com o sistema.
+                        </p>
+                        <p style="margin-top: 8px">
+                            Em vez de um "controle remoto" (mouse), você escreve <strong>bilhetes com ordens exatas</strong> para o
+                            computador. É muito mais poderoso!
+                        </p>
+                    </section>
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0" />
+
+                    <section>
+                        <h3 style="color: var(--color-brand-primary); margin-bottom: 5px">A Gramática do Computador</h3>
+                        <p>Quase todo comando segue esta lógica simples:</p>
+
+                        <div
+                            style="
+                                background: #f1f3f5;
+                                padding: 10px;
+                                border-radius: 6px;
+                                text-align: center;
+                                font-family: var(--font-mono);
+                                font-weight: bold;
+                                color: #495057;
+                                margin: 10px 0;
+                            ">
+                            AÇÃO + ALVO + OPÇÃO
+                        </div>
+
+                        <ul style="padding-left: 20px; margin-top: 5px">
+                            <li><strong>Ação:</strong> O que fazer? (ex: <code>ls</code> listar, <code>rm</code> remover)</li>
+                            <li><strong>Alvo:</strong> Em quem? (ex: <code>documento.txt</code>)</li>
+                            <li><strong>Opção:</strong> Como? (ex: <code>-r</code> recursivo)</li>
+                        </ul>
+                    </section>
+
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0" />
+
+                    <section>
+                        <h3 style="color: var(--color-brand-primary); margin-bottom: 5px">🧩 Como o ShellBlocks ajuda?</h3>
+                        <p>Esta ferramenta é o seu tradutor:</p>
+                        <ul style="padding-left: 20px">
+                            <li style="margin-bottom: 5px">
+                                <strong>Área de Blocos:</strong> Pense na <em>Lógica</em>. Apenas encaixe as peças que fazem sentido.
+                            </li>
+                            <li style="margin-bottom: 5px">
+                                <strong>Código Gerado:</strong> Veja a <em>Sintaxe</em> real do Linux aparecendo na lateral.
+                            </li>
+                            <li>
+                                <strong>Terminal:</strong> Clique em <span style="color: #28a745; font-weight: bold">Executar</span>. O
+                                computador simulado te dará a resposta.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <div
+                        style="
+                            margin-top: 20px;
+                            background-color: #fff3cd;
+                            border-left: 4px solid #ffc107;
+                            padding: 15px;
+                            border-radius: 4px;
+                        ">
+                        <h3 style="margin-top: 0; color: #856404; font-size: 1rem">💡 Dicas para não travar:</h3>
+                        <ul style="margin: 0; padding-left: 20px; color: #856404">
+                            <li style="margin-bottom: 5px"><strong>A ordem importa:</strong> O computador lê de cima para baixo.</li>
+                            <li style="margin-bottom: 5px">
+                                <strong>Leia a Missão:</strong> O painel no topo diz o que se espera de você.
+                            </li>
+                            <li>
+                                <strong>O Erro é seu amigo:</strong> Texto vermelho não é ruim! Ele explica o que o computador não entendeu.
+                                Leia e tente de novo.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="close-help-btn" class="btn btn-close-modal" style="background-color: var(--color-brand-primary)">
+                        Entendi, vamos lá!
+                    </button>
                 </div>
             </div>
         </dialog>

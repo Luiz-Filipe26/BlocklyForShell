@@ -154,7 +154,7 @@ function modifyOptionsToDisplayProgress(
     lastUnlockedLevelIndex = Math.max(lastUnlockedLevelIndex, 0);
     nonSandboxSelectOptions.forEach((option, index) => {
         option.disabled = index > lastUnlockedLevelIndex;
-        option.text = `Nível ${index + 1}: ${option.dataset.title || ""}${option.disabled ? " [BLOQUEADO]" : ""}`;
+        option.text = `Nível ${index + 1}: ${option.dataset.title || ""}${option.disabled ? " 🔒" : ""}`;
     });
 }
 

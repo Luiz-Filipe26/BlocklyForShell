@@ -18,6 +18,7 @@ import { getPageElements } from "./features/ui/DOMProvider";
 import { GameData } from "@/types/api";
 import { setupSidebarResizer } from "./features/ui/sidebarResizer";
 import { setupSidebarToggle } from "./features/ui/sidebarController";
+import { setupHelpGuide } from "./features/ui/helpController";
 
 const pageElements = getPageElements();
 let gameData: GameData | null = null;
@@ -28,6 +29,11 @@ start();
 async function start(): Promise<void> {
     setupSidebarResizer(pageElements.sidebarResizer, pageElements.sidebar);
     setupSidebarToggle(pageElements.btnToggleSidebar, pageElements.sidebar);
+    setupHelpGuide({
+        btnHelpGuide: pageElements.btnHelpGuide,
+        helpModal: pageElements.helpModal,
+        closeHelpBtn: pageElements.closeHelpBtn,
+    });
 
     const definitions = await getDefinitions();
     const workspace = await ShellBlocks.setupWorkspace(

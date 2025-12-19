@@ -27,6 +27,9 @@ const pageElements = {
     sidebar: getElement<HTMLElement>("sidebar"),
     sidebarResizer: getElement<HTMLDivElement>("sidebar-resizer"),
     btnToggleSidebar: getElement<HTMLButtonElement>("btn-toggle-sidebar"),
+    btnHelpGuide: getElement<HTMLButtonElement>("btn-help-guide"),
+    helpModal: getElement<HTMLDialogElement>("help-modal"),
+    closeHelpBtn: getElement<HTMLButtonElement>("close-help-btn"),
 };
 
 export function getPageElements(): typeof pageElements {

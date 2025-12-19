@@ -43,22 +43,71 @@ export function showHelpBalloon(
 export function buildCommandHelpHTML(
     commandDefinition: CLI.CliDefinitions["commands"][number],
 ): string {
+    const descriptionHtml = parseDescriptionToHtml(
+        commandDefinition.description,
+    );
+
     let html = `
-        <h3>${commandDefinition.label}</h3>
-        <p>${commandDefinition.description}</p>
-        <strong>Opções disponíveis:</strong>
-        <ul style="margin-left:20px; list-style-type:disc;">
+        <h3 class="help-balloon__title">${commandDefinition.label}</h3>
+        <div class="help-balloon__desc">${descriptionHtml}</div>
     `;
 
-    for (const option of commandDefinition.options) {
-        const longFlag = option.longFlag ? ` (${option.longFlag})` : "";
+    if (commandDefinition.options && commandDefinition.options.length > 0) {
         html += `
-            <li>
-                <strong>${option.flag}</strong>${longFlag}:
-                ${option.description}
-            </li>
+            <strong class="help-balloon__subtitle">Opções disponíveis:</strong>
+            <ul class="help-balloon__list">
         `;
+
+        for (const option of commandDefinition.options) {
+            const longFlag = option.longFlag
+                ? ` (<code>${option.longFlag}</code>)`
+                : "";
+            html += `
+                <li>
+                    <code>${option.flag}</code>${longFlag}:
+                    <span class="help-balloon__text">${option.description}</span>
+                </li>
+            `;
+        }
+        html += "</ul>";
     }
 
-    return html + "</ul>";
+    return html;
+}
+
+/**
+ * Converte texto simples com quebras de linha e hifens em HTML estruturado.
+ */
+function parseDescriptionToHtml(text: string): string {
+    if (!text) return "";
+
+    const lines = text.split("\n");
+    let html = "";
+    let inList = false;
+
+    lines.forEach((line, index) => {
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith("- ")) {
+            if (!inList) {
+                html += '<ul class="help-balloon__list">';
+                inList = true;
+            }
+            html += `<li>${trimmed.substring(2)}</li>`;
+        } else {
+            if (inList) {
+                html += "</ul>";
+                inList = false;
+            }
+
+            if (trimmed.length > 0) {
+                html += trimmed;
+                if (index < lines.length - 1) html += "<br>";
+            }
+        }
+    });
+
+    if (inList) html += "</ul>";
+
+    return html;
 }

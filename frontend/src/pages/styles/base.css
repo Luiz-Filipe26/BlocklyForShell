@@ -18,6 +18,13 @@ body {
     flex-direction: column;
 }
 
+code {
+    font-family: var(--font-mono) !important;
+    color: #2c3e50 !important;
+    font-size: 0.95em !important;
+    font-weight: 600 !important;
+}
+
 @media (max-width: 768px) {
     :root {
         --is-small-screen: 1;

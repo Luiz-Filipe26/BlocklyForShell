@@ -1,4 +1,4 @@
-# **ShellBlocks 🧩💻️**
+# **ShellBlocks 🧩**
 
 Um ambiente interativo de **Programação Visual** para desmistificar a Linha de Comando (CLI) Linux.
 
@@ -13,18 +13,18 @@ Para utilizar a ferramenta, você **não** precisa de Node.js, NPM ou servidores
 - **Java Runtime (JRE 17+)**
 - **Docker Engine** instalado e rodando.
 
-### **Instalação (Linux e Windows/macOS)**
+### **Instalação (Linux, Windows e macOS)**
 
-1. Vá para a página de [**Última Versão (Release)**](https://github.com/Luiz-Filipe26/ShellBlocks/releases/tag/LATEST_BUILD).
-2. Baixe o arquivo shell-blocks.jar anexado à Release.
+1. Acesse a página de [**Última Versão (Release)**](https://github.com/Luiz-Filipe26/ShellBlocks/releases/latest).
+2. Baixe o arquivo `shell-blocks.jar` da versão mais recente.
 
 ### **Configuração de Permissões (APENAS USUÁRIOS LINUX)**
 
 Se você não conseguir rodar o Docker sem sudo, o aplicativo Java falhará. Resolva isso adicionando seu usuário ao grupo docker:
 
 ```sh
-sudo usermod \-aG docker $USER
-\# Faça logout e login novamente para aplicar a mudança.
+sudo usermod -aG docker $USER
+# Faça logout e login novamente para aplicar a mudança.
 ```
 
 ### **Inicialização**
@@ -117,10 +117,10 @@ O projeto conta com um script de automação (build_project.sh para Linux/macOS 
 \# 1\. Dê permissão de execução (Linux/macOS)
 
 ```sh
-chmod \+x build\_project.sh
+chmod +x build_project.sh
 
-\# 2\. Rode o script
-./build\_project.sh
+# 2. Rode o script
+./build_project.sh
 ```
 
 Ao final, o executável shell-blocks.jar será gerado na **raiz do projeto**.

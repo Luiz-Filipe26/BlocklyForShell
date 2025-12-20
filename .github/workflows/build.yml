@@ -1,95 +1,85 @@
-﻿name: Build and Release via Simple Tag
+﻿name: CI/CD ShellBlocks
 
 on:
   push:
     branches:
-      - 'main'
-  
+      - dev
+    tags:
+      - "v*"
+
   workflow_dispatch:
 
 permissions:
-  contents: write 
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '[build]')"
 
     steps:
-    - name: Checkout do Código
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Configurar JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: 'maven'
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: "maven"
 
-    - name: Configurar Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+      - name: Configurar Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
-    - name: Dar permissão de execução ao script
-      run: chmod +x build_project.sh
+      - name: Dar permissão de execução ao script
+        run: chmod +x build_project.sh
 
-    - name: Rodar Script de Build Completo
-      run: ./build_project.sh
+      - name: Executar Build Completo
+        run: ./build_project.sh
 
-    - name: Verificar Existência e Variável do JAR
-      run: |
-        JAR_NAME="${{ env.GENERATED_JAR_NAME }}"
-        
-        if [ -z "$JAR_NAME" ]; then
-          echo "❌ ERRO FATAL: A variável de ambiente GENERATED_JAR_NAME não foi definida ou está vazia." >&2
-          echo "O script build_project.sh falhou ao exportar o nome do JAR via \$GITHUB_ENV." >&2
-          exit 1
-        fi
-        
-        if [ ! -f "$JAR_NAME" ]; then
-          echo "❌ ERRO FATAL: O arquivo JAR ('$JAR_NAME') não foi encontrado na raiz do projeto." >&2
-          echo "Isso indica que o script de build falhou ao copiar o artefato ou o nome está incorreto." >&2
-          exit 1
-        fi
-        echo "✅ JAR '$JAR_NAME' encontrado com sucesso. Continuando para o upload."
-      
-      if: success()
+      - name: Verificar JAR Gerado
+        run: |
+          JAR_NAME="${{ env.GENERATED_JAR_NAME }}"
 
-    - name: Upload do JAR (Artifact)
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.GENERATED_JAR_NAME }}
-        path: ${{ env.GENERATED_JAR_NAME }}
-        retention-days: 5 
+          if [ -z "$JAR_NAME" ]; then
+            echo "❌ GENERATED_JAR_NAME não definido."
+            exit 1
+          fi
 
-    - name: Forçar Movimento da Tag
-      run: |
-        TAG_NAME="LATEST_BUILD"
-        CURRENT_SHA="${{ github.sha }}"
-        git tag -d $TAG_NAME || true
-        git push origin :refs/tags/$TAG_NAME || true
-        git tag $TAG_NAME $CURRENT_SHA
-        git push origin $TAG_NAME
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          if [ ! -f "$JAR_NAME" ]; then
+            echo "❌ JAR '$JAR_NAME' não encontrado."
+            exit 1
+          fi
 
-    - name: Fetch Tags Novamente
-      run: git fetch --tags
+          echo "✅ JAR '$JAR_NAME' validado."
 
-    - name: Criar/Atualizar Release Única
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: LATEST_BUILD
-        target_commitish: ${{ github.sha }}
-        name: 🚀 Versão Mais Recente (LATEST_BUILD)
-        files: ${{ env.GENERATED_JAR_NAME }}
-        body: |
-          Build disparado pelo commit: ${{ github.sha }}
-          Timestamp: ${{ github.event.head_commit.timestamp }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifact (Dev)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: actions/upload-artifact@v4
+        with:
+          name: shellblocks-dev-build
+          path: ${{ env.GENERATED_JAR_NAME }}
+          retention-days: 3
+
+      - name: Preparar Asset da Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          RELEASE_NAME="shellblocks-${VERSION}.jar"
+          mv "${{ env.GENERATED_JAR_NAME }}" "$RELEASE_NAME"
+          echo "RELEASE_ASSET=$RELEASE_NAME" >> $GITHUB_ENV
+
+      - name: Criar Release Oficial
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.RELEASE_ASSET }}
+          body: |
+            Release automática gerada pelo pipeline de integração contínua.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
